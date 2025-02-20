@@ -13,7 +13,7 @@ const Footer = () => {
                     </div>
                     <div className="flex flex-row gap-2 mr-2 justify-end absolute right-0">
                         <img className='h-[40px]' src={Reduce}></img>
-                        <img className='h-[40px]'src={Full}></img>
+                        <img className='h-[40px]' src={Full}></img>
                         <img className='h-[40px]' src={Cross}></img>
                     </div>
                 </div>
