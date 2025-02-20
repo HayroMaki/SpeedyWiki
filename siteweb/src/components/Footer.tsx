@@ -2,6 +2,7 @@ import Cross from '../assets/Icon/Cross_Icon.png';
 import Full from '../assets/Icon/FullScreen_Icon.png';
 import Reduce from '../assets/Icon/Reduce_Icon.png';
 
+
 const Footer = () => {
     return ( 
             <div className="w-[100%]">
@@ -17,8 +18,8 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="h-25 bg-[#EEE6E0] border-3 border-[#6d6d6d] flex flex-col border-t-0 justify-center text-center">
-                    <a className='text-[30px]'>Copyright</a>
+                <div className="h-25 bg-[#EEE6E0] border-3 border-[#6d6d6d] flex flex-col border-t-0 justify-center text-center ">
+                            <a className='text-[30px]'>Copyright</a>
                 </div>
             </div>
         )

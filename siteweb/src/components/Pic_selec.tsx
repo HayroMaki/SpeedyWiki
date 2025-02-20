@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import Randicon from '../assets/Icon/Random_Icon.png';
-import PP1 from '../assets/Image/Char1.png';
-import PP2 from '../assets/Image/Char3.png';
-import PP3 from '../assets/Image/Char4.png';
-import PP4 from '../assets/Image/Char5.png';
-import PP5 from '../assets/Image/Char2.png';
-import PP6 from '../assets/Image/Char6.png';
+import Randicon from '../assets/Image/Random Icon.png';
+import PP1 from '../assets/Image/dvdguy 1.png';
+import PP2 from '../assets/Image/New Piskel (2) 1.png';
+import PP3 from '../assets/Image/New Piskel (2) 3.png';
+import PP4 from '../assets/Image/New Piskel (3) 1.png';
+import PP5 from '../assets/Image/New Piskel 2.png';
+import PP6 from '../assets/Image/New Piskel 3.png';
 
 const PicSelect = () => {
     const PP = [PP1,PP2,PP3,PP4,PP5,PP6];
