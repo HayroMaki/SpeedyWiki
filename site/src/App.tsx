@@ -8,12 +8,13 @@ import Test from './pages/Test';
 import GamePage from './pages/GamePage';
 import GamePage2 from './pages/GamePage copy';
 import Truc from './pages/truv';
+
 function App() {
   return (
     <main className='h-FULL'>
     <Router>
         <Routes>
-            <Route path="/" element={<Homepage/>} />
+            <Route path="/" element={<Homepage/>}/>
             <Route path="/Join" element={<Join/>}/>
             <Route path="/NameSelection" element={<NameSelection/>}/>
             <Route path="/About" element={<About/>}/>

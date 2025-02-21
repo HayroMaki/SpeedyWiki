@@ -1,7 +1,7 @@
 import Cross from '../assets/Icon/Cross_Icon.png';
 import Full from '../assets/Icon/FullScreen_Icon.png';
 import Reduce from '../assets/Icon/Reduce_Icon.png';
-import Footer from '../components/Footer';
+import FooterWindow from '../components/FooterWindow.tsx';
 import { NavLink} from "react-router-dom";
 
 const Homepage = () => {
@@ -32,7 +32,7 @@ const Homepage = () => {
             </div>
         </div>
         <div className='absolute bottom-0 w-[100%]'>
-            <Footer />
+            <FooterWindow />
         </div>
         </>
         )

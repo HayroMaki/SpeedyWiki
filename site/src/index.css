@@ -27,6 +27,19 @@ body {
   align-items: center;
 }
 
+.icons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  margin-right: 2px;
+  position: absolute;
+  right: 0;
+}
+
+.icon {
+  height: 40px;
+}
+
 .all-unset {
   all: unset;
 }
