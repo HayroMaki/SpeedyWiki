@@ -1,0 +1,53 @@
+.homePage-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.homePage-size{
+    width: calc(var(--spacing) * 220);
+}
+
+
+.homePage-top{
+    height: 50px;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+  
+}
+
+.homePage_icons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    margin-right: 2px;
+    position: absolute;
+  }
+
+.homePage-content{
+    height: 20rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #EEE6E0;
+    justify-content: center;
+    gap:8px;
+    border-width: 3px;
+    border-color: #6d6d6d;
+    border-top-width: 0px;
+}
+
+@media (max-width: 768px) {
+    .homePage-content{
+        gap:24px;
+    }
+}
+
+.homePage_content h1 {
+    font-size: 40px;
+    padding: 5px;
+}

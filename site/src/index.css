@@ -15,6 +15,7 @@ body {
 .title {
   color: #464646;
   -webkit-text-stroke: 3px white;
+  font-size: 132px;
 }
 
 .button {
@@ -42,4 +43,10 @@ body {
 
 .all-unset {
   all: unset;
+}
+
+@media (max-width: 768px) {
+  .title{
+    font-size: 90px;
+  }
 }
