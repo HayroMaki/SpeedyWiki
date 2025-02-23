@@ -17,19 +17,19 @@
     margin: auto;
 }
 
-.footer-bouton {
+.footer-button {
     width: 10rem;
     height: 2rem;
     font-size: 30px;
 }
 
 @media (min-width: 768px) {
-    .footer-bouton {
+    .footer-button {
         width: 350px;
     }
 }
 
-.footer-bottom {
+.footer-content {
     height: 80%;
     background-color: #EEE6E0;
     border: 3px solid #6d6d6d;

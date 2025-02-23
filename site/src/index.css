@@ -17,7 +17,7 @@ body {
   -webkit-text-stroke: 3px white;
 }
 
-.bouton {
+.button {
   display: flex;
   background-color: #D9D9D9;
   border-color: #464646;
