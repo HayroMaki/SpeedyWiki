@@ -1,8 +1,9 @@
-.article-list-container {
+.wiki-container {
     width: 100%;
+    height: 100%;
 }
 
-.article-list-top {
+.wiki-top {
     height: 3rem;
     background-color: #A2D2F6;
     border: 3px solid #6d6d6d;
@@ -12,43 +13,47 @@
     align-items: center;
 }
 
-.article-list-content {
+.wiki-content {
+    height: calc(100% - 3rem);
     background-color: #EEE6E0;
     border: 3px solid #6d6d6d;
     display: flex;
     flex-direction: column;
+    align-items: center;
     text-align: left;
 }
 
-.article-list-title {
+.wiki-spacer {
     height: 3rem;
-    padding-left: 8px;
-    font-size: 22px;
 }
 
-@media (min-width: 768px) {
-    .article-list-title {
-        font-size: 26px;
-    }
-}
-
-.article-list-articles-container {
+.wiki-wikipage-container {
     width: 100%;
-    height: 80%;
+    height: calc(100% - 4rem);
     background-color: white;
     border: 3px solid #6d6d6d;
     border-left: 0;
     border-right: 0;
     display: flex;
     flex-direction: column;
-    padding: 8px;
+    text-align: left;
     font-size: 20px;
+    padding: 12px;
+    overflow: auto;
 }
 
-.article-list-articles {
-    list-style: none;
+@media (min-width: 768px) {
+    .wiki-wikipage-container {
+        font-size: 20px;
+        gap: 24px;
+    }
 }
 
-.article-list-bottom-spacer {
-    height: 8px;
+.wiki-frame {
+    width: 100%;
+    height: 100%;
+}
+
+.wiki-bottom-spacer {
+    height: 1rem;
 }

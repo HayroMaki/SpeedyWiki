@@ -28,6 +28,7 @@ export const ArticleListWindow = (props: {articles : Article[]}) => {
                             ))}
                         </ul>
                     </div>
+                    <div className="article-list-bottom-spacer"></div>
                 </div>
             </div>
         </>
