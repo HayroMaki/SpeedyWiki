@@ -12,7 +12,7 @@ const WikipediaFrame = (props: { src: string; className: string; onPageChange: (
 
     useEffect(() => {
         const handlePageTitleChange = (event: MessageEvent) => {
-            if (event.origin === "http://localhost:3001") { // Vérifiez l'origine pour la sécurité
+            if (event.origin === "http://localhost:3001") { // Verify origin for security (WILL BE MODIFIED LATER)
                 props.onPageChange(event.data);
             }
         };
