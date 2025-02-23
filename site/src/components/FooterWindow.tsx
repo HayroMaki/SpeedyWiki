@@ -1,10 +1,10 @@
-import "../stylesheets/footer.css";
+import "../stylesheets/footerWindow.css";
 
 import Cross from '../assets/Icon/Cross_Icon.png';
 import Full from '../assets/Icon/FullScreen_Icon.png';
 import Reduce from '../assets/Icon/Reduce_Icon.png';
 
-const FooterWindow = () => {
+export const FooterWindow = () => {
     return ( 
         <div className="footer-container">
             <div className="footer-top">
@@ -21,8 +21,7 @@ const FooterWindow = () => {
                 <a className='footer-copyright'>Copyright</a>
             </div>
         </div>
-        )
+    )
 };
-
 export default FooterWindow;
 
