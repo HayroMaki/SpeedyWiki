@@ -3,6 +3,7 @@ import Full from '../assets/Icon/FullScreen_Icon.png';
 import Reduce from '../assets/Icon/Reduce_Icon.png';
 import FooterWindow from '../components/FooterWindow.tsx';
 import { useState } from "react";
+import '../stylesheets/pageJoin.css'
 
 interface Connexion {
     link : string;
@@ -22,33 +23,33 @@ const Join: React.FC = () => {
 
     return ( 
         <>
-        <div className="flex flex-col items-center text-center overflow-hidden">
-            <h1 className="title text-[90px] md:text-[132px]">SpeedyWiki</h1>
+        <div className="pageJoin-container">
+            <h1 className="title">SpeedyWiki</h1>
             <br />
-            <div className="w-120 md:w-220">
+            <div className="pageJoin-size">
 
-                <div className="h-[50px] bg-[#A2D2F6] border-3 border-[#6d6d6d] flex justify-end items-center">
-                    <div className="flex flex-row gap-2 mr-2">
+                <div className="pageJoin-top">
+                    <div className="pageJoin_icons-container">
                         <img className='h-[40px]' src={Reduce}></img>
                         <img className='h-[40px]' src={Full}></img>
                         <img className='h-[40px]' src={Cross}></img>
                     </div>
                 </div>
 
-                <div className="gap-1 h-80 bg-[#EEE6E0] border-3 border-[#6d6d6d] flex flex-col border-t-0 justify-center md:gap-[5px]">
+                <div className="pageJoin-content">
 
-                    <h1 className="text-[23px] md:text-[37px] p-5">To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
-                       <form onSubmit={handleSubmit} className="flex justify-center items-center flex-col text-center gap-4">
-                        <input type="text" name="link" className='text-[35px] border-3 border-[#6d6d6d] bg-white text-[#6d6d6d]'
+                    <h1 className="">To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
+                       <form onSubmit={handleSubmit} className="">
+                        <input type="text" name="link" className=''
                                 value={formData.link}
                                 onChange={handleChange}
                                 required placeholder='Ex:E3DJ36'/>
-                        <button className='bouton text-[20px] md:text-[32px] w-[190px]' type='submit'>Continue</button>
+                        <button className='button Joinbutton' type='submit'>Continue</button>
                        </form>
                 </div>
             </div>
         </div>
-        <div className='absolute bottom-0 w-[100%]'>
+        <div className='Footer'>
             <FooterWindow />
         </div>
         </>

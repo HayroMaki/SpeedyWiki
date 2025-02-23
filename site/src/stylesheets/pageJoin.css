@@ -1,0 +1,90 @@
+.pageJoin-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.pageJoin-size{
+    width: calc(var(--spacing) * 220);
+}
+
+@media (max-width: 768px) {
+    .pageJoin-size{
+        width: calc(var(--spacing) * 120);
+    }
+}
+.pageJoin-top{
+    height: 50px;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+  
+}
+
+.pageJoin_icons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    margin-right: 2px;
+    position: absolute;
+  }
+
+  .pageJoin-content{
+    height: 20rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #EEE6E0;
+    justify-content: center;
+    gap:8px;
+    border-width: 3px;
+    border-color: #6d6d6d;
+    border-top-width: 0px;
+}
+
+@media (max-width: 768px) {
+    .pageJoin-content{
+        gap:13px;
+    }
+}
+
+.pageJoin-content h1 {
+    font-size: 37px;
+    padding: 5px;
+}
+
+@media (max-width: 768px) {
+    .pageJoin-content h1{
+       font-size: 33px;
+    }
+}
+
+.pageJoin-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.pageJoin-content input {
+    font-size: 35px;
+    background-color: white;
+    color: #6d6d6d;
+    border: 3px solid #6d6d6d;
+}
+
+.Joinbutton {
+    font-size: 32px;
+    width: 40%;
+}
+
+.Footer{
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
