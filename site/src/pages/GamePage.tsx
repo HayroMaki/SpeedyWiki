@@ -13,6 +13,7 @@ import {InventoryWindow} from "../components/InventoryWindow.tsx";
 const GamePage = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
+  const [page, setPage] = useState<string>('');
 
   const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
@@ -43,6 +44,7 @@ const GamePage = () => {
       fetchArticles().then(articles => {
         setArticles(articles);
         setWikiContent(articles[0].url);
+        setPage(articles[0].title);
       });
     }
   });
@@ -55,7 +57,7 @@ const GamePage = () => {
           <ChatWindow/>
         </div>
         <div className="game-page-content">
-          <WikiContentWindow wikiContent={wikiContent}/>
+          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} />
           <InventoryWindow/>
         </div>
       </div>

@@ -37,6 +37,14 @@ app.get("/proxy", async (req, res) => {
         const response = await axios.get(url);
         let modifiedHtml = response.data;
 
+        // Get the page's title :
+        const titleMatch = modifiedHtml.match(/<h1\b[^>]*>(.*?)<\/h1>/i);
+        const pageTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : "?";
+
+
+        // Envoyer le titre au client via un événement
+        modifiedHtml += `<script>window.parent.postMessage('${pageTitle}', '*');</script>`;
+
         // Modify images that uses a relative link :
         modifiedHtml = modifiedHtml.replace(
             /<img\s+[^>]*src="\/(?!\/)/g,
@@ -53,7 +61,6 @@ app.get("/proxy", async (req, res) => {
 
                     // Vérify if url contains a blocked prefix :
                     if (blockedPrefixes.some(prefix => href.includes(prefix))) {
-                        console.log("block : " + href);
 
                         // If it does, block it :
                         return match.replace(
@@ -82,6 +89,16 @@ app.get("/proxy", async (req, res) => {
             /href="\/w\/load.php/g,
             `href="https://en.wikipedia.org/w/load.php`
         );
+
+        // Also block forms :
+        modifiedHtml = modifiedHtml.replace(
+            /<form\s+([^>]*?)>/g,
+            (match, attributes) => {
+                // Make it disabled while keeping its class and other attributes :
+                return `<form ${attributes} style="pointer-events: none; opacity: 0.5;" disabled>`;
+            }
+        );
+
 
         res.send(modifiedHtml);
     } catch (error) {
