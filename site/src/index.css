@@ -37,6 +37,7 @@ body {
   gap: 2px;
   margin-right: 2px;
   right: 0;
+  position: absolute;
 }
 
 .icon {

@@ -4,7 +4,7 @@ import Cross from '../assets/Icon/Cross_Icon.png';
 import Full from '../assets/Icon/FullScreen_Icon.png';
 import Reduce from '../assets/Icon/Reduce_Icon.png';
 
-export const FooterWindow = () => {
+ const FooterWindow = () => {
     return ( 
         <div className="footer-container">
             <div className="footer-top">

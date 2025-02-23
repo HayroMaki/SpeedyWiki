@@ -23,16 +23,16 @@ const Homepage = () => {
 
                 <div className="homePage-content">
 
-                    <h1 className="text-[32px] md:text-[48px] p-5">Create or Join an online lobby !</h1>
-                    <div className="gap-4 item-end flex flex-row flex-wrap justify-center md:gap-60">
-                        <NavLink to="/NameSelectionHost"className="bouton text-[32px] md:text-[48px] w-[240px]">Create !</NavLink>
-                        <NavLink to="/Join" className="bouton text-[32px] md:text-[48px] w-[240px]">Join !</NavLink>
+                    <h1>Create or Join an online lobby !</h1>
+                    <div className="button_links">
+                        <NavLink to="/NameSelectionHost"className="home_button">Create !</NavLink>
+                        <NavLink to="/Join" className="home_button">Join !</NavLink>
                     </div>
 
                 </div>
             </div>
         </div>
-        <div className='absolute bottom-0 w-[100%]'>
+        <div className='Footer'>
             <FooterWindow />
         </div>
         </>
