@@ -1,6 +1,6 @@
 import "../stylesheets/gamePage.css"
 
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 
 import {Article} from "../interfaces/Article.tsx";
