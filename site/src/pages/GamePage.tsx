@@ -1,6 +1,7 @@
 import "../stylesheets/gamePage.css"
 
 import {useEffect, useState} from "react";
+import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 
 import {Article} from "../interfaces/Article.tsx";
 
@@ -11,43 +12,40 @@ import {InventoryWindow} from "../components/InventoryWindow.tsx";
 
 const GamePage = () => {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [wikiContent, setWikiContent] = useState<string>("");
+  const [wikiContent, setWikiContent] = useState<string>('');
 
-  const fetchArticles = async () => {
+  const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
     const fetchedArticles: Article[] = [];
 
     for (let i = 0; i < numberOfArticles; i++) {
       try {
         const response = await fetch(
-            "https://fr.wikipedia.org/api/rest_v1/page/random/summary"
+            "https://en.wikipedia.org/api/rest_v1/page/random/summary"
         );
         const data = await response.json();
         fetchedArticles.push({
           id: i,
           title: data.title,
-          url: `https://fr.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
           users: [],
           completion: false
         });
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'article:", error);
+        console.error("Error during the fetch of the articles : ", error);
       }
     }
-    setArticles(fetchedArticles);
+    return fetchedArticles;
   };
 
-  const fetchWikipediaPage = async () => {
-    setWikiContent(articles[0].url);
-  };
-
-  useEffect(() => {
-    fetchArticles();
-    if (articles.length > 0) {
-      fetchWikipediaPage();
+  useRunOnce({
+    fn: () => {
+      fetchArticles().then(articles => {
+        setArticles(articles);
+        setWikiContent(articles[0].url);
+      });
     }
-    console.log(articles);
-  }, []);
+  });
 
   return (
     <>
@@ -60,7 +58,7 @@ const GamePage = () => {
           <WikiContentWindow wikiContent={wikiContent}/>
           <InventoryWindow/>
         </div>
-        </div>
+      </div>
     </>
   );
 };
