@@ -1,14 +1,14 @@
-import "../stylesheets/gamePage.css"
+import "../stylesheets/gamePage/gamePage.css"
 
 import {useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 
 import {Article} from "../interfaces/Article.tsx";
 
-import {WikiContentWindow} from "../components/WikiContentWindow.tsx";
-import {ArticleListWindow} from "../components/ArticleListWindow.tsx";
-import {ChatWindow} from "../components/ChatWindow.tsx"
-import {InventoryWindow} from "../components/InventoryWindow.tsx";
+import {WikiContentWindow} from "../components/gamePage/WikiContentWindow.tsx";
+import {ArticleListWindow} from "../components/gamePage/ArticleListWindow.tsx";
+import {ChatWindow} from "../components/gamePage/ChatWindow.tsx"
+import {InventoryWindow} from "../components/gamePage/InventoryWindow.tsx";
 
 const GamePage = () => {
   const [articles, setArticles] = useState<Article[]>([]);

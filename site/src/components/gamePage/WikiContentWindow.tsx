@@ -1,8 +1,8 @@
-import "../stylesheets/wikiContentWindow.css"
+import "../../stylesheets/gamePage/wikiContentWindow.css"
 
-import Reduce from "../assets/Icon/Reduce_Icon.png";
-import Full from "../assets/Icon/FullScreen_Icon.png";
-import Cross from "../assets/Icon/Cross_Icon.png";
+import Reduce from "../../assets/Icon/Reduce_Icon.png";
+import Full from "../../assets/Icon/FullScreen_Icon.png";
+import Cross from "../../assets/Icon/Cross_Icon.png";
 
 import {useEffect ,useState, useRef} from "react";
 
