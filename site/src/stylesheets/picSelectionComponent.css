@@ -1,0 +1,31 @@
+.pic-select-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pic-select-image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.pic-select-image {
+    height: 210px;
+    width: 210px;
+}
+
+.pic-select-button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: -40px;
+    padding-right: 8px; /* équivalent à pr-2 en Tailwind */
+}
+
+.pic-select-button {
+    height: 50px;
+    width: 50px;
+    z-index: 10;
+}

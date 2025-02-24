@@ -1,4 +1,7 @@
+import "../stylesheets/picSelectionComponent.css";
+
 import { useState } from 'react';
+
 import Randicon from '../assets/Image/Random Icon.png';
 import PP1 from '../assets/Image/dvdguy 1.png';
 import PP2 from '../assets/Image/New Piskel (2) 1.png';
@@ -21,11 +24,11 @@ const PicSelect = () => {
     };
     return(
         <>
-            <div className="container">
-                <div className="image-container">
-                    <img className="image" src={item} alt="random" />
-                    <div className="button-container">
-                        <button className="button" onClick={generateRandomItem}>
+            <div className="pic-select-container">
+                <div className="pic-select-image-container">
+                    <img className="pic-select-image" src={item} alt="random" />
+                    <div className="pic-select-button-container">
+                        <button className="pic-select-button" onClick={generateRandomItem}>
                             <img src={Randicon} alt="random icon" />
                         </button>
                     </div>
