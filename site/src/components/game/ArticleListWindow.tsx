@@ -23,7 +23,7 @@ export const ArticleListWindow = (props: {articles : Article[]}) => {
                         <ul id="article-list-articles">
                             {props.articles.map((article) => (
                                 <li key={article.id}>
-                                    <h1>- {article.title}</h1>
+                                    <h1 style={{ textDecoration: article.completion ? "line-through" : "none" }}>- {article.title}</h1>
                                 </li>
                             ))}
                         </ul>

@@ -1,6 +1,6 @@
 import "../stylesheets/game/Game.css"
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 
 import {Article} from "../interfaces/Article.tsx";
@@ -42,6 +42,16 @@ const Game = () => {
     return fetchedArticles;
   };
 
+  const CheckPage = ()  => {
+    setArticles(prevArticles =>
+      prevArticles.map(article =>
+        article.title === page ? { ...article, completion: true } : article
+      )
+    );
+  };
+
+
+
   useRunOnce({
     fn: () => {
       fetchArticles().then(articles => {
@@ -51,6 +61,11 @@ const Game = () => {
       });
     }
   });
+
+  useEffect(() => {
+    CheckPage();
+  }, [page]);
+
 
   return (
     <>
