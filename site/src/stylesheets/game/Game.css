@@ -25,3 +25,18 @@
     align-items: center;
     gap: 12px;
 }
+
+@media (max-width: 1420px) {
+    .game-page {
+        gap: 0;
+    }
+
+    .game-page-side {
+        width: 0;
+        visibility: hidden;
+    }
+
+    .game-page-content {
+        width: 100%;
+    }
+}

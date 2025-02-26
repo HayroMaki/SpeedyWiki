@@ -23,13 +23,7 @@
 .chat-title {
     height: 3rem;
     padding-left: 8px;
-    font-size: 22px;
-}
-
-@media (min-width: 768px) {
-    .chat-title {
-        font-size: 26px;
-    }
+    font-size: 26px;
 }
 
 .chat-box {
@@ -41,25 +35,13 @@
     border-right: 0;
     padding: 8px;
     font-size: 20px;
-}
-
-@media (min-width: 768px) {
-    .chat-box {
-        font-size: 20px;
-        gap: 24px;
-    }
+    gap: 24px;
 }
 
 .chat-input-container {
     height: 4rem;
     margin: 8px;
-    font-size: 24px;
-}
-
-@media (min-width: 768px) {
-    .chat-input-container {
-        font-size: 26px;
-    }
+    font-size: 26px;
 }
 
 .chat-input {
@@ -73,4 +55,10 @@
 .chat-input:focus {
     border: 3px solid #393939;
     border-radius: 0;
+}
+
+@media (max-width: 1420px) {
+    .chat-input-container {
+        font-size: 22px;
+    }
 }

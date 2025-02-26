@@ -1,37 +1,40 @@
-import "../stylesheets/gamePage/gamePage.css"
+import "../stylesheets/game/Game.css"
 
 import {useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 
 import {Article} from "../interfaces/Article.tsx";
 
-import {WikiContentWindow} from "../components/gamePage/WikiContentWindow.tsx";
-import {ArticleListWindow} from "../components/gamePage/ArticleListWindow.tsx";
-import {ChatWindow} from "../components/gamePage/ChatWindow.tsx"
-import {InventoryWindow} from "../components/gamePage/InventoryWindow.tsx";
+import {WikiContentWindow} from "../components/game/WikiContentWindow.tsx";
+import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
+import {ChatWindow} from "../components/lobby/ChatWindow.tsx"
+import {InventoryWindow} from "../components/game/InventoryWindow.tsx";
 
-const GamePage = () => {
+const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
-
+  
   const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
     const fetchedArticles: Article[] = [];
+    let id = 0;
 
-    for (let i = 0; i < numberOfArticles; i++) {
+    while (fetchedArticles.length < numberOfArticles) {
       try {
-        const response = await fetch(
-            "https://en.wikipedia.org/api/rest_v1/page/random/summary"
-        );
+        const response = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
         const data = await response.json();
+        const title = data.title;
+
+
         fetchedArticles.push({
-          id: i,
-          title: data.title,
-          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title)}`,
+          id: id,
+          title: title,
+          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
           users: [],
           completion: false
         });
+        id++;
       } catch (error) {
         console.error("Error during the fetch of the articles : ", error);
       }
@@ -65,4 +68,4 @@ const GamePage = () => {
   );
 };
 
-export default GamePage;
+export default Game;

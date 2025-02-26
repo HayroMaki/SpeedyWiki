@@ -33,22 +33,10 @@
     border-top-width: 0;
 }
 
-@media (max-width: 768px) {
-    .homePage-content{
-        gap:24px;
-    }
-}
-
 .homePage-content h1 {
     text-align: center;
     font-size: 48px;
     padding: 5px;
-}
-
-@media (max-width: 768px) {
-    .homePage-content h1 {
-       font-size: 36px;
-    }
 }
 
 .button_links {
@@ -58,12 +46,6 @@
     justify-content: center;
     align-items: end;
     gap: 60px;
-}
-
-@media (max-width: 768px) {
-    .button_links {
-       gap:25px;
-    }
 }
 
 .home_button {
@@ -79,8 +61,21 @@
     margin-bottom: 3px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1420px) {
+    .homePage-container {
+        width: 80%;
+    }
+
+    .homePage-content {
+        gap:24px;
+    }
+
+    .homePage-content h1 {
+        font-size: 36px;
+    }
+
     .home_button {
         font-size: 32px;
+        width: 30%;
     }
 }

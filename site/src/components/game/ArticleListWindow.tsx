@@ -1,10 +1,10 @@
-import "../../stylesheets/gamePage/articleListWindow.css"
+import "../../stylesheets/game/articleListWindow.css"
 
 import {Article} from "../../interfaces/Article.tsx";
 
-import Cross from "../../assets/Icon/Cross_Icon.png";
-import Full from "../../assets/Icon/FullScreen_Icon.png";
-import Reduce from "../../assets/Icon/Reduce_Icon.png";
+import Cross from "../../assets/icon/Cross_Icon.png";
+import Full from "../../assets/icon/FullScreen_Icon.png";
+import Reduce from "../../assets/icon/Reduce_Icon.png";
 
 export const ArticleListWindow = (props: {articles : Article[]}) => {
     return (

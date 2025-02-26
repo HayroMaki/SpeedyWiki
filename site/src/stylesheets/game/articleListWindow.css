@@ -23,13 +23,7 @@
 .article-list-title {
     height: 3rem;
     padding-left: 8px;
-    font-size: 22px;
-}
-
-@media (min-width: 768px) {
-    .article-list-title {
-        font-size: 26px;
-    }
+    font-size: 26px;
 }
 
 .article-list-articles-container {

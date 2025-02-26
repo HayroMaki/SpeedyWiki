@@ -1,26 +1,22 @@
 import {Route, HashRouter as Router, Routes } from 'react-router-dom';
-import Homepage from './pages/Homepage';
+import Home from './pages/Home.tsx';
 import Join from './pages/Join';
-import NameSelection from './pages/Name_Selection';
+import Selection from './pages/Selection.tsx';
 import About from './pages/Aboutus';
-import NameSelectionhost from './pages/Name_Selection_host';
-import Test from './pages/Test';
-import GamePage from './pages/GamePage';
-import Truc from './pages/truv';
+import Game from './pages/Game.tsx';
+import Lobby from "./pages/Lobby.tsx";
 
 function App() {
   return (
     <main className='h-FULL'>
     <Router>
         <Routes>
-            <Route path="/" element={<Homepage/>}/>
+            <Route path="/" element={<Home/>}/>
             <Route path="/Join" element={<Join/>}/>
-            <Route path="/NameSelection" element={<NameSelection/>}/>
+            <Route path="/Selection" element={<Selection/>}/>
+            <Route path="/Lobby" element={<Lobby/>}/>
+            <Route path='/Game' element={<Game/>}/>
             <Route path="/About" element={<About/>}/>
-            <Route path="/NameSelectionHost" element={<NameSelectionhost />} />
-            <Route path='/Test' element={<Test/>}/>
-            <Route path='/GamePage' element={<GamePage/>}/>
-            <Route path='/truc' element={<Truc title={"France"}/>}/>
         </Routes>
     </Router>
 </main>

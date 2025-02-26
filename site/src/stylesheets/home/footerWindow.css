@@ -19,15 +19,9 @@
 }
 
 .footer-button {
-    width: 10rem;
+    width: 18rem;
     height: 2rem;
     font-size: 30px;
-}
-
-@media (min-width: 768px) {
-    .footer-button {
-        width: 18rem;
-    }
 }
 
 .footer-content {

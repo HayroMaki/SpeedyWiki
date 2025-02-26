@@ -99,7 +99,50 @@ app.get("/proxy", async (req, res) => {
             }
         );
 
+        // Create a new stylesheet for the scroll bar :
 
+        // Made with the CSS Scrollbar Generator from CSSPortal :
+        // https://www.cssportal.com/css-scrollbar-generator/
+        const customScrollCSS = `
+<style>
+/* Firefox (uncomment to work in Firefox, although other properties will not work!)
+/** {
+    scrollbar-width: thin;
+    scrollbar-color: #A2D2F6 #EEE6E0;
+}*/
+
+/* Chrome, Edge and Safari */
+*::-webkit-scrollbar {
+    height: 20px;
+    width: 20px;
+}
+*::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: #EEE6E0;
+    border: 3px solid #6D6D6D;
+}
+*::-webkit-scrollbar-track:hover {
+    background-color: #EEE6E0;
+}
+*::-webkit-scrollbar-track:active {
+    background-color: #EEE6E0;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background-color: #A2D2F6;
+    border: 3px solid #7B8DA9;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #91BCDD;
+}
+*::-webkit-scrollbar-thumb:active {
+    background-color: #d2edff;
+}
+</style>`;
+        // Add the stylesheet in the head of the page :
+        modifiedHtml = modifiedHtml.replace("<head>", `<head>${customScrollCSS}`);
+
+        // Send response containing modified HTML page :
         res.send(modifiedHtml);
     } catch (error) {
         res.status(500).send("Error loading the page.");

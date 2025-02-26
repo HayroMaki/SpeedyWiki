@@ -1,9 +1,9 @@
-import Cross from '../assets/Icon/Cross_Icon.png';
-import Full from '../assets/Icon/FullScreen_Icon.png';
-import Reduce from '../assets/Icon/Reduce_Icon.png';
-import FooterWindow from '../components/FooterWindow.tsx';
+import Cross from '../assets/icon/Cross_Icon.png';
+import Full from '../assets/icon/FullScreen_Icon.png';
+import Reduce from '../assets/icon/Reduce_Icon.png';
+import FooterWindow from '../components/home/FooterWindow.tsx';
 import { useState } from "react";
-import '../stylesheets/pageJoin.css'
+import '../stylesheets/Join.css'
 
 interface Connexion {
     link : string;
@@ -23,34 +23,31 @@ const Join: React.FC = () => {
 
     return ( 
         <>
-        <div className="pageJoin-container">
+        <div className="join">
             <h1 className="title">SpeedyWiki</h1>
             <br />
-            <div className="pageJoin-size">
+            <div className="join-container">
 
-                <div className="pageJoin-top">
-                    <div className="pageJoin_icons-container">
-                        <img className='h-[40px]' src={Reduce}></img>
-                        <img className='h-[40px]' src={Full}></img>
-                        <img className='h-[40px]' src={Cross}></img>
+                <div className="join-top">
+                    <div className="icons-container">
+                        <img className='icon' src={Reduce}></img>
+                        <img className='icon' src={Full}></img>
+                        <img className='icon' src={Cross}></img>
                     </div>
                 </div>
 
-                <div className="pageJoin-content">
-
-                    <h1 className="">To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
-                       <form onSubmit={handleSubmit} className="">
-                        <input type="text" name="link" className=''
+                <div className="join-content">
+                    <h1>To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
+                       <form onSubmit={handleSubmit}>
+                        <input type="text" name="link"
                                 value={formData.link}
                                 onChange={handleChange}
-                                required placeholder='Ex:E3DJ36'/>
-                        <button className='button Joinbutton' type='submit'>Continue</button>
+                                required placeholder="Ex : E3DJ36"/>
+                        <button className='button join-button' type='submit'>Continue</button>
                        </form>
                 </div>
             </div>
-        </div>
-        <div className='Footer'>
-            <FooterWindow />
+            <FooterWindow/>
         </div>
         </>
         )

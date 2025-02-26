@@ -1,8 +1,8 @@
-import "../stylesheets/footerWindow.css";
+import "../../stylesheets/home/footerWindow.css";
 
-import Cross from '../assets/Icon/Cross_Icon.png';
-import Full from '../assets/Icon/FullScreen_Icon.png';
-import Reduce from '../assets/Icon/Reduce_Icon.png';
+import Cross from '../../assets/icon/Cross_Icon.png';
+import Full from '../../assets/icon/FullScreen_Icon.png';
+import Reduce from '../../assets/icon/Reduce_Icon.png';
 
  const FooterWindow = () => {
     return ( 

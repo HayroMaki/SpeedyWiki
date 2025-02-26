@@ -47,8 +47,9 @@ body {
   all: unset;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1420px) {
   .title{
     font-size: 90px;
+    -webkit-text-stroke: 2px white
   }
 }

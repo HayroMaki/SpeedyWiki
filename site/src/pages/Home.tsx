@@ -1,16 +1,16 @@
-import Cross from '../assets/Icon/Cross_Icon.png';
-import Full from '../assets/Icon/FullScreen_Icon.png';
-import Reduce from '../assets/Icon/Reduce_Icon.png';
-import FooterWindow from '../components/FooterWindow.tsx';
-import '../stylesheets/homePage.css'
+import Cross from '../assets/icon/Cross_Icon.png';
+import Full from '../assets/icon/FullScreen_Icon.png';
+import Reduce from '../assets/icon/Reduce_Icon.png';
+import FooterWindow from '../components/home/FooterWindow.tsx';
+import '../stylesheets/Home.css'
 import { NavLink} from "react-router-dom";
 
-const Homepage = () => {
+const Home = () => {
     return ( 
         <>
         <div className="homePage">
             <h1 className="title">SpeedyWiki</h1>
-            <br />
+            <br/>
             <div className="homePage-container">
                 <div className="homePage-top">
                     <div className="icons-container">
@@ -22,7 +22,7 @@ const Homepage = () => {
                 <div className="homePage-content">
                     <h1>Create or Join an online lobby !</h1>
                     <div className="button_links">
-                        <NavLink to="/NameSelectionHost" className="home_button">Create !</NavLink>
+                        <NavLink to="Selection" className="home_button">Create !</NavLink>
                         <NavLink to="/Join" className="home_button">Join !</NavLink>
                     </div>
                 </div>
@@ -33,5 +33,5 @@ const Homepage = () => {
         )
 };
 
-export default Homepage;
+export default Home;
 
