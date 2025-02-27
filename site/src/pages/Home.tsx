@@ -22,8 +22,8 @@ const Home = () => {
                 <div className="homePage-content">
                     <h1>Create or Join an online lobby !</h1>
                     <div className="button_links">
-                        <NavLink to="Selection" className="home_button">Create !</NavLink>
-                        <NavLink to="/Join" className="home_button">Join !</NavLink>
+                        <NavLink to="Selection" className="home_button button">Create !</NavLink>
+                        <NavLink to="/Join" className="home_button button">Join !</NavLink>
                     </div>
                 </div>
             </div>

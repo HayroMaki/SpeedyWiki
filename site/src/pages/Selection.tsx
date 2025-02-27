@@ -49,7 +49,7 @@ const Selection: React.FC = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     required placeholder='Ex: Xx_CoolAssName_xX'/>
-                            <button className='selection-button' type='submit'>Join !</button>
+                            <button className='selection-button button' type='submit'>Join !</button>
                        </form>
                     </div>
                 </div>

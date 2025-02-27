@@ -1,10 +1,12 @@
 import "../../stylesheets/lobby/playerListWindow.css"
 
+import {User} from "../../interfaces/User"
+
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 
-export const PlayerListWindow = () => {
+export const PlayerListWindow = (props : {players: User[]}) => {
     return (
         <>
             <div className="player-list-container">
@@ -18,10 +20,13 @@ export const PlayerListWindow = () => {
                 <div className="player-list-content">
                     <h1 className="player-list-title">Players :</h1>
                     <div className="player-list-players-container">
-                        <ul id="player-list-players">
-                            {
-                            // Mettre la liste des joueurs ici...
-                            }
+                        <ul className="player-list-players">
+                            {props.players.map((player) => (
+                                <li>
+                                    <img src={"../../assets/image/Char" + player.picture + ".png"} alt="player"/>
+                                    {player.name}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <div className="player-list-bottom-spacer"></div>

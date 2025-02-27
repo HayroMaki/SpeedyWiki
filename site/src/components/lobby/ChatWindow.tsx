@@ -25,7 +25,6 @@ export const ChatWindow = () => {
                     </div>
                 </div>
             </div>
-
         </>
     )
 }
