@@ -26,7 +26,7 @@ const Game = () => {
         const data = await response.json();
         const title = data.title;
 
-
+        if (!fetchedArticles.some(article => article.title === title)) {
         fetchedArticles.push({
           id: id,
           title: title,
@@ -35,6 +35,7 @@ const Game = () => {
           completion: false
         });
         id++;
+      }
       } catch (error) {
         console.error("Error during the fetch of the articles : ", error);
       }
