@@ -5,7 +5,7 @@ import {useState} from "react";
 import {User} from "../interfaces/User.tsx";
 
 import {PlayerListWindow} from "../components/lobby/PlayerListWindow.tsx";
-import {ChatWindow} from "../components/lobby/ChatWindow.tsx";
+import ChatWindow from "../components/lobby/ChatWindow.tsx";
 import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
 import {ExitWindow} from "../components/lobby/ExitWindow.tsx";
 

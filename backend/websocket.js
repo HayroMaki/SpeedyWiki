@@ -1,9 +1,9 @@
 import { WebSocketServer } from "ws";
 
-const server = new WebSocketServer({ port: 3002 });
+const websocket = new WebSocketServer({ port: 3002 });
 const users = new Set();
 
-server.on("connection", (ws) => {
+websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
 
   ws.on("message", (message) => {
@@ -15,7 +15,7 @@ server.on("connection", (ws) => {
       }
 
       // Envoi du message à tous les clients connectés
-      server.clients.forEach((client) => {
+      websocket.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({ pseudo, text }));
         }
