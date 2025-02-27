@@ -6,7 +6,11 @@ import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 
-export const ArticleListWindow = (props: {articles : Article[]}) => {
+import { useState } from "react";
+
+export const ArticleListWindow = (props: { articles: Article[] }) => {
+    const [hoveredArticle, setHoveredArticle] = useState<Article | null>(null);
+
     return (
         <>
             <div className="article-list-container">
@@ -22,17 +26,27 @@ export const ArticleListWindow = (props: {articles : Article[]}) => {
                     <div className="article-list-articles-container">
                         <ul id="article-list-articles">
                             {props.articles.map((article) => (
-                                <li key={article.id}>
-                                    <h1 style={{ textDecoration: article.completion ? "line-through" : "none" }}>- {article.title}</h1>
+                                <li
+                                    key={article.id}
+                                    onMouseEnter={() => setHoveredArticle(article)}
+                                    onMouseLeave={() => setHoveredArticle(null)}
+                                >
+                                    <h1 style={{ textDecoration: article.completion ? "line-through" : "none" }}>
+                                        - {article.title}
+                                    </h1>
                                 </li>
                             ))}
                         </ul>
                     </div>
+                    {hoveredArticle && (
+                        <div className="article-list-hover-text">
+                            {hoveredArticle.extract}
+                        </div>
+                    )}
                     <div className="article-list-bottom-spacer"></div>
                 </div>
             </div>
         </>
-    )
-}
-
+    );
+};
 export default ArticleListWindow;

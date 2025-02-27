@@ -30,8 +30,8 @@ const Game = () => {
         fetchedArticles.push({
           id: id,
           title: title,
+          extract: data.extract,
           url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
-          users: [],
           completion: false
         });
         id++;

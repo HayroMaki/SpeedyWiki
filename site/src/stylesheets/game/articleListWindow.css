@@ -46,3 +46,8 @@
 .article-list-bottom-spacer {
     height: 8px;
 }
+
+.article-list-hover-text {
+    margin: 1rem;
+    font-size: 18px;
+}
