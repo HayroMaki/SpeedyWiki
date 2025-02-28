@@ -7,7 +7,7 @@ import {Article} from "../interfaces/Article.tsx";
 
 import {WikiContentWindow} from "../components/game/WikiContentWindow.tsx";
 import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
-import {ChatWindow} from "../components/lobby/ChatWindow.tsx"
+import ChatWindow from "../components/lobby/ChatWindow.tsx"
 import {InventoryWindow} from "../components/game/InventoryWindow.tsx";
 import { useNavigate } from "react-router-dom";
 
@@ -31,8 +31,8 @@ const Game = () => {
         fetchedArticles.push({
           id: id,
           title: title,
+          extract: data.extract,
           url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
-          users: [],
           completion: false
         });
         id++;

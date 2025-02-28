@@ -31,6 +31,16 @@ body {
   align-items: center;
 }
 
+.button:hover {
+  background-color: #e7f6fa;
+  border-color: #8f8f8f;
+}
+
+.button:active {
+  background-color: #8bd9e6;
+  border-color: #8f8f8f;
+}
+
 .icons-container {
   display: flex;
   flex-direction: row;
