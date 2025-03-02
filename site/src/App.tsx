@@ -5,6 +5,7 @@ import Selection from './pages/Selection.tsx';
 import About from './pages/Aboutus';
 import Game from './pages/Game.tsx';
 import Lobby from "./pages/Lobby.tsx";
+import Win from './pages/Win.tsx';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/Lobby" element={<Lobby/>}/>
             <Route path='/Game' element={<Game/>}/>
             <Route path="/About" element={<About/>}/>
+            <Route path='/Win' element={<Win/>}/>
         </Routes>
     </Router>
 </main>

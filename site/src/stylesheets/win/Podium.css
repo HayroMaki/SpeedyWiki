@@ -1,0 +1,56 @@
+.Podium-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2%;
+}
+
+.Top1-window {
+    width: 40%;
+    margin-bottom: 5%;
+    
+}
+
+.Podium-top {
+    height: 3rem;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    border-bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+
+
+.Podium-content{
+    background-color: #EEE6E0;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    flex-direction: column;
+    text-align: center;   
+    font-size: 28px;
+    justify-content: center;
+    align-items: center;
+}
+
+.Others {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    gap: 4%;
+}
+
+.First-Place{
+    width: 125px;
+}
+
+.Other-podium{
+    width: 85px;
+}
+
+.Top2-3-window{
+    width: 45%;
+}

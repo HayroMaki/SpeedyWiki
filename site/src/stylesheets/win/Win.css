@@ -1,0 +1,42 @@
+.winPage-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.winPage-Upper{
+    display: flex;
+    flex-direction: row;
+    height: 90%;
+}
+
+.winPage-Lower{
+    display: flex;
+    flex-direction: row;
+    height: 25%;
+    justify-content: center;
+}
+
+.Button-container{
+    width: 35%;
+    margin: 2%;
+}
+
+.Button-top{
+    height: 3rem;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    border-bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.Button-content{
+    background-color: #EEE6E0;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 2%;
+    font-size: 36px;
+}

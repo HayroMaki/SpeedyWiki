@@ -10,8 +10,11 @@ import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx"
 import {InventoryWindow} from "../components/game/InventoryWindow.tsx";
 import { useNavigate } from "react-router-dom";
+import { User } from "../interfaces/User.tsx";
 
 const Game = () => {
+  const [userList, setUserList] = useState<User[]>([]);
+  const [user,setUser] = useState<User>();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
@@ -51,8 +54,8 @@ const Game = () => {
       )
     );
     if (articles.every(article => article.completion)) {
-      const naviguate = useNavigate();
-      naviguate('')
+     
+      
     }
   };
 
