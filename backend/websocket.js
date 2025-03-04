@@ -16,7 +16,7 @@ websocket.on("connection", (ws) => {
 
       // Envoi du message à tous les clients connectés
       websocket.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
+        if (client.readyState === ws.OPEN) {
           client.send(JSON.stringify({ pseudo, text }));
         }
       });
