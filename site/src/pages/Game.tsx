@@ -89,9 +89,11 @@ const Game = () => {
           <div className="Inventory">
           <InventoryWindow/>
           </div>
+          <div className="App_Component">
           {activeSection === "inventory" && <InventoryWindow />}
           {activeSection === "chat" && <ChatWindow />}
           {activeSection === "objectives" && <ArticleListWindow articles={articles}/>}
+          </div>
           <div className="App_Block">
           <div className="Block" onClick={() => setActiveSection("inventory")}>
             Inventory

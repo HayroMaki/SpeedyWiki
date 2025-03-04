@@ -26,10 +26,17 @@
     gap: 12px;
 }
 
+.Inventory{
+    width: 100%;
+}
 .App_Block{
     visibility: hidden;
     width: 0%;
+    display: none;
     
+}
+.App_Component{
+    display: none;
 }
 
 .Block{
@@ -63,6 +70,7 @@
     }
 
     .Inventory{
+        width: 0;
         display: none;
     }
 
@@ -74,5 +82,10 @@
         justify-content: center;
         align-items: center;
         gap: 3px;
+    }
+
+    .App_Component{
+        width: 100%;
+        display: block;
     }
 }
