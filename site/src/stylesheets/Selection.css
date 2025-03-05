@@ -83,3 +83,9 @@ input {
         font-size: 24px;
     }
 }
+
+@media (max-height: 750px) {
+    .selection-content h1 {
+        font-size: 24px;
+    }
+  }
