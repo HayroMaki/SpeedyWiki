@@ -4,6 +4,7 @@ import Reduce from '../assets/icon/Reduce_Icon.png';
 import FooterWindow from '../components/home/FooterWindow.tsx';
 import { useState } from "react";
 import '../stylesheets/Join.css'
+import { useNavigate } from 'react-router-dom';
 
 interface Connexion {
     link : string;
@@ -11,6 +12,7 @@ interface Connexion {
 
 const Join: React.FC = () => {
     const [formData, setFormData] = useState<Connexion>({ link: "" });
+    const nav = useNavigate();
   
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({ link: e.target.value });
@@ -18,7 +20,8 @@ const Join: React.FC = () => {
   
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log("Lien soumis:", formData.link);
+      const link = formData.link;
+      nav("/Selection?game=" + link);
     };
 
     return ( 

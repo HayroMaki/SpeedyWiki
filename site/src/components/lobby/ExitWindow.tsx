@@ -2,11 +2,14 @@ import Reduce from "../../assets/icon/Reduce_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Exit from "../../assets/icon/Exit_Icon_no_bg.png";
+import { useNavigate } from "react-router-dom";
 
 export const ExitWindow = () => {
+    const nav = useNavigate();
+    
     const handleClick = (event) => {
         event.preventDefault();
-        // TODO : Exit the lobby.
+        nav("/");
     }
 
     return (
