@@ -5,6 +5,7 @@ import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
 
 import {useEffect ,useState, useRef} from "react";
+import InventoryWindow from "./InventoryWindow";
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -62,6 +63,11 @@ export const WikiContentWindow = (props: { wikiContent: string, title: string, s
                         <h1 className="wiki-title">Page : {pageTitle}</h1>
                         <button className="wiki-button button" onClick={handleInventoryClick}>Inventory</button>
                     </div>
+                    {inventoryOpen && (
+                        <div className="Inventory">
+                            <InventoryWindow/>
+                        </div>
+                    )}
                     <section id="wiki-wikipage" className="wiki-wikipage-container">
                         <WikipediaFrame
                             src={props.wikiContent}

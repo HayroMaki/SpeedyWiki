@@ -7,6 +7,8 @@
     background-color: #A2D2F6;
     border: 3px solid #6d6d6d;
     border-bottom: 0;
+    border-top: 0;
+    border-left: 0;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -15,16 +17,11 @@
 .inventory-content {
     background-color: #EEE6E0;
     border: 3px solid #6d6d6d;
+    border-left: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     text-align: left;
-}
-
-.inventory-title {
-    height: 3rem;
-    padding-left: 8px;
-    font-size: 26px;
 }
 
 .inventory-box {
@@ -43,6 +40,6 @@
     gap: 8px;
 }
 
-.inventory-bottom-spacer {
+.inventory-spacer {
     height: 1rem;
 }
