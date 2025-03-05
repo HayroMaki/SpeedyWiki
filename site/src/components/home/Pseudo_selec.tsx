@@ -25,6 +25,7 @@ const PseudoSelection = () => {
                     }
                 }}
                 placeholder="xX_CoolAssUserName_Xx"
+                className="Pseudo_input"
             />
         </div>
 

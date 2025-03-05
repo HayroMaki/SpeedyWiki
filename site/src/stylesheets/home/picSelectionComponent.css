@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    
 }
 
 .pic-select-image-container {
@@ -12,8 +13,9 @@
 }
 
 .pic-select-image {
-    height: 210px;
-    width: 210px;
+    width: 100%;
+    max-width: 210px;
+    height: auto;
 }
 
 .pic-select-button-container {
@@ -28,4 +30,25 @@
     height: 50px;
     width: 50px;
     z-index: 10;
+}
+
+@media (max-height: 768px) {
+    .pic-select-image {
+        max-width: 120px;
+    }
+    .pic-select-button {
+        height: 40px;
+        width: 40px;
+    }
+}
+
+@media (max-height: 480px) {
+    .pic-select-image {
+        max-width: 80px;
+    }
+
+    .pic-select-button {
+        height: 30px;
+        width: 30px;
+    }
 }

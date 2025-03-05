@@ -57,9 +57,21 @@ body {
   all: unset;
 }
 
+.Pseudo_input{
+  width: 70%;
+  text-align: center;
+}
+
 @media (max-width: 1420px) {
   .title{
     font-size: 90px;
     -webkit-text-stroke: 2px white
+  }
+}
+
+@media (max-height: 800px) {
+  .Pseudo_input{
+    height:80%;
+    font-size: large;
   }
 }
