@@ -80,11 +80,11 @@ input {
     }
 
     .selection-content h1 {
-        font-size: 24px;
+        font-size: 32px;
     }
 }
 
-@media (max-height: 750px) {
+@media (max-height: 450px) {
     .selection-content h1 {
         font-size: 24px;
     }

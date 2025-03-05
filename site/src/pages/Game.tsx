@@ -56,7 +56,6 @@ const Game = () => {
     );
     if (articles.every(article => article.completion)) {
      
-      
     }
   };
 
