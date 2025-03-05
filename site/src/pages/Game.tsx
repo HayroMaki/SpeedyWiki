@@ -59,8 +59,6 @@ const Game = () => {
     }
   };
 
-
-
   useRunOnce({
     fn: () => {
       fetchArticles().then(articles => {
@@ -75,7 +73,6 @@ const Game = () => {
     CheckPage();
   }, [page]);
 
-
   return (
     <>
       <div className="game-page">
@@ -84,23 +81,20 @@ const Game = () => {
           <ChatWindow/>
         </div>
         <div className="game-page-content">
-          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} />
-          <div className="Inventory">
-          <InventoryWindow/>
-          </div>
+          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage}/>
           <div className="App_Component">
-          {activeSection === "inventory" && <InventoryWindow />}
-          {activeSection === "chat" && <ChatWindow />}
-          {activeSection === "objectives" && <ArticleListWindow articles={articles}/>}
+            {activeSection === "inventory" && <InventoryWindow/>}
+            {activeSection === "chat" && <ChatWindow />}
+            {activeSection === "objectives" && <ArticleListWindow articles={articles}/>}
           </div>
           <div className="App_Block">
-          <div className="Block" onClick={() => setActiveSection("inventory")}>
-            Inventory
-          </div>
-          <div className="Block" onClick={() => setActiveSection("objectives")}>Objectives
-          </div>
-          <div className="Block" onClick={() => setActiveSection("chat")}> Chat
-          </div>
+            <div className="Block" onClick={() => setActiveSection("inventory")}>
+              Inventory
+            </div>
+            <div className="Block" onClick={() => setActiveSection("objectives")}>Objectives
+            </div>
+            <div className="Block" onClick={() => setActiveSection("chat")}> Chat
+            </div>
           </div>
         </div>
       </div>

@@ -16,9 +16,9 @@ export const InventoryWindow = () => {
                     </div>
                 </div>
                 <div className="inventory-content">
-                    <h1 className="inventory-title">Inventory :</h1>
+                    <div className="inventory-spacer"></div>
                     <div className="inventory-box"></div>
-                    <div className="inventory-bottom-spacer"></div>
+                    <div className="inventory-spacer"></div>
                 </div>
             </div>
 

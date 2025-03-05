@@ -5,6 +5,7 @@ import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
 
 import {useEffect ,useState, useRef} from "react";
+import InventoryWindow from "./InventoryWindow";
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -35,11 +36,17 @@ const WikipediaFrame = (props: { src: string; className: string; onPageChange: (
 
 export const WikiContentWindow = (props: { wikiContent: string, title: string, setPage: (page: string) => void }) => {
     const [pageTitle, setPageTitle] = useState(props.title);
-
+    const [inventoryOpen, setInventoryOpen] = useState(false);
+    
     const handlePageChange = (newTitle: string) => {
         setPageTitle(newTitle);
         props.setPage(newTitle);
     };
+
+    const handleInventoryClick = () => {
+        setInventoryOpen(!inventoryOpen);
+        console.log("inventory open : " + inventoryOpen);
+    }
 
     return (
         <>
@@ -52,7 +59,15 @@ export const WikiContentWindow = (props: { wikiContent: string, title: string, s
                     </div>
                 </div>
                 <div className="wiki-content">
-                    <h1 className="wiki-title">Page : {pageTitle}</h1>
+                    <div className="wiki-content-top">
+                        <h1 className="wiki-title">Page : {pageTitle}</h1>
+                        <button className="wiki-button button" onClick={handleInventoryClick}>Inventory</button>
+                    </div>
+                    {inventoryOpen && (
+                        <div className="Inventory">
+                            <InventoryWindow/>
+                        </div>
+                    )}
                     <section id="wiki-wikipage" className="wiki-wikipage-container">
                         <WikipediaFrame
                             src={props.wikiContent}
