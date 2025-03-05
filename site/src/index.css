@@ -69,9 +69,14 @@ body {
   }
 }
 
-@media (max-height: 800px) {
+@media (max-height: 750px) {
   .Pseudo_input{
-    height:80%;
-    font-size: large;
+    font-size:larger;
+  }
+}
+
+@media (max-height: 450px) {
+  .Pseudo_input{
+    font-size:medium;
   }
 }

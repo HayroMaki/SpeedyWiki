@@ -34,7 +34,7 @@
 
 @media (max-height: 768px) {
     .pic-select-image {
-        max-width: 120px;
+        max-width: 100px;
     }
     .pic-select-button {
         height: 40px;
