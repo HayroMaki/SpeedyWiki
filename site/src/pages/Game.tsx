@@ -18,6 +18,7 @@ const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   
   const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
@@ -85,7 +86,23 @@ const Game = () => {
         </div>
         <div className="game-page-content">
           <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} />
+          <div className="Inventory">
           <InventoryWindow/>
+          </div>
+          <div className="App_Component">
+          {activeSection === "inventory" && <InventoryWindow />}
+          {activeSection === "chat" && <ChatWindow />}
+          {activeSection === "objectives" && <ArticleListWindow articles={articles}/>}
+          </div>
+          <div className="App_Block">
+          <div className="Block" onClick={() => setActiveSection("inventory")}>
+            Inventory
+          </div>
+          <div className="Block" onClick={() => setActiveSection("objectives")}>Objectives
+          </div>
+          <div className="Block" onClick={() => setActiveSection("chat")}> Chat
+          </div>
+          </div>
         </div>
       </div>
     </>

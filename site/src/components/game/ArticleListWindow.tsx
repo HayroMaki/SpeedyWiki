@@ -23,6 +23,7 @@ export const ArticleListWindow = (props: { articles: Article[] }) => {
                 </div>
                 <div className="article-list-content">
                     <h1 className="article-list-title">Objectives :</h1>
+                    <div className="article-list-content-container">
                     <div className="article-list-articles-container">
                         <ul id="article-list-articles">
                             {props.articles.map((article) => (
@@ -43,6 +44,7 @@ export const ArticleListWindow = (props: { articles: Article[] }) => {
                             {hoveredArticle.extract}
                         </div>
                     )}
+                    </div>
                     <div className="article-list-bottom-spacer"></div>
                 </div>
             </div>

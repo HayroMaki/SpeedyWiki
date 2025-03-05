@@ -26,6 +26,33 @@
     gap: 12px;
 }
 
+.Inventory{
+    width: 100%;
+}
+.App_Block{
+    visibility: hidden;
+    width: 0%;
+    display: none;
+    
+}
+.App_Component{
+    display: none;
+}
+
+.Block{
+    width: 30%;
+    text-align: center;
+    padding: 4%;
+    background-color: #D9D9D9;
+    border-color: #464646;
+    border-width: 3px;
+    font-size: larger;
+}
+.Block:active {
+    background-color: #8bd9e6;
+    border-color: #8f8f8f;
+  }
+
 @media (max-width: 1420px) {
     .game-page {
         gap: 0;
@@ -38,5 +65,27 @@
 
     .game-page-content {
         width: 100%;
+    
+    
+    }
+
+    .Inventory{
+        width: 0;
+        display: none;
+    }
+
+    .App_Block{
+        visibility: visible;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .App_Component{
+        width: 100%;
+        display: block;
     }
 }
