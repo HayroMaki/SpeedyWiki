@@ -12,6 +12,13 @@
     align-items: center;
 }
 
+.article-content-top{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .article-list-content {
     background-color: #EEE6E0;
     border: 3px solid #6d6d6d;
@@ -52,6 +59,10 @@
     font-size: 18px;
 }
 
+
+.article-button {
+    display: none;
+}
 @media (max-width: 1420px) {
     .article-list-content-container{
         display: flex;
@@ -62,5 +73,13 @@
         margin: 0px;
         font-size: 16px;
         border-left: 3px solid #6d6d6d;
+    }
+
+    .article-button{
+        display: block;
+        width: 124px;
+    border-color: #6d6d6d;
+    margin: 2px;
+    font-size: 20px;
     }
 }

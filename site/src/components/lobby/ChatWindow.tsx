@@ -4,8 +4,10 @@ import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 import useRunOnce from "../tools/useRunOnce.tsx";
-
-const ChatWindow: React.FC = () => {
+interface ChatWindowProps {
+    toggleContent?: (() => void) | null; 
+  }
+  const ChatWindow: React.FC<ChatWindowProps> = ({ toggleContent }) => {
     const pseudo = localStorage.getItem("pseudo") || "Anonyme"; // Récupère le pseudo
     const [message, setMessage] = useState<string>("");
     const [messages, setMessages] = useState<{ pseudo: string; text: string }[]>([]);
@@ -52,7 +54,10 @@ const ChatWindow: React.FC = () => {
                 </div>
             </div>
             <div className="chat-content">
-                <h1 className="chat-title">Chat :</h1>
+                <div className="chat-content-top">
+                    <h1 className="chat-title">Chat :</h1>
+                    <button className="chat-button button" onClick={() => toggleContent && toggleContent()}>Objectif</button>
+                </div>
                 <div id="Chat" className="chat-box">
                     {messages.map((msg, index) => (
                         <div key={index}>

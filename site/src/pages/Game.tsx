@@ -11,6 +11,7 @@ import ChatWindow from "../components/lobby/ChatWindow.tsx"
 import {InventoryWindow} from "../components/game/InventoryWindow.tsx";
 import { useNavigate } from "react-router-dom";
 import { User } from "../interfaces/User.tsx";
+import AppWindow from "../components/game/AppWindow.tsx";
 
 const Game = () => {
   const [userList, setUserList] = useState<User[]>([]);
@@ -18,7 +19,7 @@ const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>("chat");
   
   const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
@@ -77,24 +78,13 @@ const Game = () => {
     <>
       <div className="game-page">
         <div className="game-page-side">
-          <ArticleListWindow articles={articles}/>
+          <ArticleListWindow  articles={articles}/>
           <ChatWindow/>
         </div>
         <div className="game-page-content">
           <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage}/>
           <div className="App_Component">
-            {activeSection === "inventory" && <InventoryWindow/>}
-            {activeSection === "chat" && <ChatWindow />}
-            {activeSection === "objectives" && <ArticleListWindow articles={articles}/>}
-          </div>
-          <div className="App_Block">
-            <div className="Block" onClick={() => setActiveSection("inventory")}>
-              Inventory
-            </div>
-            <div className="Block" onClick={() => setActiveSection("objectives")}>Objectives
-            </div>
-            <div className="Block" onClick={() => setActiveSection("chat")}> Chat
-            </div>
+            <AppWindow articles={articles}/>
           </div>
         </div>
       </div>

@@ -8,7 +8,9 @@ import Reduce from "../../assets/icon/Reduce_Icon.png";
 
 import { useState } from "react";
 
-export const ArticleListWindow = (props: { articles: Article[] }) => {
+export const ArticleListWindow = (props: { articles: Article[]; toggleContent?: (() => void) | null }) => {
+
+
     const [hoveredArticle, setHoveredArticle] = useState<Article | null>(null);
 
     return (
@@ -22,7 +24,10 @@ export const ArticleListWindow = (props: { articles: Article[] }) => {
                     </div>
                 </div>
                 <div className="article-list-content">
+                <div className="article-content-top">
                     <h1 className="article-list-title">Objectives :</h1>
+                    <button className="article-button button" onClick={() => props.toggleContent && props.toggleContent()}>Chat</button>
+                </div>
                     <div className="article-list-content-container">
                     <div className="article-list-articles-container">
                         <ul id="article-list-articles">
