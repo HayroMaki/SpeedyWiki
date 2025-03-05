@@ -35,11 +35,17 @@ const WikipediaFrame = (props: { src: string; className: string; onPageChange: (
 
 export const WikiContentWindow = (props: { wikiContent: string, title: string, setPage: (page: string) => void }) => {
     const [pageTitle, setPageTitle] = useState(props.title);
-
+    const [inventoryOpen, setInventoryOpen] = useState(false);
+    
     const handlePageChange = (newTitle: string) => {
         setPageTitle(newTitle);
         props.setPage(newTitle);
     };
+
+    const handleInventoryClick = () => {
+        setInventoryOpen(!inventoryOpen);
+        console.log("inventory open : " + inventoryOpen);
+    }
 
     return (
         <>
@@ -52,7 +58,10 @@ export const WikiContentWindow = (props: { wikiContent: string, title: string, s
                     </div>
                 </div>
                 <div className="wiki-content">
-                    <h1 className="wiki-title">Page : {pageTitle}</h1>
+                    <div className="wiki-content-top">
+                        <h1 className="wiki-title">Page : {pageTitle}</h1>
+                        <button className="wiki-button button" onClick={handleInventoryClick}>Inventory</button>
+                    </div>
                     <section id="wiki-wikipage" className="wiki-wikipage-container">
                         <WikipediaFrame
                             src={props.wikiContent}

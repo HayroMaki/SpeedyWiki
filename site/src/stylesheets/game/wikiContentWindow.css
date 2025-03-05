@@ -22,6 +22,13 @@
     text-align: left;
 }
 
+.wiki-content-top {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .wiki-title {
     height: 3rem;
     padding-left: 8px;
@@ -50,5 +57,11 @@
 
 .wiki-bottom-spacer {
     height: 1rem;
+}
+
+.wiki-button {
+    width: 124px;
+    border-color: #6d6d6d;
+    margin: 2px;
 }
 

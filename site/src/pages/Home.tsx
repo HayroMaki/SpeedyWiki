@@ -9,8 +9,6 @@ import {useNavigate} from 'react-router-dom';
 const Home = () => {
     const nav = useNavigate();
 
-    function createLobby()
-
     const handleClick = (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         // TODO : create a lobby and return it's connexion code.
