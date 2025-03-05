@@ -8,8 +8,4 @@ export interface User {
     pages: [];
     items: [];
     item_used: number;
-    time : {
-        minute: number;
-        second: number;
-    };
 }
