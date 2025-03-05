@@ -26,34 +26,32 @@ const Join: React.FC = () => {
 
     return ( 
         <>
-        <div className="join">
-            <h1 className="title">SpeedyWiki</h1>
-            <br />
-            <div className="join-container">
-
-                <div className="join-top">
-                    <div className="icons-container">
-                        <img className='icon' src={Reduce}></img>
-                        <img className='icon' src={Full}></img>
-                        <img className='icon' src={Cross}></img>
+            <div className="join">
+                <h1 className="title">SpeedyWiki</h1>
+                <br />
+                <div className="join-container">
+                    <div className="join-top">
+                        <div className="icons-container">
+                            <img className='icon' src={Reduce}></img>
+                            <img className='icon' src={Full}></img>
+                            <img className='icon' src={Cross}></img>
+                        </div>
+                    </div>
+                    <div className="join-content">
+                        <h1>To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" name="link"
+                                    value={formData.link}
+                                    onChange={handleChange}
+                                    required placeholder="Ex : E3DJ36"/>
+                            <button className='button join-button' type='submit'>Continue</button>
+                        </form>
                     </div>
                 </div>
-
-                <div className="join-content">
-                    <h1>To join a lobby, click on the invitation link or enter the lobby Id here :</h1>
-                       <form onSubmit={handleSubmit}>
-                        <input type="text" name="link"
-                                value={formData.link}
-                                onChange={handleChange}
-                                required placeholder="Ex : E3DJ36"/>
-                        <button className='button join-button' type='submit'>Continue</button>
-                       </form>
-                </div>
+                <FooterWindow/>
             </div>
-            <FooterWindow/>
-        </div>
         </>
-        )
+    )
 };
 
 export default Join
