@@ -20,7 +20,8 @@ const Game = () => {
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
   const [activeSection, setActiveSection] = useState<string | null>("chat");
-  
+  const navigate = useNavigate();
+
   const fetchArticles: () => Promise<Article[]> = async () => {
     const numberOfArticles = 5;
     const fetchedArticles: Article[] = [];
@@ -56,7 +57,7 @@ const Game = () => {
       )
     );
     if (articles.every(article => article.completion)) {
-     
+     navigate("/Win");
     }
   };
 
