@@ -6,6 +6,7 @@ import Cross from "../../assets/icon/Cross_Icon.png";
 
 import {useEffect ,useState, useRef} from "react";
 import InventoryWindow from "./InventoryWindow";
+import { Artifact } from "../../interfaces/Artifact";
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -34,7 +35,7 @@ const WikipediaFrame = (props: { src: string; className: string; onPageChange: (
     );
 };
 
-export const WikiContentWindow = (props: { wikiContent: string, title: string, setPage: (page: string) => void }) => {
+export const WikiContentWindow = (props: { wikiContent: string, title: string, setPage: (page: string) => void;  inventory: Artifact[]}) => {
     const [pageTitle, setPageTitle] = useState(props.title);
     const [inventoryOpen, setInventoryOpen] = useState(false);
     
@@ -65,7 +66,7 @@ export const WikiContentWindow = (props: { wikiContent: string, title: string, s
                     </div>
                     {inventoryOpen && (
                         <div className="Inventory">
-                            <InventoryWindow/>
+                            <InventoryWindow inventory={props.inventory}/>
                         </div>
                     )}
                     <section id="wiki-wikipage" className="wiki-wikipage-container">

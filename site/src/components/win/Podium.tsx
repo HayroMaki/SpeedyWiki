@@ -1,7 +1,7 @@
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
-import image1 from "../../assets/image/Char2.png";
+import image1 from "../../assets/image/char/Char2.png";
 import '../../stylesheets/win/Podium.css'
 const Podium = () => {
     return(

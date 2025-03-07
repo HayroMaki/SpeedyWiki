@@ -13,34 +13,89 @@ import ChatWindow from "../components/lobby/ChatWindow.tsx";
 import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
 import {ExitWindow} from "../components/lobby/ExitWindow.tsx";
 
+const exUser1: User = {
+    id:1,
+    name:"Johny",
+    picture:2,
+    color:"#1F3A62",
+    current_page:"...",
+    clicks:4,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser2: User = {
+    id:2,
+    name:"Joseph",
+    picture:6,
+    color:"#BB124C",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser3: User = {
+    id:3,
+    name:"Jonathan",
+    picture:4,
+    color:"#1149C2",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser4: User = {
+    id:4,
+    name:"George",
+    picture:1,
+    color:"#FFFF11",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser5: User = {
+    id:5,
+    name:"George II",
+    picture:8,
+    color:"#992817",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser6: User = {
+    id:6,
+    name:"Jotaro",
+    picture:1,
+    color:"#111111",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+const exUser7: User = {
+    id:7,
+    name:"Josuke",
+    picture:4,
+    color:"#AAAABA",
+    current_page:"...",
+    clicks:2,
+    pages:[],
+    items:[],
+    item_used:0
+}
+
+const exUserList:User[] = [exUser1,exUser2,exUser3,exUser4,exUser5,exUser6,exUser7];
+
 export const Lobby = () => {
-    const exUser1: User = {
-        id:1,
-        name:"Johny",
-        picture:2,
-        color:"#1F3A62",
-        current_page:"...",
-        clicks:4,
-        pages:[],
-        items:[],
-        item_used:0
-    }
-    const exUser2: User = {
-        id:2,
-        name:"Joseph",
-        picture:6,
-        color:"#BB124C",
-        current_page:"...",
-        clicks:2,
-        pages:[],
-        items:[],
-        item_used:0
-    }
-
-    const exUserList:User[] = [exUser1,exUser2];
-
     const [players, setplayers] = useState(exUserList);
-    const [host, setHost] = useState(false);
+    const [host, setHost] = useState(true);
     const [lobby, setLobby] = useState("");
 
     return (

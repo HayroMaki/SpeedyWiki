@@ -3,15 +3,16 @@ import "../../stylesheets/home/picSelectionComponent.css";
 import { useState } from 'react';
 
 import Randicon from '../../assets/icon/Random_Icon.png';
-import PP1 from '../../assets/image/Char1.png';
-import PP2 from '../../assets/image/Char2.png';
-import PP3 from '../../assets/image/Char3.png';
-import PP4 from '../../assets/image/Char4.png';
-import PP5 from '../../assets/image/Char5.png';
-import PP6 from '../../assets/image/Char6.png';
-import PP7 from '../../assets/image/Char7.png';
-import PP8 from '../../assets/image/Char8.png';
-import PP9 from '../../assets/image/Char9.png';
+
+import PP1 from '../../assets/image/char/Char1.png';
+import PP2 from '../../assets/image/char/Char2.png';
+import PP3 from '../../assets/image/char/Char3.png';
+import PP4 from '../../assets/image/char/Char4.png';
+import PP5 from '../../assets/image/char/Char5.png';
+import PP6 from '../../assets/image/char/Char6.png';
+import PP7 from '../../assets/image/char/Char7.png';
+import PP8 from '../../assets/image/char/Char8.png';
+import PP9 from '../../assets/image/char/Char9.png';
 
 const PicSelect = () => {
     const PP = [PP1,PP2,PP3,PP4,PP5,PP6,PP7,PP8,PP9];

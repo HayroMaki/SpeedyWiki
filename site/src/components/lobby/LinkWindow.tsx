@@ -7,7 +7,7 @@ import {Notification} from "../tools/Notification.tsx";
 import {useNotification} from "../tools/useNotification.ts";
 
 export const LinkWindow = (props: {link: string}) => {
-    const { visible, text, showNotification } = useNotification();
+    const {visible, text, showNotification} = useNotification();
 
     const handleClick = (event) => {
         event.preventDefault();

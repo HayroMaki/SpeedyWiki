@@ -1,20 +1,46 @@
 import "../stylesheets/game/Game.css"
 
+import TEMP from "../assets/image/artifact/TEMP.png";
+
 import {useEffect, useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
+import {useNavigate} from "react-router-dom";
 
 import {Article} from "../interfaces/Article.tsx";
+import {Artifact} from "../interfaces/Artifact.tsx";
 
 import {WikiContentWindow} from "../components/game/WikiContentWindow.tsx";
 import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx"
-import {useNavigate} from "react-router-dom";
 import AppWindow from "../components/game/AppWindow.tsx";
+
+const baseInventory: Artifact[] = [
+  {
+    id:0,
+    name: "test1",
+    icon: TEMP,
+    effect: () => {},
+    count: 1,
+  },{
+    id:1,
+    name: "test2",
+    icon: TEMP,
+    effect: () => {},
+    count: 0,
+  },{
+    id:2,
+    name: "test3",
+    icon: TEMP,
+    effect: () => {},
+    count: 3,
+  }
+]
 
 const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
+  const [inventory,setInventory] = useState<Artifact[]>(baseInventory);
   const navigate = useNavigate();
 
   const fetchArticles: () => Promise<Article[]> = async () => {
@@ -78,7 +104,7 @@ const Game = () => {
           <ChatWindow/>
         </div>
         <div className="game-page-content">
-          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage}/>
+          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} inventory={inventory}/>
           <div className="App_Component">
             <AppWindow articles={articles}/>
           </div>
