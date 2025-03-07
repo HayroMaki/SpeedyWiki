@@ -6,6 +6,18 @@ import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 
+import PP1 from '../../assets/image/Char1.png';
+import PP2 from '../../assets/image/Char2.png';
+import PP3 from '../../assets/image/Char3.png';
+import PP4 from '../../assets/image/Char4.png';
+import PP5 from '../../assets/image/Char5.png';
+import PP6 from '../../assets/image/Char6.png';
+import PP7 from '../../assets/image/Char7.png';
+import PP8 from '../../assets/image/Char8.png';
+import PP9 from '../../assets/image/Char9.png';
+
+const PP:string[] = [PP1,PP2,PP3,PP4,PP5,PP6,PP7,PP8,PP9];
+
 export const PlayerListWindow = (props : {players: User[]}) => {
     return (
         <>
@@ -21,12 +33,15 @@ export const PlayerListWindow = (props : {players: User[]}) => {
                     <h1 className="player-list-title">Players :</h1>
                     <div className="player-list-players-container">
                         <ul className="player-list-players">
-                            {props.players.map((player) => (
-                                <li>
-                                    <img src={"../../assets/image/Char" + player.picture + ".png"} alt="player"/>
-                                    {player.name}
-                                </li>
-                            ))}
+                            {props.players.map((player) => { 
+                                const style = {color:player.color}
+                                return (
+                                    <li className="player-list-line" style={style} key={player.id}>
+                                        <img className="player-list-players-image" src={PP[player.picture - 1]} alt=""/>
+                                        {player.name}
+                                    </li>
+                                )
+                            })}
                         </ul>
                     </div>
                     <div className="player-list-bottom-spacer"></div>

@@ -14,7 +14,32 @@ import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
 import {ExitWindow} from "../components/lobby/ExitWindow.tsx";
 
 export const Lobby = () => {
-    const [players, setplayers] = useState([]);
+    const exUser1: User = {
+        id:1,
+        name:"Johny",
+        picture:2,
+        color:"#1F3A62",
+        current_page:"...",
+        clicks:4,
+        pages:[],
+        items:[],
+        item_used:0
+    }
+    const exUser2: User = {
+        id:2,
+        name:"Joseph",
+        picture:6,
+        color:"#BB124C",
+        current_page:"...",
+        clicks:2,
+        pages:[],
+        items:[],
+        item_used:0
+    }
+
+    const exUserList:User[] = [exUser1,exUser2];
+
+    const [players, setplayers] = useState(exUserList);
     const [host, setHost] = useState(false);
     const [lobby, setLobby] = useState("");
 
