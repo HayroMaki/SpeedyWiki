@@ -43,7 +43,7 @@ app.get("/proxy", async (req, res) => {
         const pageTitle = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : "?";
 
 
-        // Envoyer le titre au client via un événement
+        // Send the page's title to the client using postMessage :
         modifiedHtml += `<script>window.parent.postMessage('${pageTitle}', '*');</script>`;
 
         // Modify images that uses a relative link :

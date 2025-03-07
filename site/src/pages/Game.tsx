@@ -50,14 +50,14 @@ const Game = () => {
     return fetchedArticles;
   };
 
-  const CheckPage = ()  => {
+  const CheckPage = () => {
     setArticles(prevArticles =>
       prevArticles.map(article =>
         article.title === page ? { ...article, completion: true } : article
       )
     );
-    if (articles.every(article => article.completion)) {
-      //navigate("/Win");
+    if (articles.length > 0 && articles.every(article => article.completion)) {
+      navigate("/Win");
     }
   };
 
