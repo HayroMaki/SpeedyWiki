@@ -1,8 +1,11 @@
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
+
 import FooterWindow from '../components/home/FooterWindow.tsx';
+
 import '../stylesheets/Home.css'
+
 import {NavLink} from "react-router-dom";
 import {useNavigate} from 'react-router-dom';
 

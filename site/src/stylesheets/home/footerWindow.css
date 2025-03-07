@@ -39,3 +39,10 @@
 .icons-container {
     margin-left: auto;
 }
+
+@media (max-width: 620px) {
+    .footer-button {
+        width: 10rem;
+        font-size: 24px;
+    }
+}

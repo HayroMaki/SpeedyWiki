@@ -50,6 +50,7 @@
 }
 
 .join-content input {
+    width: 80%;
     font-size: 35px;
     background-color: white;
     color: #6d6d6d;

@@ -57,7 +57,7 @@ const Game = () => {
       )
     );
     if (articles.every(article => article.completion)) {
-     navigate("/Win");
+      //navigate("/Win");
     }
   };
 

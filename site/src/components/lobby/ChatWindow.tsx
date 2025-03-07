@@ -1,9 +1,13 @@
 import React, { useState } from "react";
+
 import "../../stylesheets/lobby/chatWindow.css";
+
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
+
 import useRunOnce from "../tools/useRunOnce.tsx";
+
 interface ChatWindowProps {
     toggleContent?: (() => void) | null; 
   }

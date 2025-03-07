@@ -1,5 +1,9 @@
 import "../stylesheets/lobby/Lobby.css"
 
+import Cross from '../assets/icon/Cross_Icon.png';
+import Full from '../assets/icon/FullScreen_Icon.png';
+import Reduce from '../assets/icon/Reduce_Icon.png';
+
 import {useState} from "react";
 
 import {User} from "../interfaces/User.tsx";
@@ -26,7 +30,18 @@ export const Lobby = () => {
                         {host ? (
                             <></>
                         ):(
-                            <></>
+                            <div className="lobby-window-container">
+                                <div className="lobby-window-top">
+                                    <div className="icons-container">
+                                        <img className='icon' src={Reduce}></img>
+                                        <img className='icon' src={Full}></img>
+                                        <img className='icon' src={Cross}></img>
+                                    </div>
+                                </div>
+                                <div className="lobby-window-content">
+                                    <h1>Waiting for host...</h1>
+                                </div>
+                            </div>
                         )}
                     </div>
                     <div className="lobby-bottom">
