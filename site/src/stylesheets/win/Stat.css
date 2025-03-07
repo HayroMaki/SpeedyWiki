@@ -1,6 +1,7 @@
 .Stat-container {
-    width: 20%;
-    margin: 2%;
+    width: 30%;
+    margin-top: 1%;
+    margin-left: 1%;
 }
 
 .Stat-list-top {
@@ -19,31 +20,30 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    
 }
 
-
-
-.Stat-title{
+.Stat-title {
     height: 3rem;
     padding-left: 8px;
     font-size: 26px;
 }
 
-.Stat-list-container{
+.Stat-list-container {
     width: 100%;
     height: 80%;
+    min-height: 20vh;
     background-color: white;
     border: 3px solid #6d6d6d;
     border-left: 0px;
-    border-bottom: 0px;
     border-right: 0px;
     display: flex;
     flex-direction: column;
     font-size: 26px;
+    margin-bottom: 1rem;
 }
 
-.Stat-list-articles{
+.Stat-list-articles {
+    min-height: 1rem;
     background-color: #EEE6E0;
     border: 3px solid #6d6d6d;
     border-left: 0px;

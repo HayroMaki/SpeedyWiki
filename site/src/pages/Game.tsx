@@ -8,7 +8,7 @@ import {Article} from "../interfaces/Article.tsx";
 import {WikiContentWindow} from "../components/game/WikiContentWindow.tsx";
 import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx"
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import AppWindow from "../components/game/AppWindow.tsx";
 
 const Game = () => {
