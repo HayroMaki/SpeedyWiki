@@ -8,18 +8,13 @@ import {Article} from "../interfaces/Article.tsx";
 import {WikiContentWindow} from "../components/game/WikiContentWindow.tsx";
 import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx"
-import {InventoryWindow} from "../components/game/InventoryWindow.tsx";
 import { useNavigate } from "react-router-dom";
-import { User } from "../interfaces/User.tsx";
 import AppWindow from "../components/game/AppWindow.tsx";
 
 const Game = () => {
-  const [userList, setUserList] = useState<User[]>([]);
-  const [user,setUser] = useState<User>();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
-  const [activeSection, setActiveSection] = useState<string | null>("chat");
   const navigate = useNavigate();
 
   const fetchArticles: () => Promise<Article[]> = async () => {
@@ -34,15 +29,15 @@ const Game = () => {
         const title = data.title;
 
         if (!fetchedArticles.some(article => article.title === title)) {
-        fetchedArticles.push({
-          id: id,
-          title: title,
-          extract: data.extract,
-          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
-          completion: false
-        });
-        id++;
-      }
+          fetchedArticles.push({
+            id: id,
+            title: title,
+            extract: data.extract,
+            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+            completion: false
+          });
+          id++;
+        }
       } catch (error) {
         console.error("Error during the fetch of the articles : ", error);
       }
@@ -79,7 +74,7 @@ const Game = () => {
     <>
       <div className="game-page">
         <div className="game-page-side">
-          <ArticleListWindow  articles={articles}/>
+          <ArticleListWindow articles={articles}/>
           <ChatWindow/>
         </div>
         <div className="game-page-content">
