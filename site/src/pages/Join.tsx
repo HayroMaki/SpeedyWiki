@@ -1,10 +1,15 @@
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
+
 import FooterWindow from '../components/home/FooterWindow.tsx';
+
 import { useState } from "react";
+
 import '../stylesheets/Join.css'
+
 import { useNavigate } from 'react-router-dom';
+import { useWS } from '../components/WSContext.tsx';
 
 interface Connexion {
     link : string;
@@ -13,15 +18,17 @@ interface Connexion {
 const Join: React.FC = () => {
     const [formData, setFormData] = useState<Connexion>({ link: "" });
     const nav = useNavigate();
+    const {setLobby} = useWS();
   
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({ link: e.target.value });
     };
   
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const link = formData.link;
-      nav("/Selection?game=" + link);
+        e.preventDefault();
+        const link = formData.link;
+        setLobby(link);
+        nav("/Selection?game=" + link);
     };
 
     return ( 

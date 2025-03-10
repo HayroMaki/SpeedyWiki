@@ -42,13 +42,10 @@ const fetchArticles = async () => {
   return fetchedArticles;
 };
 
-let articleList = await fetchArticles();
-
-let plrList = [];
-
 const websocket = new WebSocketServer({ port: 3002 });
 const users = new Set();
 
+/* 
 const MONGO_URI = 'mongodb+srv://randyboujaber:CaAfkMsGpCHnoDn7@randy.x6z56.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
@@ -57,66 +54,50 @@ mongoose.connect(MONGO_URI, {})
 
 
 const cnx = mongoose.connection;
-/*
-let id = makeid(6);
-let lobby = {
-  id: id,
-  link: "localhost:5173/#/Game?game="+id,
-  articles: articleList,
-  host: 1,
-  players: plrList,
-  time: 300,
-  chat: []
-}
 */
 
-let i = 1;
+const lobbies = [];
 
 // WEBSOCKET
 
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
-  console.log(articleList);
-  if(i === 1) {
-    cnx.useDb("speedywiki").collection("Lobbys").insertOne(lobby)
-  }
-  if(plrList.length < 4) {
-    plrList.push({
-      id: i,
-      name: "get_pseudo",
-      picture: 3,
-      color: "red",
-      current_page: articleList[0].title,
-      clicks: 0,
-      pages: [],
-      items: [],
-      item_used: 0,
-    });
-    cnx.useDb("speedywiki").collection("Lobbys").updateOne({"id" : id}, {$set: {"players" : plrList}})
-    i++
-  }
 
   ws.on("message", (message) => {
     try {
-      const { pseudo, text } = JSON.parse(message);
-
-      if (text === 'JOIN') {
-        users.add(pseudo);
-      }
-
-      // Envoi du message à tous les clients connectés
-      websocket.clients.forEach((client) => {
-        if (client.readyState === ws.OPEN) {
-          client.send(JSON.stringify({ pseudo, text }));
-          lobby.chat.push({player: pseudo, text: text});
-
+      const {type, lobby, pseudo, text} = JSON.parse(message);
+      console.log(type + " on " + lobby + " - " + pseudo + " : " + text);
+      // Action depending on the message type :
+      switch(type) {
+        case ("chat"):
+          // Send the message to every connected user :
+          websocket.clients.forEach((client) => {
+            if (client.readyState === ws.OPEN) {
+              client.send(JSON.stringify({type:"chat", pseudo, text }));
+              //lobby.chat.push({player: pseudo, text: text});
+            }
+          });
+          //cnx.useDb("speedywiki").collection("Lobbys").updateOne({"id" : id}, {$set: {"chat" : lobby.chat}});
+          break;
+        case ("create"):
+          // TODO : Create a lobby and add the user to it.
+          break;
+        case ("lobby"):
+        // Send the connexion message to every connected user :
+        websocket.clients.forEach((client) => {
+            if (client.readyState === ws.OPEN) {
+              const sys_text = pseudo + " joined the game.";
+              client.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
+              //lobby.chat.push({player: pseudo, text: text});
+            }
+          });
+          break;
+        default:
+          console.log("Unknown message type : " + type + " from : " + pseudo + " : " + text );
         }
-      });
-      cnx.useDb("speedywiki").collection("Lobbys").updateOne({"id" : id}, {$set: {"chat" : lobby.chat}})
-    } catch (error) {
+      } catch (error) {
       console.error("Erreur de parsing JSON :", error);
     }
-
   });
 
   ws.on("close", () => {

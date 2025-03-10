@@ -1,14 +1,23 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useWS } from '../../components/WSContext.tsx';
+
+import Message from "../../interfaces/Message.tsx";
 
 const PseudoSelection = () => {
-    const [pseudo, setPseudo] = useState("");
     const navigate = useNavigate();
+    const {sendMessage, lobby, pseudo, setPseudo} = useWS();
 
     const handleStart = () => {
         if (pseudo.trim() !== "") {
-            localStorage.setItem("pseudo", pseudo); // Stocke le pseudo
-            navigate("/Game"); // Redirige vers le lobby ou la partie
+            const message:Message = {
+                type: "lobby",
+                lobby: lobby,
+                pseudo: pseudo,
+                text: "JOIN",
+            }
+            sendMessage(message);
+            console.log(message);
+            navigate("/Game"); // Redirige vers le lobby ou la partie.
         }
     };
 
@@ -20,8 +29,8 @@ const PseudoSelection = () => {
                 onChange={(e) => setPseudo(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                        e.preventDefault(); // Empêche le retour à la ligne
-                        handleStart(); // Envoie le message
+                        e.preventDefault();
+                        handleStart();
                     }
                 }}
                 placeholder="xX_CoolAssUserName_Xx"
