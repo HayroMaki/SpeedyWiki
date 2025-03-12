@@ -1,6 +1,7 @@
-import { WebSocketServer } from "ws";
+import {WebSocketServer} from "ws";
 import mongoose from "mongoose";
-import http from "http";
+import fs from 'fs';
+import path from 'path';
 
 function makeid(length) {
   let result = '';
@@ -40,23 +41,32 @@ const fetchArticles = async () => {
     }
   }
   return fetchedArticles;
-};
+}
+
+function readEnvFile(filePath = './.env') {
+    const envPath = path.resolve(process.cwd(), filePath);
+    if (!fs.existsSync(envPath)) {
+        throw new Error(`Le fichier ${filePath} n'existe pas.`);
+    }
+
+    const envContent = fs.readFileSync(envPath, 'utf-8');
+    return envContent.split('\n').reduce((acc, line) => {
+        const trimmedLine = line.trim();
+        if (trimmedLine && !trimmedLine.startsWith('#')) {
+            const [key, ...valueParts] = trimmedLine.split('=');
+            const value = valueParts.join('=').trim().replace(/^"|"$/g, '').replace(/^'|'$/g, '');
+            acc[key.trim()] = value;
+        }
+        return acc;
+    }, {});
+}
 
 const websocket = new WebSocketServer({ port: 3002 });
 const users = new Set();
 
-const {readFile} = require("fs");
+const env = readEnvFile();
 
-let pass = readFile("tac.txt", "utf8", (err, data) => {
-  if (err) {
-    console.error("Erreur :", err);
-    return;
-  }
-  const lignes = data.split("\n");
-  return lignes[0];
-});
-
-const MONGO_URI = 'mongodb+srv://randyboujaber:'+pass+'@randy.x6z56.mongodb.net/';
+const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
