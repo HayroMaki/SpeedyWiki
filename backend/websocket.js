@@ -70,7 +70,7 @@ const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mon
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
-const collection = mongoose.connection.useDb("speedywiki").collection("Lobbys");
+const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies");
 
 const lobbies = {};
 
