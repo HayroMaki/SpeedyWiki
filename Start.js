@@ -18,7 +18,10 @@ const runCommand = (command, location) => {
 };
 
 // Démarrer le backend (Node.js)
+//runCommand("node server-iut.js", path.join(__dirname, "backend"));
 runCommand("node server.js", path.join(__dirname, "backend"));
+
 runCommand("node websocket.js", path.join(__dirname, "backend"));
+
 // Démarrer le frontend (React)
 runCommand("npm run dev", path.join(__dirname, "site"));
