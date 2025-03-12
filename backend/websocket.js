@@ -61,11 +61,6 @@ function readEnvFile(filePath = './.env') {
     }, {});
 }
 
-const lobbyTemplate = {
-  id: 1,
-  code: "193747"
-};
-
 // Create websocket on 3002 :
 const websocket = new WebSocketServer({ port: 3002 });
 
@@ -77,42 +72,56 @@ mongoose.connect(MONGO_URI, {})
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
 const collection = mongoose.connection.useDb("speedywiki").collection("Lobbys");
 
-const lobbies = [];
+const lobbies = {};
 
 // Setup websocket :
 websocket.on("connection", (ws) => {
-  console.log("✅ Client connected.");
+  console.log("✅ Client connected");
+  let userLobby = null;
+  let userPseudo = null;
   
   ws.on("message", (message) => {
     try {
       const {type, lobby, pseudo, text} = JSON.parse(message);
       console.log(type + " on " + lobby + " - " + pseudo + " : " + text);
+
       // Action depending on the message type :
       switch(type) {
+
         case "chat":
-          // Send the message to every connected user :
-          websocket.clients.forEach((client) => {
-            if (client.readyState === ws.OPEN) {
-              client.send(JSON.stringify({type:"chat", pseudo, text }));
-              //lobby.chat.push({player: pseudo, text: text});
-            }
-          });
-          //collection.updateOne({"id" : id}, {$set: {"chat" : lobby.chat}});
+          if (userLobby && lobbies[userLobby]) {
+            // Send the message to every user in the same lobby :
+            lobbies[userLobby].forEach((client) => {
+              if (client.ws.readyState === ws.OPEN) {
+                client.ws.send(JSON.stringify({type:"chat", pseudo, text }));
+              }
+            });
+          }
           break;
 
         case "create":
-          collection.insertOne(lobbyTemplate);
+          collection.insertOne({"id": 1})
+              .then(r => console.log("Created new game in DB."))
+              .catch(err => console.error("Could not create new game in DB : ",err));
           break;
 
         case "lobby":
-        // Send the connexion message to every connected user :
-        websocket.clients.forEach((client) => {
-            if (client.readyState === ws.OPEN) {
-              const sys_text = pseudo + " joined the game.";
-              client.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
-              //lobby.chat.push({player: pseudo, text: text});
-            }
-          });
+          if (!lobbies[lobby]) {
+            lobbies[lobby] = new Set();
+            console.log(lobby);
+          }
+
+          userLobby = lobby;
+          userPseudo = pseudo;
+          lobbies[userLobby].add({"ws":ws});
+
+          // Send the connexion message to every user in the same lobby :
+          lobbies[userLobby].forEach((client) => {
+              if (client.ws.readyState === ws.OPEN) {
+                const sys_text = pseudo + " joined the game.";
+                client.ws.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
+              }
+            });
           break;
         default:
           console.log("Unknown message type : " + type + " from : " + pseudo + " : " + text );
@@ -124,6 +133,24 @@ websocket.on("connection", (ws) => {
 
   ws.on("close", () => {
     console.log("❌ Client disconnected");
+    if (userLobby && lobbies[userLobby]) {
+
+      // Send the deconnexion message to every user in the same lobby :
+      lobbies[userLobby].forEach((client) => {
+        if (client.ws.readyState === ws.OPEN) {
+          const sys_text = userPseudo + " left the game.";
+          client.ws.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
+        }
+      });
+
+      // Remove the deconnected user :
+      lobbies[userLobby].delete(ws);
+
+      // Delete empty lobbies :
+      if (lobbies[userLobby].size === 0) {
+        delete lobbies[userLobby];
+      }
+    }
   });
 });
 
