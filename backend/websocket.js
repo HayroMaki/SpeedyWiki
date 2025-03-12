@@ -45,17 +45,25 @@ const fetchArticles = async () => {
 const websocket = new WebSocketServer({ port: 3002 });
 const users = new Set();
 
-/* 
-const MONGO_URI = 'mongodb+srv://randyboujaber:CaAfkMsGpCHnoDn7@randy.x6z56.mongodb.net/';
+const {readFile} = require("fs");
+
+let pass = readFile("tac.txt", "utf8", (err, data) => {
+  if (err) {
+    console.error("Erreur :", err);
+    return;
+  }
+  const lignes = data.split("\n");
+  return lignes[0];
+});
+
+const MONGO_URI = 'mongodb+srv://randyboujaber:'+pass+'@randy.x6z56.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
 
 
-const cnx = mongoose.connection;
-*/
-
+const collection = mongoose.connection.useDb("speedywiki").collection("Lobbys");
 const lobbies = [];
 
 // WEBSOCKET
@@ -77,7 +85,7 @@ websocket.on("connection", (ws) => {
               //lobby.chat.push({player: pseudo, text: text});
             }
           });
-          //cnx.useDb("speedywiki").collection("Lobbys").updateOne({"id" : id}, {$set: {"chat" : lobby.chat}});
+          //collection.updateOne({"id" : id}, {$set: {"chat" : lobby.chat}});
           break;
         case ("create"):
           // TODO : Create a lobby and add the user to it.
