@@ -146,7 +146,7 @@ app.get("/proxy", async (req, res) => {
         // Send response containing modified HTML page :
         res.send(modifiedHtml);
     } catch (error) {
-        res.status(500).send("Error loading the page.");
+        res.status(500).send("Error loading the page : " + error);
     }
 });
 
