@@ -84,6 +84,7 @@ const Game = () => {
 
   useRunOnce({
     fn: () => {
+      
       fetchArticles().then(articles => {
         setArticles(articles);
         setWikiContent(articles[0].url);

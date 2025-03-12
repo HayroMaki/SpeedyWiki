@@ -1,6 +1,7 @@
 import "../../stylesheets/home/picSelectionComponent.css";
 
-import { useState } from 'react';
+import { useWS } from '../../components/WSContext.tsx';
+import useRunOnce from "../tools/useRunOnce";
 
 import Randicon from '../../assets/icon/Random_Icon.png';
 
@@ -16,21 +17,24 @@ import PP9 from '../../assets/image/char/Char9.png';
 
 const PicSelect = () => {
     const PP = [PP1,PP2,PP3,PP4,PP5,PP6,PP7,PP8,PP9];
-    const [item, setItem] = useState(PP[Math.floor(Math.random() * PP.length)]);
+    const {picture, setPicture} = useWS();
 
     const generateRandomItem = () => {
-      const randomItem = PP[Math.floor(Math.random() * PP.length)]
-      if (randomItem == item){
+      const randomItem = Math.floor(Math.random() * PP.length);
+      if (randomItem == picture){
         generateRandomItem();
       } else {
-        setItem(randomItem);
+        setPicture(randomItem);
       }
     };
+
+    useRunOnce({fn: () => {generateRandomItem();}})
+
     return(
         <>
             <div className="pic-select-container">
                 <div className="pic-select-image-container">
-                    <img className="pic-select-image" src={item} alt="random" />
+                    <img className="pic-select-image" src={PP[picture]} alt="random" />
                     <div className="pic-select-button-container">
                         <button className="pic-select-button" onClick={generateRandomItem}>
                             <img src={Randicon} alt="random icon" />

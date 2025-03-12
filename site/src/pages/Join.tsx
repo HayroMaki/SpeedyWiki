@@ -5,11 +5,10 @@ import Reduce from '../assets/icon/Reduce_Icon.png';
 import FooterWindow from '../components/home/FooterWindow.tsx';
 
 import { useState } from "react";
-
-import '../stylesheets/Join.css'
-
 import { useNavigate } from 'react-router-dom';
 import { useWS } from '../components/WSContext.tsx';
+
+import '../stylesheets/Join.css'
 
 interface Connexion {
     link : string;
@@ -18,10 +17,20 @@ interface Connexion {
 const Join: React.FC = () => {
     const [formData, setFormData] = useState<Connexion>({ link: "" });
     const nav = useNavigate();
-    const {setLobby} = useWS();
-  
+    const {lobby ,setLobby} = useWS();
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({ link: e.target.value });
+      const url = window.location.href;
+        const urlParams = new URLSearchParams(url.substring(url.indexOf("?")));
+        if (urlParams.has("game")) {
+            const paramValues = urlParams.get("game");
+            if (paramValues !== null) {
+                console.log(paramValues);
+                setLobby(paramValues);
+                console.log(lobby);
+            }
+        }
     };
   
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +44,7 @@ const Join: React.FC = () => {
         <>
             <div className="join">
                 <h1 className="title">SpeedyWiki</h1>
-                <br />
+                <br/>
                 <div className="join-container">
                     <div className="join-top">
                         <div className="icons-container">

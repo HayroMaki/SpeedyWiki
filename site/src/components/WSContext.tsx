@@ -13,6 +13,8 @@ interface WSContextType {
     setLobby: React.Dispatch<React.SetStateAction<string>>;
     pseudo: string;
     setPseudo: React.Dispatch<React.SetStateAction<string>>;
+    picture: number;
+    setPicture: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -22,11 +24,13 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [lobby, setLobby] = useState<string>("");
     const [pseudo, setPseudo] = useState<string>("");
+    const [picture,setPicture] = useState<number>(0);
 
     useRunOnce({
         fn: () => {
             if (!WS) {
-                const socket = new WebSocket("ws://localhost:3002");
+                const host = window.location.hostname;
+                const socket = new WebSocket("ws://"+host+":3002");
 
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
@@ -56,7 +60,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, messages, lobby, setLobby, pseudo, setPseudo}}>
+        <WSContext.Provider value={{ WS, sendMessage, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
             {children}
         </WSContext.Provider>
     );

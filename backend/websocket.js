@@ -61,33 +61,35 @@ function readEnvFile(filePath = './.env') {
     }, {});
 }
 
+const lobbyTemplate = {
+  id: 1,
+  code: "193747"
+};
+
+// Create websocket on 3002 :
 const websocket = new WebSocketServer({ port: 3002 });
-const users = new Set();
 
+// Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
-
 const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mongodb.net/';
-
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
-
-
 const collection = mongoose.connection.useDb("speedywiki").collection("Lobbys");
+
 const lobbies = [];
 
-// WEBSOCKET
-
+// Setup websocket :
 websocket.on("connection", (ws) => {
-  console.log("✅ Client connected");
-
+  console.log("✅ Client connected.");
+  
   ws.on("message", (message) => {
     try {
       const {type, lobby, pseudo, text} = JSON.parse(message);
       console.log(type + " on " + lobby + " - " + pseudo + " : " + text);
       // Action depending on the message type :
       switch(type) {
-        case ("chat"):
+        case "chat":
           // Send the message to every connected user :
           websocket.clients.forEach((client) => {
             if (client.readyState === ws.OPEN) {
@@ -97,10 +99,12 @@ websocket.on("connection", (ws) => {
           });
           //collection.updateOne({"id" : id}, {$set: {"chat" : lobby.chat}});
           break;
-        case ("create"):
-          // TODO : Create a lobby and add the user to it.
+
+        case "create":
+          collection.insertOne(lobbyTemplate);
           break;
-        case ("lobby"):
+
+        case "lobby":
         // Send the connexion message to every connected user :
         websocket.clients.forEach((client) => {
             if (client.readyState === ws.OPEN) {
