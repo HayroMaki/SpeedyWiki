@@ -4,7 +4,7 @@ import Cross from "../../assets/icon/Cross_Icon.png";
 import Link from "../../assets/icon/Link_Icon_no_bg.png";
 
 import {Notification} from "../tools/Notification.tsx";
-import {useNotification} from "../tools/useNotification.ts";
+import {useNotification} from "../tools/useNotification.tsx";
 
 export const LinkWindow = (props: {link: string}) => {
     const {visible, text, showNotification} = useNotification();

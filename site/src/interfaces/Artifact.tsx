@@ -2,6 +2,6 @@ export interface Artifact {
     id: number;
     name: string;
     icon: string;
-    effect: Function;
+    effect: number;
     count: number;
 }

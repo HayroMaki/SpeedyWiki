@@ -1,7 +1,5 @@
 import "../stylesheets/game/Game.css"
 
-import TEMP from "../assets/image/artifact/TEMP.png";
-
 import {useEffect, useState} from "react";
 import {useRunOnce} from "../components/tools/useRunOnce.tsx";
 import {useNavigate} from "react-router-dom";
@@ -14,27 +12,7 @@ import {ArticleListWindow} from "../components/game/ArticleListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx"
 import AppWindow from "../components/game/AppWindow.tsx";
 
-const baseInventory: Artifact[] = [
-  {
-    id:0,
-    name: "test1",
-    icon: TEMP,
-    effect: () => {},
-    count: 1,
-  },{
-    id:1,
-    name: "test2",
-    icon: TEMP,
-    effect: () => {},
-    count: 0,
-  },{
-    id:2,
-    name: "test3",
-    icon: TEMP,
-    effect: () => {},
-    count: 3,
-  }
-]
+import baseInventory from "../components/game/Inventory.tsx";
 
 const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);

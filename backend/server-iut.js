@@ -36,7 +36,7 @@ app.get("/proxy", async (req, res) => {
 
     try {
         // Get the page's content :
-        const response = await fetch(url, { agent });
+        const response = await fetch(url);
         let modifiedHtml = await response.text();
 
         // Get the page's title :

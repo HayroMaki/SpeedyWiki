@@ -66,12 +66,13 @@ const websocket = new WebSocketServer({ port: 3002 });
 
 // Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
+/*
 const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mongodb.net/';
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
 const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies");
-
+*/
 const lobbies = {};
 
 // Setup websocket :
@@ -100,9 +101,11 @@ websocket.on("connection", (ws) => {
           break;
 
         case "create":
+          /*
           collection.insertOne({"id": 1})
               .then(r => console.log("Created new game in DB."))
               .catch(err => console.error("Could not create new game in DB : ",err));
+          */
           break;
 
         case "lobby":
