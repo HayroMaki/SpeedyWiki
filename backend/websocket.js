@@ -65,12 +65,14 @@ function readEnvFile(filePath = './.env') {
 const websocket = new WebSocketServer({ port: 3002 });
 
 // Connect to mongoDB Atlas cluster :
-const env = readEnvFile();
+//const env = readEnvFile();
+/*
 const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mongodb.net/';
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
     .catch(err => console.error('❌ Erreur de connexion à MongoDB Atlas', err));
 const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies");
+*/
 
 const lobbies = {};
 
@@ -89,9 +91,9 @@ websocket.on("connection", (ws) => {
       switch(type) {
 
         case "chat":
-          if (userLobby && lobbies[userLobby]) {
+          if (userLobby && lobbies[userLobby].players) {
             // Send the message to every user in the same lobby :
-            lobbies[userLobby].forEach((client) => {
+            lobbies[userLobby].players.forEach((client) => {
               if (client.ws.readyState === ws.OPEN) {
                 client.ws.send(JSON.stringify({type:"chat", pseudo, text }));
               }
@@ -108,20 +110,33 @@ websocket.on("connection", (ws) => {
           break;
 
         case "lobby":
+          // If the lobby doesn't exist, create it and fetch random articles :
           if (!lobbies[lobby]) {
-            lobbies[lobby] = new Set();
+            lobbies[lobby] = {
+              "players":new Set(),
+              "articles": null,
+            };
+            fetchArticles().then((articles) => {
+              lobbies[lobby].articles = articles;
+              console.log(lobbies[lobby]);
+            });
             console.log(lobby);
           }
 
           userLobby = lobby;
           userPseudo = pseudo;
-          lobbies[userLobby].add({"ws":ws});
+          lobbies[userLobby].players.add({
+            "ws":ws, 
+            "pseudo":pseudo,
+          });
+
+          ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}))
 
           // Send the connexion message to every user in the same lobby :
-          lobbies[userLobby].forEach((client) => {
+          lobbies[userLobby].players.forEach((client) => {
               if (client.ws.readyState === ws.OPEN) {
                 const sys_text = pseudo + " joined the game.";
-                client.ws.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
+                client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
               }
             });
           break;
@@ -138,7 +153,7 @@ websocket.on("connection", (ws) => {
     if (userLobby && lobbies[userLobby]) {
 
       // Send the deconnexion message to every user in the same lobby :
-      lobbies[userLobby].forEach((client) => {
+      lobbies[userLobby].players.forEach((client) => {
         if (client.ws.readyState === ws.OPEN) {
           const sys_text = userPseudo + " left the game.";
           client.ws.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
@@ -146,10 +161,10 @@ websocket.on("connection", (ws) => {
       });
 
       // Remove the deconnected user :
-      lobbies[userLobby].delete(ws);
+      lobbies[userLobby].players.delete(ws);
 
       // Delete empty lobbies :
-      if (lobbies[userLobby].size === 0) {
+      if (lobbies[userLobby].players.size === 0) {
         delete lobbies[userLobby];
       }
     }
