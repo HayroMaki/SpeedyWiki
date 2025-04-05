@@ -1,0 +1,88 @@
+.aboutus-container{
+display: flex;
+justify-content: center;
+gap: 8px;
+
+}
+
+.about-container {
+    width: 40%;
+    height: 50vh;
+}
+
+.about-title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.about-top{
+    height: 3rem;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.about-content{
+    height: 20rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #EEE6E0;
+    justify-content: center;
+    gap:50px;
+    border-width: 3px;
+    border-color: #6d6d6d;
+    border-top-width: 0;
+}
+
+
+
+
+.bottom-block {
+    margin-top: 350px;
+}
+
+.member-image {
+    width: 150px;
+    height: 150px;
+    
+    object-fit: cover;
+    margin: 0 20px;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    font-size: 22px;
+    margin: 0;
+}
+
+.member-role {
+    font-size: 18px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.member-description {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.member-links {
+    margin-top: 10px;
+}
+
+.member-links a {
+    text-decoration: none;
+    color: #0073b1;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.member-links a:hover {
+    text-decoration: underline;
+}

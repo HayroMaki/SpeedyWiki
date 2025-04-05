@@ -1,27 +1,75 @@
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
+
+import "../stylesheets/Aboutus.css";
+const teamMembers = [
+    {
+        name: "Randy Bou-Jaber",
+        role: "Project Manager",
+        description: "Pretty af",
+        image: "https://via.placeholder.com/150",
+        linkedin: "https://www.linkedin.com/in/alice-dupont",
+        email: "mailto:alice@example.com"
+    },
+    {
+        name: "Martial Carceles",
+        role: "Developper python",
+        description: "Young developper always willing to learn more about IT. Hire him because he's the best in the world (Written by himself)",
+        image: "https://via.placeholder.com/150",
+        linkedin: "https://www.linkedin.com/in/lucas-morel",
+        email: "mailto:lucas@example.com"
+    },
+    {
+        name: "Jules Renaud-Granges",
+        role: "Developper FullStack",
+        description: "Better than Martial",
+        image: "https://via.placeholder.com/150",
+        linkedin: "https://www.linkedin.com/in/jean-martin",
+        email: "mailto:jean@example.com"
+    },
+    {
+        name: "Guillaume Augeraud",
+        role: "Developper Front-end",
+        description: "Im the only serious one here",
+        linkedin: "https://www.linkedin.com/in/sophie-bernard",
+        email: "mailto:sophie@example.com"
+    }
+];
+
 const About = () => {
-    return(
-    <div className="w-120 md:w-220">
-
-                <div className="h-[50px] bg-[#A2D2F6] border-3 border-[#6d6d6d] flex justify-end items-center">
-                    <div className="flex flex-row gap-2 mr-2">
-                        <img className='h-[40px]' src={Reduce}></img>
-                        <img className='h-[40px]' src={Full}></img>
-                        <img className='h-[40px]' src={Cross}></img>
+    return (
+        <>
+        <h1 className="about-title">About us</h1>
+        <div className="aboutus-container">
+            {teamMembers.map((member, index) => (
+                <div 
+                    key={index} 
+                    className={`about-container `}
+                >
+                    <div className="about-top">
+                        <div className="icons-container">
+                            <img className='icon' src={Reduce}></img>
+                            <img className='icon' src={Full}></img>
+                            <img className='icon' src={Cross}></img>
+                        </div>
+                    </div>
+                    <div className='about-content'>
+                        <img src={member.image} alt={member.name} className="member-image" />
+                        <div className="member-info">
+                            <h2 className="member-name">{member.name}</h2>
+                            <h3 className="member-role">{member.role}</h3>
+                            <p className="member-description">{member.description}</p>
+                            <div className="member-links">
+                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                                <a href={member.email}>Email</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div className="gap-8 h-80 bg-[#EEE6E0] border-3 border-[#6d6d6d] flex flex-col border-t-0 justify-center md:gap-24">
-
-                    <h1 className="text-[32px] md:text-[48px] p-5">Create or Join an online lobby !</h1>
-                    <div className="gap-4 item-end flex flex-row flex-wrap justify-center md:gap-60">
-                    
-                    </div>
-
-                </div>
-            </div>
+            ))}
+        </div>
+        </>
     );
 }
 
