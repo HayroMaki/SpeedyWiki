@@ -2,7 +2,6 @@ import express from "express";
 import axios from "axios";
 import cors from "cors";
 
-
 const app = express();
 const PORT = 3001;
 
@@ -146,7 +145,7 @@ app.get("/proxy", async (req, res) => {
         // Send response containing modified HTML page :
         res.send(modifiedHtml);
     } catch (error) {
-        res.status(500).send("Error loading the page.");
+        res.status(500).send("Error loading the page : " + error);
     }
 });
 

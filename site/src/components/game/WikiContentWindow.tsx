@@ -10,11 +10,12 @@ import { Artifact } from "../../interfaces/Artifact";
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const proxyUrl = `http://localhost:3001/proxy?url=${encodeURIComponent(props.src)}`;
+    const host = window.location.hostname;
+    const proxyUrl = `http://`+host+`:3001/proxy?url=${encodeURIComponent(props.src)}`;
 
     useEffect(() => {
         const handlePageTitleChange = (event: MessageEvent) => {
-            if (event.origin === "http://localhost:3001") { // Verify origin for security (WILL BE MODIFIED LATER)
+            if (event.origin === "http://"+host+":3001") { // Verify origin for security (WILL BE MODIFIED LATER)
                 props.onPageChange(event.data);
             }
         };

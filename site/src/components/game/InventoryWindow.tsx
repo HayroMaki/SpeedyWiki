@@ -5,8 +5,8 @@ import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 
 import {Artifact} from "../../interfaces/Artifact";
-
-import useNotification from "../tools/useNotification";
+import {Notification} from "../tools/Notification.tsx";
+import {useNotification} from "../tools/useNotification.tsx";
 
 export const InventoryWindow = (props: {inventory: Artifact[]}) => {
     const {visible, text, showNotification} = useNotification();
@@ -29,8 +29,9 @@ export const InventoryWindow = (props: {inventory: Artifact[]}) => {
                                 return (
                                     <div key={artifact.id} className="inventory-item" 
                                         onClick={() => {
+                                            console.log("clicked.")
                                             showNotification(<div>Used {artifact.name} !</div>, 2000);
-                                            artifact.effect();
+                                            artifact.count--;
                                         }}>
                                         <img src={artifact.icon} alt="Art."></img>
                                         <p>{artifact.count}</p>
@@ -42,7 +43,7 @@ export const InventoryWindow = (props: {inventory: Artifact[]}) => {
                     <div className="inventory-spacer"></div>
                 </div>
             </div>
-
+            <Notification visible={visible} text={text}/>
         </>
     )
 }

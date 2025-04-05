@@ -8,11 +8,15 @@ interface WSContextType {
     sendMessage: (message: Message) => void;
     messages: {
         type: any; pseudo: string; text: string 
-}[];
+    }[];
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+    getResponse: () => Message | null;
     lobby: string;
     setLobby: React.Dispatch<React.SetStateAction<string>>;
     pseudo: string;
     setPseudo: React.Dispatch<React.SetStateAction<string>>;
+    picture: number;
+    setPicture: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -22,11 +26,13 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [lobby, setLobby] = useState<string>("");
     const [pseudo, setPseudo] = useState<string>("");
+    const [picture,setPicture] = useState<number>(0);
 
     useRunOnce({
         fn: () => {
             if (!WS) {
-                const socket = new WebSocket("ws://localhost:3002");
+                const host = window.location.hostname;
+                const socket = new WebSocket("ws://"+host+":3002");
 
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
@@ -46,6 +52,15 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     });
 
+    const getResponse = () => {
+        for (let m of messages) {
+            if (m.type == "response-sys" && m.pseudo == "SYSTEM") {
+                return m;
+            }
+        }
+        return null;
+    }
+
     // Fonction pour envoyer un message
     const sendMessage = (message: Message) => {
         if (WS && WS.readyState === WebSocket.OPEN) {
@@ -56,7 +71,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, messages, lobby, setLobby, pseudo, setPseudo}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
             {children}
         </WSContext.Provider>
     );

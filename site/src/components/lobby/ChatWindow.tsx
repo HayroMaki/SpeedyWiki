@@ -17,7 +17,6 @@ interface ChatWindowProps {
     const [chat, setChat] = useState<string>("");
     const {WS, sendMessage, messages, lobby, pseudo} = useWS();
     
-
     const handleSendMessage = () => {
         if (WS && chat) {
             const message:Message = {
@@ -55,16 +54,15 @@ interface ChatWindowProps {
                                         <strong>{msg.pseudo} :</strong> {msg.text}
                                     </div>
                                 );
-
                             case "chat-sys":
                                 return (
-                                    <div key={index} style={{color:"#FFFFAA"}}>
+                                    <div key={index} style={{color:"#FFAA00"}}>
                                         {msg.text}
                                     </div>
                                 );
-
-                            default:
-                                break;
+                            case "":
+                                
+                            default:break;
                         }
                     })}
                 </div>

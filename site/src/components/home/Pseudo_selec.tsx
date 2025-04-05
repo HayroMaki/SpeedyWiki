@@ -5,7 +5,7 @@ import Message from "../../interfaces/Message.tsx";
 
 const PseudoSelection = () => {
     const navigate = useNavigate();
-    const {sendMessage, lobby, pseudo, setPseudo} = useWS();
+    const {messages, sendMessage, getResponse, setMessages, lobby, pseudo, setPseudo} = useWS();
 
     const handleStart = () => {
         if (pseudo.trim() !== "") {
@@ -17,7 +17,24 @@ const PseudoSelection = () => {
             }
             sendMessage(message);
             console.log(message);
-            navigate("/Game"); // Redirige vers le lobby ou la partie.
+            const checker = setInterval(() => {
+                const m = getResponse();
+                if (m) {
+                    if (m.text == "OK") {
+                        // Delete m using setMessages.
+                        navigate("/game");
+                    } else {
+                        console.log(m);
+                        // Delete m using setMessages.
+                        clearTimeout(timeout);
+                    }
+                }
+            }, 200);
+
+            const timeout = setTimeout(() => {
+                clearInterval(checker);
+                console.log("Unable to connect.");
+            },5000);
         }
     };
 

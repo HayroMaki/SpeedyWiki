@@ -14,7 +14,10 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "https-proxy-agent": "^7.0.6",
     "mongoose": "^8.12.1",
+    "mongosh": "^2.4.2",
+    "node-fetch": "^3.3.2",
     "ws": "^8.18.1"
   }
 }
