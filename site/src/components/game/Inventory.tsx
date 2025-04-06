@@ -13,13 +13,13 @@ export const baseInventory: Artifact[] = [
         name: "test2",
         icon: TEMP,
         effect: 1,
-        count: 0,
+        count: 2,
     },{
         id:2,
         name: "test3",
         icon: TEMP,
         effect: 2,
-        count: 0,
+        count: 3,
     }
 ];
 

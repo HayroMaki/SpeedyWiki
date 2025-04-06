@@ -80,7 +80,7 @@ const PseudoSelection = () => {
             if (m.text === "OK") {
                 if (timeoutId) clearTimeout(timeoutId);
                 setMessages([]);
-                navigate("/game");
+                navigate("/Lobby");
             } else {
                 if (timeoutId) clearTimeout(timeoutId);
                 setMessages([]);

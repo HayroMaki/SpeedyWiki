@@ -99,11 +99,14 @@
 }
 
 .lobby-window-content {
+    display: flex;
     height: calc(100% - 3rem);
     background-color: #EEE6E0;
     border-width: 3px;
     border-color: #6d6d6d;
     border-top-width: 0;
+    justify-content: center;
+    align-items: center;
 }
 
 .lobby-window-content h1 {

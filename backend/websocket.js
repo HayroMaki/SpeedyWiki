@@ -99,6 +99,21 @@ websocket.on("connection", (ws) => {
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
               break;
+            case "START":
+                if (lobbies[lobby]) {
+                    // Vérifiez que l'expéditeur est bien l'hôte (à implémenter selon votre logique)
+                    
+                    // Envoyer un message à tous les joueurs du lobby
+                    lobbies[lobby].players.forEach((client) => {
+                        if (client.ws.readyState === client.ws.OPEN) {
+                            client.ws.send(JSON.stringify({
+                                type: "START",
+                                lobby: lobby
+                            }));
+                        }
+                    });
+                }
+                break;
           }
           break;
 

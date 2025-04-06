@@ -1,18 +1,15 @@
-import "../stylesheets/lobby/Lobby.css"
-
+import "../stylesheets/lobby/Lobby.css";
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
-
-import {useState} from "react";
-
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {User} from "../interfaces/User.tsx";
-
 import {PlayerListWindow} from "../components/lobby/PlayerListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx";
 import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
 import {ExitWindow} from "../components/lobby/ExitWindow.tsx";
-
+import {useWS} from "../components/WSContext.tsx";
 const exUser1: User = {
     id:1,
     name:"Johny",
@@ -94,43 +91,94 @@ const exUser7: User = {
 const exUserList:User[] = [exUser1,exUser2,exUser3,exUser4,exUser5,exUser6,exUser7];
 
 export const Lobby = () => {
-    const [players, setplayers] = useState(exUserList);
-    const [host, setHost] = useState(true);
-    const [lobby, setLobby] = useState("");
+    const navigate = useNavigate();
+    const [players, setPlayers] = useState(exUserList);
+    const [isHost, setIsHost] = useState(true); 
+    const { WS: socket, sendMessage, lobby: lobbyId, pseudo } = useWS();
+    
+    useEffect(() => {
+        if (!socket) {
+            console.error("WebSocket connection is not established");
+            return;
+        }
+
+        const handleMessage = (event: MessageEvent) => {
+            try {
+                const message = JSON.parse(event.data);
+                console.log("Message reçu:", message);
+                
+                if (message.type === 'START') {
+                    navigate("/Game");
+                }
+            } catch (error) {
+                console.error("Error parsing message:", error);
+            }
+        };
+
+        socket.addEventListener('message', handleMessage);
+
+        return () => {
+            socket.removeEventListener('message', handleMessage);
+        };
+    }, [socket]);
+
+    const startGame = () => {
+        if (!sendMessage) {
+            console.error("sendMessage function is not available");
+            return;
+        }
+
+        sendMessage({
+            type: 'lobby', // Uniformisez le type avec le serveur (minuscules)
+            lobby: lobbyId,
+            pseudo: pseudo,
+            text: "START"
+        });
+    };
 
     return (
-        <>
-            <div className="lobby">
-                <div className="lobby-side">
-                    <PlayerListWindow players={players}/>
-                    <ChatWindow/>
-                </div>
-                <div className="lobby-content">
-                    <div className="lobby-middle">
-                        {host ? (
-                            <></>
-                        ):(
-                            <div className="lobby-window-container">
-                                <div className="lobby-window-top">
-                                    <div className="icons-container">
-                                        <img className='icon' src={Reduce}></img>
-                                        <img className='icon' src={Full}></img>
-                                        <img className='icon' src={Cross}></img>
-                                    </div>
-                                </div>
-                                <div className="lobby-window-content">
-                                    <h1>Waiting for host...</h1>
+        <div className="lobby">
+            <div className="lobby-side">
+                <PlayerListWindow players={players}/>
+                <ChatWindow/>
+            </div>
+            <div className="lobby-content">
+                <div className="lobby-middle">
+                    {isHost ? (
+                        <div className="lobby-window-container">
+                            <div className="lobby-window-top">
+                                <div className="icons-container">
+                                    <img className='icon' src={Reduce} alt="Réduire"/>
+                                    <img className='icon' src={Full} alt="Plein écran"/>
+                                    <img className='icon' src={Cross} alt="Fermer"/>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                    <div className="lobby-bottom">
-                        <LinkWindow link={lobby}/>
-                        <ExitWindow/>
-                    </div>
+                            <div className="lobby-window-content">
+                                <button className="button" onClick={startGame}>Start the game</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="lobby-window-container">
+                            <div className="lobby-window-top">
+                                <div className="icons-container">
+                                    <img className='icon' src={Reduce} alt="Réduire"/>
+                                    <img className='icon' src={Full} alt="Plein écran"/>
+                                    <img className='icon' src={Cross} alt="Fermer"/>
+                                </div>
+                            </div>
+                            <div className="lobby-window-content">
+                                <h1>Waiting for host...</h1>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="lobby-bottom">
+                    <LinkWindow link={lobbyId}/> {/* Utilisez lobbyId ici */}
+                    <ExitWindow/>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
+
 export default Lobby;
