@@ -4,9 +4,11 @@ import Reduce from '../assets/icon/Reduce_Icon.png';
 
 import FooterWindow from '../components/home/FooterWindow.tsx';
 
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import {useEffect, useState} from "react";
+import {useLocation, useNavigate} from 'react-router-dom';
 import { useWS } from '../components/WSContext.tsx';
+import {Notification} from "../components/tools/Notification.tsx";
+import useNotification from "../components/tools/useNotification.tsx";
 
 import '../stylesheets/Join.css'
 
@@ -17,7 +19,17 @@ interface Connexion {
 const Join: React.FC = () => {
     const [formData, setFormData] = useState<Connexion>({ link: "" });
     const nav = useNavigate();
+    const location = useLocation();
     const {lobby ,setLobby} = useWS();
+    const {visible, text, showNotification} = useNotification();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const error = params.get("error");
+        if (error && error === "invalid") {
+            showNotification(<div>Invalid lobby Id.<br/>They gave you the wrong number...</div>, 3000);
+        }
+    },[location.search]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({ link: e.target.value });
@@ -64,6 +76,7 @@ const Join: React.FC = () => {
                         </form>
                     </div>
                 </div>
+                <Notification visible={visible} text={text}/>
                 <FooterWindow/>
             </div>
         </>

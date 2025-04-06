@@ -36,6 +36,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
+                    console.log("received :",data);
                     setMessages((prev) => [...prev, data]);
                 };
 
@@ -53,7 +54,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     });
 
     const getResponse = () => {
-        for (let m of messages) {
+        for (const m of messages) {
             if (m.type == "response-sys" && m.pseudo == "SYSTEM") {
                 return m;
             }
