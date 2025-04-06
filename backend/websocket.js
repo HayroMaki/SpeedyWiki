@@ -7,9 +7,16 @@ import {generateUniqueId} from './functions/generateUniqueId.js';
 import {fetchArticles} from './functions/fetchArticles.js';
 import {readEnvFile} from './functions/readEnvFile.js';
 
+function generateSixDigitCode() {
+  const random = Math.floor(Math.random() * 999999) + 1; // entre 1 et 999999
+  return random.toString().padStart(6, '0');
+}
 
 // Create websocket on 3002 :
-const websocket = new WebSocketServer({ port: 3002 });
+const websocket = new WebSocketServer({
+  port: 3002,
+  host: '0.0.0.0'
+});
 
 // Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
@@ -60,6 +67,24 @@ websocket.on("connection", (ws) => {
 
         case "create":
           // Create a lobby and send the lobbyId back.
+          const lobbyId = generateSixDigitCode();
+          lobbies[lobbyId] = {
+            "players": new Set(),
+            "articles": null,
+          }
+          fetchArticles().then((articles) => {
+            lobbies[lobbyId].articles = articles;
+          });
+
+          // Réponse plus claire avec l'ID du lobby
+          ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"Lobby " + lobbyId + " created."}));
+
+          collection.insertOne(lobbies[lobbyId]).then(r => {
+            console.log("Lobby inserted in DB ! ID : ", r.insertedId);
+          })
+              .catch(error => {
+                console.error("Error while inserting lobby : ", error);
+              });
           break;
 
         case "lobby":

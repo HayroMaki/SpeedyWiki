@@ -7,7 +7,7 @@ import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 
 import { useState } from "react";
-import useNotification from "../tools/useNotification.tsx";
+//import useNotification from "../tools/useNotification.tsx";
 
 export const ArticleListWindow = (props: { articles: Article[]; toggleContent?: (() => void) | null }) => {
     const [hoveredArticle, setHoveredArticle] = useState<Article | null>(null);

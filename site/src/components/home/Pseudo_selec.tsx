@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import { useWS } from '../../components/WSContext.tsx';
+import { useWS } from '../WSContext.tsx';
 
 import Message from "../../interfaces/Message.tsx";
 
