@@ -27,10 +27,7 @@ const PseudoSelection = () => {
                     text: "CHECK"
                 };
                 sendMessage(checkMessage);
-                console.log("Vérification de l'existence du lobby :", gameId);
                 setCheckDone(true);
-            } else {
-                console.warn("Paramètre 'game' invalide ou manquant.");
             }
         }
     }, [location.search]);
