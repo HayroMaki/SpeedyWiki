@@ -7,11 +7,6 @@ import {generateUniqueId} from './functions/generateUniqueId.js';
 import {fetchArticles} from './functions/fetchArticles.js';
 import {readEnvFile} from './functions/readEnvFile.js';
 
-function generateSixDigitCode() {
-  const random = Math.floor(Math.random() * 999999) + 1; // entre 1 et 999999
-  return random.toString().padStart(6, '0');
-}
-
 // Create websocket on 3002 :
 const websocket = new WebSocketServer({
   port: 3002,
@@ -34,6 +29,7 @@ lobbies[111111] = {
   "players":new Set(),
   "articles": null,
 };
+
 fetchArticles().then((articles) => {
   lobbies[111111].articles = articles;
 });
@@ -67,7 +63,7 @@ websocket.on("connection", (ws) => {
 
         case "create":
           // Create a lobby and send the lobbyId back.
-          const lobbyId = generateSixDigitCode();
+          const lobbyId = generateUniqueId(6,new Set(Object.keys(lobbies)));
           lobbies[lobbyId] = {
             "players": new Set(),
             "articles": null,
@@ -75,12 +71,13 @@ websocket.on("connection", (ws) => {
           fetchArticles().then((articles) => {
             lobbies[lobbyId].articles = articles;
           });
+          console.log("Lobby created : ID : ",lobbyId);
 
           // Réponse plus claire avec l'ID du lobby
           ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"Lobby " + lobbyId + " created."}));
 
           collection.insertOne(lobbies[lobbyId]).then(r => {
-            console.log("Lobby inserted in DB ! ID : ", r.insertedId);
+            console.log("Lobby created in DB : DB_ID : ", r.insertedId);
           })
               .catch(error => {
                 console.error("Error while inserting lobby : ", error);
@@ -124,6 +121,7 @@ websocket.on("connection", (ws) => {
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
               break;
+
             case "START":
                 if (lobbies[lobby]) {
                     // Vérifiez que l'expéditeur est bien l'hôte (à implémenter selon votre logique)

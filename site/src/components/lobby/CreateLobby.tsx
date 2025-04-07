@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useWS } from "../WSContext.tsx"; // Ajustez le chemin selon votre structure
 
 const CreateLobby: React.FC = () => {
-    const { sendMessage, messages, pseudo } = useWS();
+    const { sendMessage, setMessages, messages, pseudo, getResponse } = useWS();
     const navigate = useNavigate();
     const [isCreating, setIsCreating] = useState(false);
 
@@ -12,17 +12,13 @@ const CreateLobby: React.FC = () => {
         if (!isCreating) return;
 
         // Chercher un message de confirmation de création de lobby
-        const creationMessage = messages.find(m =>
-            m.type === "response-sys" &&
-            m.pseudo === "SYSTEM" &&
-            m.text.includes("Lobby") &&
-            m.text.includes("created")
-        );
+        const m = getResponse();
 
-        if (creationMessage) {
+        if (m && m.text.includes("Lobby") && m.text.includes("created")) {
             setIsCreating(false);
             // Extraire l'ID du lobby
-            const lobbyId = creationMessage.text.split("Lobby ")[1].split(" created")[0];
+            const lobbyId = m.text.split("Lobby ")[1].split(" created")[0];
+            setMessages([]);
             // Naviguer vers la page de sélection
             navigate(`/Selection?game=${lobbyId}`);
         }

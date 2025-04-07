@@ -13,6 +13,5 @@ export function generateUniqueId(length, existingIds) {
         if (!existingIds.has(id)) return id;
         tries++;
     }
-
     return null;
 }

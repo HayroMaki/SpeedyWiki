@@ -12,23 +12,23 @@ const PseudoSelection = () => {
     const [waitingForResponse, setWaitingForResponse] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
     const [checkDone, setCheckDone] = useState(false);
+    const [tempLobby, setTempLobby] = useState("");
 
     // Verify the URL GET lobby value :
     useEffect(() => {
-        if (lobby === undefined) {
-            const params = new URLSearchParams(location.search);
-            const gameId = params.get("game");
+        const params = new URLSearchParams(location.search);
+        const gameId = params.get("game");
 
-            if (gameId && gameId.length === 6) {
-                const checkMessage: Message = {
-                    type: "lobby",
-                    lobby: gameId,
-                    pseudo: "",
-                    text: "CHECK"
-                };
-                sendMessage(checkMessage);
-                setCheckDone(true);
-            }
+        if (gameId && gameId.length === 6) {
+            const checkMessage: Message = {
+                type: "lobby",
+                lobby: gameId,
+                pseudo: "",
+                text: "CHECK"
+            };
+            sendMessage(checkMessage);
+            setCheckDone(true);
+            setTempLobby(gameId);
         }
     }, [location.search]);
 
@@ -36,11 +36,14 @@ const PseudoSelection = () => {
     useEffect(() => {
         if (!checkDone) return;
         const response = getResponse();
+        console.log("response:",response);
         if (response && response.text === "OK") {
-            setLobby(response.lobby);
-            console.log("Valid lobby :", response.lobby);
+            setLobby(tempLobby);
+            setMessages([]);
+            console.log("Valid lobby :", lobby);
         } else if (response) {
-            console.warn("Invalid lobby :", response.lobby);
+            console.warn("Invalid lobby :", tempLobby);
+            setMessages([]);
             navigate("/Join?error=invalid");
         }
         setCheckDone(false);
