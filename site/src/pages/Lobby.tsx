@@ -88,13 +88,27 @@ const exUser7: User = {
     item_used:0
 }
 
+const pictureColorMap: { [key: number]: string } = {
+    1: "#1F3A62",   // Bleu foncé
+    2: "#BB124C",   // Rouge framboise
+    3: "#1149C2",   // Bleu roi
+    4: "#FFFF11",   // Jaune vif
+    5: "#992817",   // Rouge brique
+    6: "#111111",   // Noir
+    7: "#AAAABA",   // Gris bleuté
+    8: "#3DBF86",   // Vert menthe
+    9: "#F28C28",   // Orange doux
+  };
+
 const exUserList:User[] = [exUser1,exUser2,exUser3,exUser4,exUser5,exUser6,exUser7];
 
 export const Lobby = () => {
     const navigate = useNavigate();
-    const [players, setPlayers] = useState(exUserList);
+    //const [players, setPlayers] = useState(exUserList);
     const [isHost, setIsHost] = useState(true); 
-    const { WS: socket, sendMessage, lobby: lobbyId, pseudo } = useWS();
+    const [players, setPlayers] = useState<User[]>([]);
+
+    const { WS: socket, sendMessage, lobby: lobbyId, pseudo, messages } = useWS();
     
     useEffect(() => {
         if (!socket) {
@@ -106,21 +120,47 @@ export const Lobby = () => {
             try {
                 const message = JSON.parse(event.data);
                 console.log("Message reçu:", message);
-                
+
                 if (message.type === 'START') {
                     navigate("/Game");
+                    return;
                 }
+
+                // Ajout d'un joueur à la réception d'un message SYSTEM_USER
+                if (message.type === "response-sys" && message.pseudo === "SYSTEM_USER") {
+                    const userObj = JSON.parse(message.text);  // Convertir le texte JSON en objet
+                    const { pseudo, image } = userObj;
+
+                  
+                    setPlayers(prevPlayers => {
+                      const alreadyExists = prevPlayers.some(player => player.name === pseudo);
+                      if (alreadyExists) return prevPlayers;
+                  
+                      const newPlayer: User = {
+                        id: prevPlayers.length + 1,
+                        name: pseudo,
+                        picture: image,
+                        color: pictureColorMap[image] || "#CCCCCC",
+                        current_page: "...",
+                        clicks: 0,
+                        pages: [],
+                        items: [],
+                        item_used: 0
+                      };
+                      
+                      return [...prevPlayers, newPlayer];
+                    });
+                    
+                }
+
             } catch (error) {
                 console.error("Error parsing message:", error);
             }
         };
 
         socket.addEventListener('message', handleMessage);
-
-        return () => {
-            socket.removeEventListener('message', handleMessage);
-        };
-    }, [socket]);
+        return () => socket.removeEventListener('message', handleMessage);
+    }, [socket, navigate]);
 
     const startGame = () => {
         if (!sendMessage) {
@@ -129,7 +169,7 @@ export const Lobby = () => {
         }
 
         sendMessage({
-            type: 'lobby', // Uniformisez le type avec le serveur (minuscules)
+            type: 'lobby', 
             lobby: lobbyId,
             pseudo: pseudo,
             text: "START"
@@ -153,7 +193,7 @@ export const Lobby = () => {
                                     <img className='icon' src={Cross} alt="Fermer"/>
                                 </div>
                             </div>
-                            <div className="lobby-window-content">
+                            <div className="lobby-window-content lobby-window-button">
                                 <button className="button" onClick={startGame}>Start the game</button>
                             </div>
                         </div>

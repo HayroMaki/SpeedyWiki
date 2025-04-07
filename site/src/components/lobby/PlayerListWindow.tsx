@@ -19,6 +19,7 @@ import PP9 from '../../assets/image/char/Char9.png';
 const PP:string[] = [PP1,PP2,PP3,PP4,PP5,PP6,PP7,PP8,PP9];
 
 export const PlayerListWindow = (props : {players: User[]}) => {
+    
     return (
         <>
             <div className="player-list-container">
@@ -37,7 +38,7 @@ export const PlayerListWindow = (props : {players: User[]}) => {
                                 const style = {color:player.color}
                                 return (
                                     <li className="player-list-line" style={style} key={player.id}>
-                                        <img className="player-list-players-image" src={PP[player.picture - 1]} alt=""/>
+                                        <img className="player-list-players-image" src={PP[player.picture - 0]} alt=""/>
                                         <div className="player-list-players-name">{player.name}</div>
                                     </li>
                                 )

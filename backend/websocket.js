@@ -88,18 +88,30 @@ websocket.on("connection", (ws) => {
           switch (text) {
             case "JOIN":
               // Check that the lobby exists :
+              
               if (lobbies[lobby]) {
+                const { type, lobby, pseudo, text, image } = JSON.parse(message);
                 userLobby = lobby;
                 userPseudo = pseudo;
                 userObj = {
                   "ws":ws,
                   "pseudo":pseudo,
-                }
-
+                  "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
+                };
+                
                 // Add the player to the lobby and notify him that he can join (OK) :
                 lobbies[userLobby].players.add(userObj);
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
-
+                lobbies[lobby].players.forEach((client) => {
+                  if (client.ws.readyState === client.ws.OPEN) {
+                      client.ws.send(JSON.stringify({
+                          type: "response-sys",
+                          pseudo: "SYSTEM_USER",
+                          text:  JSON.stringify(userObj)  // Convertir userObj en chaîne JSON
+                      }));
+                  }
+                });
+                
                 // Send the connexion message to every user in the same lobby :
                 lobbies[userLobby].players.forEach((client) => {
                   if (client.ws.readyState === ws.OPEN) {

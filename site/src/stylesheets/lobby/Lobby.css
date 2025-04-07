@@ -109,6 +109,10 @@
     align-items: center;
 }
 
+.lobby-window-button{
+    width: auto;
+}
+
 .lobby-window-content h1 {
     text-align: center;
     font-size: 42px;

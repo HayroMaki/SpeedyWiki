@@ -3,11 +3,12 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { useWS } from '../WSContext.tsx';
 
 import Message from "../../interfaces/Message.tsx";
+import MessageUser from "../../interfaces/MessageUser.tsx";
 
 const PseudoSelection = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {messages, sendMessage, getResponse, setMessages, lobby, setLobby, pseudo, setPseudo} = useWS();
+    const {messages, sendMessage, getResponse, setMessages, lobby, setLobby, pseudo, setPseudo, picture} = useWS();
 
     const [waitingForResponse, setWaitingForResponse] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -53,10 +54,12 @@ const PseudoSelection = () => {
     // Asks the server the permission to enter the lobby :
     const handleStart = () => {
         if (pseudo.trim() !== "") {
-            const message:Message = {
+            
+            const message:MessageUser = {
                 type: "lobby",
                 lobby: lobby,
                 pseudo: pseudo,
+                image: picture,
                 text: "JOIN",
             }
             sendMessage(message);
