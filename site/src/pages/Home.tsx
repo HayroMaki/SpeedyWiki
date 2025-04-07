@@ -3,7 +3,7 @@ import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
 
 import FooterWindow from '../components/home/FooterWindow.tsx';
-import CreateLobby from '../components/CreateLobby'; // Assurez-vous que le chemin est correct
+import CreateLobby from '../components/lobby/CreateLobby.tsx'; // Assurez-vous que le chemin est correct
 
 import '../stylesheets/Home.css'
 

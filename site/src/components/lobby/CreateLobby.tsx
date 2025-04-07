@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWS } from "./WSContext"; // Ajustez le chemin selon votre structure
+import { useWS } from "../WSContext.tsx"; // Ajustez le chemin selon votre structure
 
 const CreateLobby: React.FC = () => {
     const { sendMessage, messages, pseudo } = useWS();
