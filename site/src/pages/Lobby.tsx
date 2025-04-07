@@ -128,27 +128,25 @@ export const Lobby = () => {
 
                 // Ajout d'un joueur à la réception d'un message SYSTEM_USER
                 if (message.type === "response-sys" && message.pseudo === "SYSTEM_USER") {
-                    const userObj = JSON.parse(message.text);  // Convertir le texte JSON en objet
-                    const { pseudo, image } = userObj;
+                    const playersList = message.text;  // La liste des joueurs reçue
+                    
+                    setPlayers(() => {
+                        // On transforme la liste reçue en format attendu
+                        const updatedPlayers = playersList.map((player: { pseudo: string; image: number; }) => {
+                        return {
+                            id: player.pseudo,  // Utilise le pseudo comme ID (assurez-vous qu'il soit unique)
+                            name: player.pseudo,
+                            picture: player.image,
+                            color: pictureColorMap[player.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
+                            current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
+                            clicks: 0,
+                            pages: [],
+                            items: [],
+                            item_used: 0
+                        };
+                        });
 
-                  
-                    setPlayers(prevPlayers => {
-                      const alreadyExists = prevPlayers.some(player => player.name === pseudo);
-                      if (alreadyExists) return prevPlayers;
-                  
-                      const newPlayer: User = {
-                        id: prevPlayers.length + 1,
-                        name: pseudo,
-                        picture: image,
-                        color: pictureColorMap[image] || "#CCCCCC",
-                        current_page: "...",
-                        clicks: 0,
-                        pages: [],
-                        items: [],
-                        item_used: 0
-                      };
-                      
-                      return [...prevPlayers, newPlayer];
+                        return updatedPlayers;
                     });
                     
                 }

@@ -99,15 +99,21 @@ websocket.on("connection", (ws) => {
                   "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
                 };
                 
+                
                 // Add the player to the lobby and notify him that he can join (OK) :
                 lobbies[userLobby].players.add(userObj);
+
+                const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
+                  pseudo: player.pseudo,
+                  image: player.image
+              }));
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
                 lobbies[lobby].players.forEach((client) => {
                   if (client.ws.readyState === client.ws.OPEN) {
                       client.ws.send(JSON.stringify({
                           type: "response-sys",
                           pseudo: "SYSTEM_USER",
-                          text:  JSON.stringify(userObj)  // Convertir userObj en chaîne JSON
+                          text:  playersArray 
                       }));
                   }
                 });
