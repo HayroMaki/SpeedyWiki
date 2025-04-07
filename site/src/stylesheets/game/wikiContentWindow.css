@@ -66,3 +66,127 @@
     font-size: 20px;
 }
 
+/* CSS pour le popup d'artifact suivant le format wiki */
+.artifact-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.artifact-popup-container {
+    width: 400px;
+    height: auto;
+    max-height: 80vh;
+}
+
+.artifact-popup-top {
+    height: 3rem;
+    background-color: #A2D2F6;
+    border: 3px solid #6d6d6d;
+    border-bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.artifact-popup-content {
+    background-color: #EEE6E0;
+    border: 3px solid #6d6d6d;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.artifact-popup-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.artifact-popup-title {
+    height: 3rem;
+    padding-left: 8px;
+    font-size: 26px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.artifact-popup-body {
+    width: 100%;
+    background-color: white;
+    border: 3px solid #6d6d6d;
+    border-left: 0;
+    border-right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    text-align: center;
+}
+
+.icons-container {
+    display: flex;
+}
+
+
+.artifact-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+}
+
+.artifact-details {
+    width: 90%;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: white;
+    border: 2px solid #6d6d6d;
+    text-align: left;
+}
+
+.artifact-name {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.artifact-effect {
+    font-size: 16px;
+}
+
+.collect-button {
+    background-color: #EEE6E0;
+    color: black;
+    border: 3px solid #6d6d6d;
+    padding: 8px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 0 #6d6d6d;
+}
+
+.collect-button:hover {
+    background-color: #ddd9d3;
+}
+
+.collect-button:active {
+    box-shadow: 1px 1px 0 #6d6d6d;
+    transform: translate(1px, 1px);
+}
+
+.artifact-popup-bottom {
+    height: 1rem;
+    background-color: #EEE6E0;
+}
