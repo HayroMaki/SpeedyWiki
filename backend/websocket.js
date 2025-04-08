@@ -132,7 +132,6 @@ websocket.on("connection", (ws) => {
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
               break;
-
             case "CHECK":
               // Return whether the lobby exists or not :
               if (lobbies[lobby]) {
@@ -186,7 +185,9 @@ websocket.on("connection", (ws) => {
                         if (client.ws.readyState === client.ws.OPEN) {
                             client.ws.send(JSON.stringify({
                                 type: "START",
-                                lobby: lobby
+                                pseudo: "SYSTEM",
+                                lobby: lobby,
+                                text: lobbies[lobby].articles
                             }));
                         }
                     });

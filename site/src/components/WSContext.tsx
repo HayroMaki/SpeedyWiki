@@ -42,7 +42,6 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                     console.log("received :",data);
                     setMessages((prev) => {
                         const newMsg = [...prev, data];
-                        console.log(newMsg);
                         return newMsg;
                     });
                 };
