@@ -161,15 +161,15 @@ websocket.on("connection", (ws) => {
                   pseudo: player.pseudo,
                   image: player.image
               }));
-                lobbies[lobby].players.forEach((client) => {
-                  if (client.ws.readyState === client.ws.OPEN) {
-                      client.ws.send(JSON.stringify({
-                          type: "response-sys",
-                          pseudo: "SYSTEM_USER",
-                          text:  playersArray 
-                      }));
-                  }
-                });
+              lobbies[lobby].players.forEach((client) => {
+                if (client.ws.readyState === client.ws.OPEN) {
+                  client.ws.send(JSON.stringify({
+                    type: "PLAYERS",
+                    pseudo: "SYSTEM",
+                    text: playersArray 
+                  }));
+                }
+              });
                 lobbies[userLobby].players.forEach((client) => {
                   if (client.ws.readyState === ws.OPEN) {
                     const sys_text = pseudo + " quit the game.";
