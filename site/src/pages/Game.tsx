@@ -13,8 +13,10 @@ import ChatWindow from "../components/lobby/ChatWindow.tsx"
 import AppWindow from "../components/game/AppWindow.tsx";
 
 import baseInventory from "../components/game/Inventory.tsx";
+import { useWS } from "../components/WSContext.tsx";
 
 const Game = () => {
+  const { getStart } = useWS();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
@@ -60,16 +62,17 @@ const Game = () => {
     }
   };
 
-  useRunOnce({
-    fn: () => {
-      
-      fetchArticles().then(articles => {
-        setArticles(articles);
-        setWikiContent(articles[0].url);
-        setPage(articles[0].title);
-      });
+  useRunOnce({fn: () => {
+    const m_start = getStart();
+    if (m_start && m_start.text) {
+      const start_art:Article[] = m_start.text;
+      console.log(start_art);
+      setArticles(start_art);
+      setWikiContent(start_art[0].url);
+      setPage(start_art[0].title);
     }
-  });
+  }});
+  
 
   useEffect(() => {
     CheckPage();

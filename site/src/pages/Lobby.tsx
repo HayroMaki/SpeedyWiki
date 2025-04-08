@@ -40,6 +40,13 @@ export const Lobby = () => {
 
     const checkMessages = () => {
         try {
+            const m_start = getStart();
+            if (m_start) {
+                console.log("found start:",m_start);
+                navigate("/Game");
+                return;
+            }
+
             const m_players = getPlayers();
             if (m_players) {
                 clear("PLAYERS","SYSTEM");
@@ -66,13 +73,6 @@ export const Lobby = () => {
                     });
                 }
             }
-        
-            const m_start = getStart();
-            if (m_start) {
-                navigate("/Game");
-                return;
-            }
-
         } catch (error) {
             console.error("Error parsing message:", error);
         }

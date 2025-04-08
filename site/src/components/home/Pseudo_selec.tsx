@@ -81,7 +81,7 @@ const PseudoSelection = () => {
         if (!waitingForResponse) return;
         const m = getResponse();
         if (m) {
-            clear();
+            clear('response-sys',"SYSTEM");
             console.log("response :", m);
             if (m.text === "OK") {
                 if (timeoutId) clearTimeout(timeoutId);
