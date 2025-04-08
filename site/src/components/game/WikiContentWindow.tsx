@@ -11,6 +11,7 @@ import Teleport from "../../assets/image/artifact/Teleport.png";
 import Mine from "../../assets/image/artifact/Mine.png";
 import Snail from "../../assets/image/artifact/Snail.png";
 import Disorientor from "../../assets/image/artifact/Disorientor.png";
+import Eraser from "../../assets/image/artifact/Eraser.png";
 import Dictator from "../../assets/image/artifact/Dictator.png";
 
 
@@ -21,17 +22,17 @@ import baseInventory from "./Inventory.tsx";
 
 // Définition des artéfacts disponibles dans le jeu
 const positiveArtifacts: Partial<Artifact>[] = [
-    { id: 1, name: "GPS", icon: GPS, effect: 1, count: 1 },
+    { id: 1, name: "GPS", icon: GPS, effect: 1, count: -1 },
     { id: 2, name: "Rollback", icon: Rollback, effect: 2, count: 1 },
-    { id: 3, name: "Teleport", icon: Teleport, effect: 3, count: 1 }
-    //{ id: 4, name: "Portal", icon: "portal_icon.png", effect: 4, count: 1 },
+    { id: 3, name: "Teleport", icon: Teleport, effect: 3, count: -1 },
+    { id: 4, name: "Mine", icon: Mine, effect: 4, count: 1 },
 ];
 
 const negativeArtifacts: Partial<Artifact>[] = [
-    { id: 101, name: "Mine", icon: Mine, effect: -1, count: 1 },
-    { id: 102, name: "Snail", icon: Snail, effect: -2, count: 1 },
-    { id: 103, name: "Disorientor", icon: Disorientor, effect: -3, count: 1 },
-    { id: 104, name: "Dictator", icon: Dictator, effect: -4, count: 1 },
+    { id: 101, name: "Eraser", icon: Eraser, effect: -1, count: -1 },
+    { id: 102, name: "Snail", icon: Snail, effect: -2, count: -1 },
+    { id: 103, name: "Disorientor", icon: Disorientor, effect: -3, count: -1 },
+    { id: 104, name: "Dictator", icon: Dictator, effect: -4, count: -1 }
 ];
 
 // Valeurs de popularité pour simuler (à remplacer par des données réelles)
@@ -113,7 +114,44 @@ export const WikiContentWindow = (props: {
     const [artifactFound, setArtifactFound] = useState<Artifact | null>(null);
     const [showArtifactPopup, setShowArtifactPopup] = useState(false);
     const [visitedPages, setVisitedPages] = useState<Set<string>>(new Set([props.title]));
+    const [isSnailActive, setIsSnailActive] = useState(false);
+    const [snailTimer, setSnailTimer] = useState(0);
+    const [showSnailPopup, setShowSnailPopup] = useState(false);
+    const [snailIntervalId, setSnailIntervalId] = useState<NodeJS.Timeout | null>(null);
 
+// Fonction pour démarrer le décompte
+    const startSnailTimer = () => {
+        // Arrêter tout timer existant
+        if (snailIntervalId) {
+            clearInterval(snailIntervalId);
+        }
+
+        // Démarrer un nouveau timer
+        const intervalId = setInterval(() => {
+            setSnailTimer(prevTime => {
+                const newTime = prevTime - 1;
+                if (newTime <= 0) {
+                    clearInterval(intervalId);
+                    setIsSnailActive(false);
+                    setShowSnailPopup(false);
+                    // toast.success("Effet de l'escargot terminé ! Vous pouvez à nouveau agir normalement.");
+                    return 0;
+                }
+                return newTime;
+            });
+        }, 1000);
+
+        setSnailIntervalId(intervalId);
+    };
+
+// Nettoyage lors du démontage du composant
+    useEffect(() => {
+        return () => {
+            if (snailIntervalId) {
+                clearInterval(snailIntervalId);
+            }
+        };
+    }, [snailIntervalId]);
     // Fonction pour déterminer si un artéfact apparaît
     const checkForArtifact = (title: string) => {
         // Ne pas générer d'artéfact si on a déjà visité cette page
@@ -133,9 +171,6 @@ export const WikiContentWindow = (props: {
         // Calculer si un artéfact apparaît
         const random = Math.random();
         if (random <= baseChance) {
-            // Un artéfact est trouvé!
-
-            // La probabilité d'obtenir un artéfact positif dépend de la popularité
             const isPositive = Math.random() <= popularity;
 
             // Sélectionner un artéfact aléatoire
@@ -153,7 +188,8 @@ export const WikiContentWindow = (props: {
 
             // Afficher l'artéfact trouvé
             setArtifactFound(foundArtifact);
-            setShowArtifactPopup(true);
+            console.log(foundArtifact.count)
+            setShowArtifactPopup(foundArtifact.count !== -1);
         }
     };
 
@@ -171,26 +207,41 @@ export const WikiContentWindow = (props: {
 
     const collectArtifact = () => {
         if (artifactFound) {
-            let x = false;
-            for(let i = 0; i < baseInventory.length; i++) {
-                if(baseInventory[i].name === artifactFound.name) {
-                    baseInventory[i].count++
-                    x = true;
-                    break;
+            if(artifactFound.count === -1) {
+                switch(artifactFound.name) {
+                    case "Snail":
+                        // Bloquer toutes les actions pendant 60 secondes
+                        setIsSnailActive(true);
+                        setSnailTimer(60);
+                        setShowSnailPopup(true);
+                        startSnailTimer();
+                        break;
+                    case "":
+                        break;
                 }
-            }
-            if(!x) {
-                baseInventory.push(artifactFound);
+            } else {
+                let x = false;
+                for(let i = 0; i < baseInventory.length; i++) {
+                    if(baseInventory[i].name === artifactFound.name) {
+                        baseInventory[i].count++
+                        x = true;
+                        break;
+                    }
+                }
+                if(!x) {
+                    baseInventory.push(artifactFound);
+                }
             }
         }
         setShowArtifactPopup(false);
         setArtifactFound(null);
     };
 
-    const closeArtifactPopup = () => {
-        setShowArtifactPopup(false);
-        setArtifactFound(null);
-    };
+
+    // const closeArtifactPopup = () => {
+    //     setShowArtifactPopup(false);
+    //     setArtifactFound(null);
+    // };
 
     return (
         <>
@@ -207,6 +258,48 @@ export const WikiContentWindow = (props: {
                         <h1 className="wiki-title">Page : {pageTitle}</h1>
                         <button className="wiki-button button" onClick={handleInventoryClick}>Inventory</button>
                     </div>
+                    <div className={`app-container ${isSnailActive ? 'snail-active' : ''}`}>
+
+                    </div>
+                    {showSnailPopup && (
+                        <div className="artifact-popup">
+                            <div className="artifact-popup-container">
+                                <div className="artifact-popup-top">
+                                    <div className="icons-container">
+                                        <img className="icon" src={Reduce} alt="Reduce" />
+                                        <img className="icon" src={Full} alt="Full Screen" />
+                                        <img className="icon" src={Cross} alt="Close" />
+                                    </div>
+                                </div>
+                                <div className="artifact-popup-content">
+                                    <div className="artifact-popup-header">
+                                        <h1 className="artifact-popup-title">You got snailed !</h1>
+                                    </div>
+                                    <div className="artifact-popup-body">
+                                        <img
+                                            src={Snail}
+                                            alt="Snail"
+                                            className="artifact-icon"
+                                        />
+                                        <div className="artifact-details">
+                                            <div className="artifact-name">Snelly the Snail</div>
+                                            <div className="artifact-effect">
+                                                You are slowed down ! Impossible to do anything for
+                                            </div>
+                                            <div className="snail-timer">
+                                                <span className="timer-value">{snailTimer}</span> seconds
+                                            </div>
+                                        </div>
+                                        <div className="snail-message">
+                                            Wait until the countdown ends...
+                                        </div>
+                                    </div>
+                                    <div className="artifact-popup-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {inventoryOpen && (
                         <div className="Inventory">
                             <InventoryWindow inventory={props.inventory}/>
@@ -231,7 +324,7 @@ export const WikiContentWindow = (props: {
                             <div className="icons-container">
                                 <img className="icon" src={Reduce} alt="Reduce" />
                                 <img className="icon" src={Full} alt="Full Screen" />
-                                <img className="icon" src={Cross} alt="Close" onClick={closeArtifactPopup} />
+                                <img className="icon" src={Cross} alt="Close"/>
                             </div>
                         </div>
                         <div className="artifact-popup-content">
