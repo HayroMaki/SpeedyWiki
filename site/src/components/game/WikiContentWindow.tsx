@@ -3,25 +3,35 @@ import "../../stylesheets/game/wikiContentWindow.css"
 import Reduce from "../../assets/icon/Reduce_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
-import LootIcon from "../../assets/image/char/Char2.png";
+
+// Artifact icons
+import GPS from "../../assets/image/artifact/GPS.png";
+import Rollback from "../../assets/image/artifact/Rollback.png";
+import Teleport from "../../assets/image/artifact/Teleport.png";
+import Mine from "../../assets/image/artifact/Mine.png";
+import Snail from "../../assets/image/artifact/Snail.png";
+import Disorientor from "../../assets/image/artifact/Disorientor.png";
+import Dictator from "../../assets/image/artifact/Dictator.png";
+
 
 import {useEffect, useState, useRef} from "react";
 import InventoryWindow from "./InventoryWindow";
 import { Artifact } from "../../interfaces/Artifact";
+import baseInventory from "./Inventory.tsx";
 
 // Définition des artéfacts disponibles dans le jeu
 const positiveArtifacts: Partial<Artifact>[] = [
-    { id: 1, name: "GPS", icon: "gps_icon.png", effect: 1, count: 1 },
-    { id: 2, name: "Time Warp", icon: "time_icon.png", effect: 2, count: 1 },
-    { id: 3, name: "Quick Search", icon: "search_icon.png", effect: 3, count: 1 },
-    { id: 4, name: "Portal", icon: "portal_icon.png", effect: 4, count: 1 },
+    { id: 1, name: "GPS", icon: GPS, effect: 1, count: 1 },
+    { id: 2, name: "Rollback", icon: Rollback, effect: 2, count: 1 },
+    { id: 3, name: "Teleport", icon: Teleport, effect: 3, count: 1 }
+    //{ id: 4, name: "Portal", icon: "portal_icon.png", effect: 4, count: 1 },
 ];
 
 const negativeArtifacts: Partial<Artifact>[] = [
-    { id: 101, name: "Mandatory Visit", icon: "visit_icon.png", effect: -1, count: 1 },
-    { id: 102, name: "Time Freeze", icon: "freeze_icon.png", effect: -2, count: 1 },
-    { id: 103, name: "Random Teleport", icon: "teleport_icon.png", effect: -3, count: 1 },
-    { id: 104, name: "Link Blocker", icon: "block_icon.png", effect: -4, count: 1 },
+    { id: 101, name: "Mine", icon: Mine, effect: -1, count: 1 },
+    { id: 102, name: "Snail", icon: Snail, effect: -2, count: 1 },
+    { id: 103, name: "Disorientor", icon: Disorientor, effect: -3, count: 1 },
+    { id: 104, name: "Dictator", icon: Dictator, effect: -4, count: 1 },
 ];
 
 // Valeurs de popularité pour simuler (à remplacer par des données réelles)
@@ -97,7 +107,6 @@ export const WikiContentWindow = (props: {
     title: string,
     setPage: (page: string) => void;
     inventory: Artifact[],
-    addToInventory?: (artifact: Artifact) => void
 }) => {
     const [pageTitle, setPageTitle] = useState(props.title);
     const [inventoryOpen, setInventoryOpen] = useState(false);
@@ -161,8 +170,18 @@ export const WikiContentWindow = (props: {
     };
 
     const collectArtifact = () => {
-        if (artifactFound && props.addToInventory) {
-            props.addToInventory(artifactFound);
+        if (artifactFound) {
+            let x = false;
+            for(let i = 0; i < baseInventory.length; i++) {
+                if(baseInventory[i].name === artifactFound.name) {
+                    baseInventory[i].count++
+                    x = true;
+                    break;
+                }
+            }
+            if(!x) {
+                baseInventory.push(artifactFound);
+            }
         }
         setShowArtifactPopup(false);
         setArtifactFound(null);
@@ -221,7 +240,7 @@ export const WikiContentWindow = (props: {
                             </div>
                             <div className="artifact-popup-body">
                                 <img
-                                    src={LootIcon}
+                                    src={artifactFound.icon}
                                     alt="Artifact"
                                     className="artifact-icon"
                                 />
