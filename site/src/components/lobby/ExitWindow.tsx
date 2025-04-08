@@ -3,12 +3,21 @@ import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Exit from "../../assets/icon/Exit_Icon_no_bg.png";
 import { useNavigate } from "react-router-dom";
-
+import { useWS } from '../WSContext.tsx';
+import MessageUser from "../../interfaces/MessageUser.tsx";
 export const ExitWindow = () => {
     const nav = useNavigate();
-    
-    const handleClick = (event) => {
-        event.preventDefault();
+    const {WS: socket, sendMessage, lobby: lobbyId, pseudo, messages, picture } = useWS();
+    const handleClick = () => {
+        const message:MessageUser = {
+                        type: "lobby",
+                        lobby: lobbyId,
+                        pseudo: pseudo,
+                        image: picture,
+                        text: "QUIT",
+                    }
+                    sendMessage(message);
+        
         nav("/");
     }
 

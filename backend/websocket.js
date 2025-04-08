@@ -44,6 +44,7 @@ websocket.on("connection", (ws) => {
   ws.on("message", (message) => {
     try {
       const {type, lobby, pseudo, text} = JSON.parse(message);
+      
       console.log(type + " on " + lobby + " - " + pseudo + " : " + text);
 
       // Action depending on the message type :
@@ -88,7 +89,6 @@ websocket.on("connection", (ws) => {
           switch (text) {
             case "JOIN":
               // Check that the lobby exists :
-              
               if (lobbies[lobby]) {
                 const { type, lobby, pseudo, text, image } = JSON.parse(message);
                 userLobby = lobby;
@@ -139,11 +139,22 @@ websocket.on("connection", (ws) => {
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
               break;
-
+            case "QUIT":
+              if (lobbies[lobby]) {
+                const { type, lobby, pseudo, text, image } = JSON.parse(message);
+                userLobby = lobby;
+                userPseudo = pseudo;
+                userObj = {
+                  "ws":ws,
+                  "pseudo":pseudo,
+                  "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
+                };
+                lobbies[userLobby].players.delete(userObj);
+              }
+                break;
             case "START":
                 if (lobbies[lobby]) {
-                    // Vérifiez que l'expéditeur est bien l'hôte (à implémenter selon votre logique)
-                    
+                  
                     // Envoyer un message à tous les joueurs du lobby
                     lobbies[lobby].players.forEach((client) => {
                         if (client.ws.readyState === client.ws.OPEN) {
