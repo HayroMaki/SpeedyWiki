@@ -17,7 +17,6 @@ export const ExitWindow = () => {
                         text: "QUIT",
                     }
                     sendMessage(message);
-        
         nav("/");
     }
 
