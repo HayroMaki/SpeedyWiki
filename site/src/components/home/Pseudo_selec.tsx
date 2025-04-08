@@ -8,7 +8,7 @@ import MessageUser from "../../interfaces/MessageUser.tsx";
 const PseudoSelection = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {messages, sendMessage, getResponse, setMessages, lobby, setLobby, pseudo, setPseudo, picture} = useWS();
+    const {messages, sendMessage, getResponse, setMessages, clear, lobby, setLobby, pseudo, setPseudo, picture} = useWS();
 
     const [waitingForResponse, setWaitingForResponse] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -27,6 +27,7 @@ const PseudoSelection = () => {
                 pseudo: "",
                 text: "CHECK"
             };
+            console.log("checking...")
             sendMessage(checkMessage);
             setCheckDone(true);
             setTempLobby(gameId);
@@ -40,8 +41,8 @@ const PseudoSelection = () => {
         console.log("response:",response);
         if (response && response.text === "OK") {
             setLobby(tempLobby);
-            setMessages([]);
-            console.log("Valid lobby :", lobby);
+            clear("response-sys","SYSTEM");
+            console.log("Valid lobby :", tempLobby);
         } else if (response) {
             console.warn("Invalid lobby :", tempLobby);
             setMessages([]);
@@ -62,6 +63,7 @@ const PseudoSelection = () => {
                 image: picture,
                 text: "JOIN",
             }
+            console.log("joining...")
             sendMessage(message);
 
             // Timeout in case the server does not respond in under 10 seconds :
@@ -79,10 +81,12 @@ const PseudoSelection = () => {
         if (!waitingForResponse) return;
         const m = getResponse();
         if (m) {
+            clear('response-sys',"SYSTEM");
             console.log("response :", m);
             if (m.text === "OK") {
                 if (timeoutId) clearTimeout(timeoutId);
-                setMessages([]);
+                console.log("Joining lobby",lobby,"as",pseudo);
+                console.log("msg:",messages);
                 navigate("/Lobby");
             } else {
                 if (timeoutId) clearTimeout(timeoutId);

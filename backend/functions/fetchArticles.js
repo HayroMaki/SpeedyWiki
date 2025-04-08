@@ -9,7 +9,7 @@ export const fetchArticles = async () => {
             const data = await response.json();
             const title = data.title;
 
-            if (!fetchedArticles.some(article => article.title === title)) {
+            if (!fetchedArticles.some(article => article.title === title) || title!="Not found.") {
                 fetchedArticles.push({
                     id: id,
                     title: title,

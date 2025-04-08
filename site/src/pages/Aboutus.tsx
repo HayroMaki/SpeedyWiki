@@ -1,39 +1,40 @@
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
+import Jules from "../assets/image/about/20230920_201224.webp";
 
 import "../stylesheets/Aboutus.css";
 const teamMembers = [
     {
-        name: "Randy Bou-Jaber",
+        name: "Randy Bou Jaber",
         role: "Project Manager",
         description: "Pretty af",
         image: "https://via.placeholder.com/150",
-        linkedin: "https://www.linkedin.com/in/alice-dupont",
-        email: "mailto:alice@example.com"
+        linkedin: "https://www.linkedin.com/in/randy-bou-jaber/",
+        email: "mailto:randyboujaber@hotmail.fr"
     },
     {
         name: "Martial Carceles",
         role: "Developper python",
         description: "Young developper always willing to learn more about IT. Hire him because he's the best in the world (Written by himself)",
         image: "https://via.placeholder.com/150",
-        linkedin: "https://www.linkedin.com/in/lucas-morel",
-        email: "mailto:lucas@example.com"
+        linkedin: "https://www.linkedin.com/in/martial-carceles-b5507a252/",
+        email: "mailto:martialinadisse@gmail.com"
     },
     {
-        name: "Jules Renaud-Granges",
+        name: "Jules Renaud-Grange",
         role: "Developper FullStack",
         description: "Better than Martial",
-        image: "https://via.placeholder.com/150",
-        linkedin: "https://www.linkedin.com/in/jean-martin",
-        email: "mailto:jean@example.com"
+        image: Jules,
+        linkedin: "https://www.linkedin.com/in/julesrenaudgrange/",
+        email: "mailto:julesgrange@outlook.fr"
     },
     {
         name: "Guillaume Augeraud",
         role: "Developper Front-end",
         description: "Im the only serious one here",
-        linkedin: "https://www.linkedin.com/in/sophie-bernard",
-        email: "mailto:sophie@example.com"
+        linkedin: "https://www.linkedin.com/in/guillaume-augeraud/",
+        email: "mailto:augeraud.guillaume@gmail.fr"
     }
 ];
 

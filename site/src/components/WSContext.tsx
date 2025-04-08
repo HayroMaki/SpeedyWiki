@@ -11,6 +11,9 @@ interface WSContextType {
     }[];
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     getResponse: () => Message | null;
+    getPlayers: () => Message | null;
+    getStart: () => Message | null;
+    clear: (type:string, pseudo:string) => void;
     lobby: string;
     setLobby: React.Dispatch<React.SetStateAction<string>>;
     pseudo: string;
@@ -37,7 +40,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
                     console.log("received :",data);
-                    setMessages((prev) => [...prev, data]);
+                    setMessages((prev) => {
+                        const newMsg = [...prev, data];
+                        return newMsg;
+                    });
                 };
 
                 socket.onopen = () => console.log("✅ WebSocket connecté");
@@ -62,6 +68,34 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         return null;
     }
 
+    const getPlayers = () => {
+        for (const m of messages) {
+            if (m.type == "PLAYERS" && m.pseudo == "SYSTEM") {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    const getStart = () => {
+        for (const m of messages) {
+            if (m.type == "START" && m.pseudo == "SYSTEM") {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    const clear = (type:string, pseudo:string = "SYSTEM") => {
+        const newMsg:Message[] = [];
+        for (const m of messages) {
+            if (m.type == type && m.pseudo == pseudo) {
+                console.log("clear:",m);
+            } else newMsg.push(m);
+        }
+        setMessages(newMsg);
+    }
+
     // Fonction pour envoyer un message
     const sendMessage = (message: Message) => {
         if (WS && WS.readyState === WebSocket.OPEN) {
@@ -72,7 +106,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
             {children}
         </WSContext.Provider>
     );

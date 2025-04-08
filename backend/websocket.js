@@ -103,18 +103,20 @@ websocket.on("connection", (ws) => {
                 // Add the player to the lobby and notify him that he can join (OK) :
                 lobbies[userLobby].players.add(userObj);
 
+                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
+
                 const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
                   pseudo: player.pseudo,
                   image: player.image
-              }));
-                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
+                }));
+
                 lobbies[lobby].players.forEach((client) => {
                   if (client.ws.readyState === client.ws.OPEN) {
-                      client.ws.send(JSON.stringify({
-                          type: "response-sys",
-                          pseudo: "SYSTEM_USER",
-                          text:  playersArray 
-                      }));
+                    client.ws.send(JSON.stringify({
+                      type: "PLAYERS",
+                      pseudo: "SYSTEM",
+                      text: playersArray 
+                    }));
                   }
                 });
                 
@@ -130,7 +132,6 @@ websocket.on("connection", (ws) => {
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
               break;
-
             case "CHECK":
               // Return whether the lobby exists or not :
               if (lobbies[lobby]) {
@@ -149,7 +150,31 @@ websocket.on("connection", (ws) => {
                   "pseudo":pseudo,
                   "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
                 };
-                lobbies[userLobby].players.delete(userObj);
+                for (const player of lobbies[userLobby].players) {
+                  if (player.pseudo === pseudo) {
+                    lobbies[userLobby].players.delete(player);
+                    break;
+                  }
+                }
+                const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
+                  pseudo: player.pseudo,
+                  image: player.image
+              }));
+              lobbies[lobby].players.forEach((client) => {
+                if (client.ws.readyState === client.ws.OPEN) {
+                  client.ws.send(JSON.stringify({
+                    type: "PLAYERS",
+                    pseudo: "SYSTEM",
+                    text: playersArray 
+                  }));
+                }
+              });
+                lobbies[userLobby].players.forEach((client) => {
+                  if (client.ws.readyState === ws.OPEN) {
+                    const sys_text = pseudo + " quit the game.";
+                    client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
+                  }
+                });
               }
                 break;
             case "START":
@@ -160,7 +185,9 @@ websocket.on("connection", (ws) => {
                         if (client.ws.readyState === client.ws.OPEN) {
                             client.ws.send(JSON.stringify({
                                 type: "START",
-                                lobby: lobby
+                                pseudo: "SYSTEM",
+                                lobby: lobby,
+                                text: lobbies[lobby].articles
                             }));
                         }
                     });
