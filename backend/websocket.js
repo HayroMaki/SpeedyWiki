@@ -149,7 +149,31 @@ websocket.on("connection", (ws) => {
                   "pseudo":pseudo,
                   "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
                 };
-                lobbies[userLobby].players.delete(userObj);
+                for (const player of lobbies[userLobby].players) {
+                  if (player.pseudo === pseudo) {
+                    lobbies[userLobby].players.delete(player);
+                    break;
+                  }
+                }
+                const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
+                  pseudo: player.pseudo,
+                  image: player.image
+              }));
+                lobbies[lobby].players.forEach((client) => {
+                  if (client.ws.readyState === client.ws.OPEN) {
+                      client.ws.send(JSON.stringify({
+                          type: "response-sys",
+                          pseudo: "SYSTEM_USER",
+                          text:  playersArray 
+                      }));
+                  }
+                });
+                lobbies[userLobby].players.forEach((client) => {
+                  if (client.ws.readyState === ws.OPEN) {
+                    const sys_text = pseudo + " quit the game.";
+                    client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
+                  }
+                });
               }
                 break;
             case "START":
