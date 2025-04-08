@@ -10,83 +10,8 @@ import ChatWindow from "../components/lobby/ChatWindow.tsx";
 import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
 import {ExitWindow} from "../components/lobby/ExitWindow.tsx";
 import {useWS} from "../components/WSContext.tsx";
-const exUser1: User = {
-    id:1,
-    name:"Johny",
-    picture:2,
-    color:"#1F3A62",
-    current_page:"...",
-    clicks:4,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser2: User = {
-    id:2,
-    name:"Joseph",
-    picture:6,
-    color:"#BB124C",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser3: User = {
-    id:3,
-    name:"Jonathan",
-    picture:4,
-    color:"#1149C2",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser4: User = {
-    id:4,
-    name:"George",
-    picture:1,
-    color:"#FFFF11",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser5: User = {
-    id:5,
-    name:"George II",
-    picture:8,
-    color:"#992817",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser6: User = {
-    id:6,
-    name:"Jotaro",
-    picture:1,
-    color:"#111111",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
-const exUser7: User = {
-    id:7,
-    name:"Josuke",
-    picture:4,
-    color:"#AAAABA",
-    current_page:"...",
-    clicks:2,
-    pages:[],
-    items:[],
-    item_used:0
-}
+import useRunOnce from "../components/tools/useRunOnce.tsx";
+
 
 const pictureColorMap: { [key: number]: string } = {
     1: "#1F3A62",   // Bleu foncé
@@ -98,67 +23,60 @@ const pictureColorMap: { [key: number]: string } = {
     7: "#AAAABA",   // Gris bleuté
     8: "#3DBF86",   // Vert menthe
     9: "#F28C28",   // Orange doux
-  };
-
-const exUserList:User[] = [exUser1,exUser2,exUser3,exUser4,exUser5,exUser6,exUser7];
+};
 
 export const Lobby = () => {
     const navigate = useNavigate();
-    //const [players, setPlayers] = useState(exUserList);
     const [isHost, setIsHost] = useState(true); 
     const [players, setPlayers] = useState<User[]>([]);
-
-    const { WS: socket, sendMessage, lobby: lobbyId, pseudo, messages } = useWS();
+    const { sendMessage, setMessages, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart } = useWS();
     
+    console.log(messages);
+    useRunOnce({fn:() => {checkMessages()}});
+
     useEffect(() => {
-        if (!socket) {
-            console.error("WebSocket connection is not established");
-            return;
-        }
+       checkMessages(); 
+    },[messages]);
 
-        const handleMessage = (event: MessageEvent) => {
-            try {
-                const message = JSON.parse(event.data);
-                console.log("Message reçu:", message);
-
-                if (message.type === 'START') {
-                    navigate("/Game");
-                    return;
-                }
-
-                // Ajout d'un joueur à la réception d'un message SYSTEM_USER
-                if (message.type === "response-sys" && message.pseudo === "SYSTEM_USER") {
-                    const playersList = message.text;  // La liste des joueurs reçue
-                    
+    const checkMessages = () => {
+        try {
+            const m_players = getPlayers();
+            if (m_players) {
+                clear("PLAYERS","SYSTEM");
+                console.log("Message reçu:", m_players);
+                const playersList = m_players.text; 
+                console.log(playersList);
+                
+                if (playersList) {
                     setPlayers(() => {
                         // On transforme la liste reçue en format attendu
-                        const updatedPlayers = playersList.map((player: { pseudo: string; image: number; }) => {
-                        return {
-                            id: player.pseudo,  // Utilise le pseudo comme ID (assurez-vous qu'il soit unique)
-                            name: player.pseudo,
-                            picture: player.image,
-                            color: pictureColorMap[player.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
-                            current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
-                            clicks: 0,
-                            pages: [],
-                            items: [],
-                            item_used: 0
-                        };
+                        return playersList.map((player: { pseudo: string; image: number; }) => {
+                            return {
+                                id: player.pseudo,  // Utilise le pseudo comme ID (assurez-vous qu'il soit unique)
+                                name: player.pseudo,
+                                picture: player.image,
+                                color: pictureColorMap[player.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
+                                current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
+                                clicks: 0,
+                                pages: [],
+                                items: [],
+                                item_used: 0
+                            };
                         });
-
-                        return updatedPlayers;
                     });
-                    
                 }
-
-            } catch (error) {
-                console.error("Error parsing message:", error);
             }
-        };
+        
+            const m_start = getStart();
+            if (m_start) {
+                navigate("/Game");
+                return;
+            }
 
-        socket.addEventListener('message', handleMessage);
-        return () => socket.removeEventListener('message', handleMessage);
-    }, [socket, navigate]);
+        } catch (error) {
+            console.error("Error parsing message:", error);
+        }
+    }
 
     const startGame = () => {
         if (!sendMessage) {

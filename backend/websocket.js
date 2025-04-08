@@ -103,18 +103,20 @@ websocket.on("connection", (ws) => {
                 // Add the player to the lobby and notify him that he can join (OK) :
                 lobbies[userLobby].players.add(userObj);
 
+                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
+
                 const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
                   pseudo: player.pseudo,
                   image: player.image
-              }));
-                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
+                }));
+
                 lobbies[lobby].players.forEach((client) => {
                   if (client.ws.readyState === client.ws.OPEN) {
-                      client.ws.send(JSON.stringify({
-                          type: "response-sys",
-                          pseudo: "SYSTEM_USER",
-                          text:  playersArray 
-                      }));
+                    client.ws.send(JSON.stringify({
+                      type: "PLAYERS",
+                      pseudo: "SYSTEM",
+                      text: playersArray 
+                    }));
                   }
                 });
                 
