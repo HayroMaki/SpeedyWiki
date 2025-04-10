@@ -31,6 +31,7 @@ const Game = () => {
         }
         return article;
       });
+
   
       if (player) {
         setPlayer(prev =>
@@ -50,6 +51,16 @@ const Game = () => {
         );
         console.log("click:",player.clicks);
         console.log("history:",player.pages);
+
+        const newUpdatedArticles = updatedArticles.map(article => {
+          const isPageVisited = player.pages.includes(article.title);
+          if (isPageVisited) {
+            return { ...article, completion: true };
+          }
+          return article;
+        });
+  
+        return newUpdatedArticles;
       }
       return updatedArticles;
     });
