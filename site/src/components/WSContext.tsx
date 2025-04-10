@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {createContext, ReactNode, useContext, useState} from "react";
 import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
 
@@ -26,10 +26,29 @@ const WSContext = createContext<WSContextType | undefined>(undefined);
 
 export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [WS, setWS] = useState<WebSocket | null>(null);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [lobby, setLobby] = useState<string>("");
-    const [pseudo, setPseudo] = useState<string>("");
-    const [picture,setPicture] = useState<number>(0);
+    const [lobby, setLobby] = useState<string>(() => localStorage.getItem("lobby") || "");
+    const [pseudo, setPseudo] = useState<string>(() => localStorage.getItem("pseudo") || "");
+    const [picture, setPicture] = useState<number>(() => parseInt(localStorage.getItem("picture") || "0"));
+    const [messages, setMessages] = useState<Message[]>(() => {
+        const stored = localStorage.getItem("messages");
+        return stored ? JSON.parse(stored) : [];
+    });
+
+    React.useEffect(() => {
+        localStorage.setItem("lobby", lobby);
+    }, [lobby]);
+
+    React.useEffect(() => {
+        localStorage.setItem("pseudo", pseudo);
+    }, [pseudo]);
+
+    React.useEffect(() => {
+        localStorage.setItem("picture", picture.toString());
+    }, [picture]);
+
+    React.useEffect(() => {
+        localStorage.setItem("messages", JSON.stringify(messages));
+    }, [messages]);
 
     useRunOnce({
         fn: () => {
@@ -40,15 +59,66 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
                     console.log("received :",data);
-                    setMessages((prev) => {
-                        const newMsg = [...prev, data];
-                        return newMsg;
-                    });
+                    setMessages((prev) => [...prev, data]);
                 };
 
-                socket.onopen = () => console.log("✅ WebSocket connecté");
-                socket.onerror = (error) => console.error("❌ Erreur WebSocket :", error);
-                socket.onclose = (event) => console.warn("⚠️ WebSocket fermé :", event.reason);
+                socket.onopen = () => {
+                    if (window.location.hash =="#/Lobby" || window.location.hash == "#/Game") {
+                        console.log("checking for possible reconnexion...")
+                        const storedPseudo = localStorage.getItem("pseudo");
+                        const storedLobby = localStorage.getItem("lobby");
+                        if (storedLobby && storedLobby.length === 6) {
+                            const checkMessage: Message = {
+                                type: "lobby",
+                                lobby: storedLobby,
+                                pseudo: "",
+                                text: "CHECK"
+                            };
+                            console.log("Reconnection : lobby verification...");
+                            socket.send(JSON.stringify(checkMessage));
+
+                            // Waiting for check response to reconnect :
+                            const checkInterval = setInterval(() => {
+                                const response = getResponse();
+                                if (response) {
+                                    clearInterval(checkInterval);
+                                    clearTimeout(failTimeout);
+
+                                    if (response.text === "OK") {
+                                        console.log("Valid Lobby :", storedLobby);
+                                        const joinMessage: Message = {
+                                            type: "lobby",
+                                            lobby: storedLobby,
+                                            pseudo: storedPseudo || "",
+                                            text: "JOIN"
+                                        };
+                                        socket.send(JSON.stringify(joinMessage));
+                                        setLobby(storedLobby);
+                                        setPseudo(storedPseudo || "");
+                                    } else {
+                                        console.warn("Invalid Lobby :", storedLobby);
+                                        setMessages([]);
+                                        localStorage.removeItem("lobby");
+                                        localStorage.removeItem("pseudo");
+                                        window.location.replace("/");
+                                    }
+                                    clear("response-sys", "SYSTEM");
+                                }
+                            }, 200);
+
+                            const failTimeout = setTimeout(() => {
+                                clearInterval(checkInterval);
+                                console.warn("Timeout Lobby Check.");
+                                setMessages([]);
+                                localStorage.removeItem("lobby");
+                                localStorage.removeItem("pseudo");
+                                window.location.replace("/");
+                            }, 5000);
+                        }
+                    }
+                };
+                socket.onerror = (error) => console.error("❌ WebSocket Error :", error);
+                socket.onclose = (event) => console.warn("⚠️ WebSocket Closed :", event.reason);
 
                 setWS(socket);
 

@@ -17,20 +17,22 @@ const PseudoSelection = () => {
 
     // Verify the URL GET lobby value :
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const gameId = params.get("game");
+        if (!checkDone) {
+            const params = new URLSearchParams(location.search);
+            const gameId = params.get("game");
 
-        if (gameId && gameId.length === 6) {
-            const checkMessage: Message = {
-                type: "lobby",
-                lobby: gameId,
-                pseudo: "",
-                text: "CHECK"
-            };
-            console.log("checking...")
-            sendMessage(checkMessage);
-            setCheckDone(true);
-            setTempLobby(gameId);
+            if (gameId && gameId.length === 6) {
+                const checkMessage: Message = {
+                    type: "lobby",
+                    lobby: gameId,
+                    pseudo: "",
+                    text: "CHECK"
+                };
+                console.log("checking...")
+                sendMessage(checkMessage);
+                setCheckDone(true);
+                setTempLobby(gameId);
+            }
         }
     }, [location.search]);
 
@@ -81,7 +83,7 @@ const PseudoSelection = () => {
         if (!waitingForResponse) return;
         const m = getResponse();
         if (m) {
-            clear('response-sys',"SYSTEM");
+            setMessages([]);
             console.log("response :", m);
             if (m.text === "OK") {
                 if (timeoutId) clearTimeout(timeoutId);
@@ -90,7 +92,6 @@ const PseudoSelection = () => {
                 navigate("/Lobby");
             } else {
                 if (timeoutId) clearTimeout(timeoutId);
-                setMessages([]);
             }
             setWaitingForResponse(false);
         }

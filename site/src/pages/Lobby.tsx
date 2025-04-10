@@ -29,13 +29,15 @@ export const Lobby = () => {
     const navigate = useNavigate();
     const [isHost, setIsHost] = useState(true); 
     const [players, setPlayers] = useState<User[]>([]);
-    const { sendMessage, setMessages, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart } = useWS();
+    const { sendMessage, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart } = useWS();
     
     console.log(messages);
-    useRunOnce({fn:() => {checkMessages()}});
+    useRunOnce({fn:() => {
+        checkMessages();
+    }});
 
     useEffect(() => {
-       checkMessages(); 
+       checkMessages();
     },[messages]);
 
     const checkMessages = () => {
