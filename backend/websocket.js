@@ -66,6 +66,7 @@ websocket.on("connection", (ws) => {
           // Create a lobby and send the lobbyId back.
           const lobbyId = generateUniqueId(6,new Set(Object.keys(lobbies)));
           lobbies[lobbyId] = {
+            "id": lobbyId,
             "players": new Set(),
             "articles": null,
           }
@@ -98,8 +99,8 @@ websocket.on("connection", (ws) => {
                   "pseudo":pseudo,
                   "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
                 };
-                
-                
+
+
                 // Add the player to the lobby and notify him that he can join (OK) :
                 lobbies[userLobby].players.add(userObj);
 
@@ -127,10 +128,18 @@ websocket.on("connection", (ws) => {
                     client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
                   }
                 });
+                var plrList = {$set: { players: playersArray }};
+                collection.updateOne({id : lobby}, plrList).then(r => {
+                  console.log("Player list updated in lobby : ", lobby);
+                })
+                    .catch(error => {
+                      console.error("Error when updating player list in lobby : ", error);
+                    });
               } else {
                 // If lobby does not exist, notify him that he cannot join (KO) :
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
+
               break;
             case "CHECK":
               // Return whether the lobby exists or not :
@@ -175,6 +184,13 @@ websocket.on("connection", (ws) => {
                     client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
                   }
                 });
+                var plrLeave = {$set: { players: playersArray }};
+                collection.updateOne({id : lobby}, plrLeave).then(r => {
+                  console.log("Player list updated in lobby : ", lobby);
+                })
+                    .catch(error => {
+                      console.error("Error when updating player list in lobby : ", error);
+                    });
               }
                 break;
             case "START":
@@ -191,6 +207,14 @@ websocket.on("connection", (ws) => {
                             }));
                         }
                     });
+
+                  var artList = {$set: { articles: lobbies[lobby].articles }};
+                  collection.updateOne({id : lobby}, artList).then(r => {
+                    console.log("Article list updated in lobby : ", lobby);
+                  })
+                      .catch(error => {
+                        console.error("Error when updating article list in lobby : ", error);
+                      });
                 }
                 break;
           }
