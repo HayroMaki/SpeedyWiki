@@ -99,7 +99,7 @@ const Game = () => {
           <ChatWindow/>
         </div>
         <div className="game-page-content">
-          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} inventory={inventory}/>
+          <WikiContentWindow wikiContent={wikiContent} title={page} setPage={setPage} inventory={inventory} articles={articles}/>
           <div className="App_Component">
             <AppWindow articles={articles}/>
           </div>

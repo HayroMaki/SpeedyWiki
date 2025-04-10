@@ -18,7 +18,7 @@ return(
                     <h1 className="Stat-title">Your stats :</h1>
                     <div className="Stat-list-container">
                     <h1>Move : </h1>
-                    <h1>Time : </h1>
+                   
                     <h1>Pages found :</h1>
                     <div className="Stat-list-articles">
                         
