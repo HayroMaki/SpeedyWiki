@@ -375,41 +375,41 @@ export const WikiContentWindow = (props: {
             setSnailTimer(snail_timer_int);
             setShowSnailPopup(true);
             startSnailTimer();
-        }
+        } else {
+            // Prevents artifact farming
+            if (visitedPages.has(title)) {
+                return;
+            }
+            setVisitedPages(prev => new Set(prev).add(title));
+            const baseChance = 0.20;
+            const popularity = estimatePopularity(title);
 
-        // Prevents artifact farming
-        if (visitedPages.has(title)) {
-            return;
-        }
-        setVisitedPages(prev => new Set(prev).add(title));
-        const baseChance = 0.20;
-        const popularity = estimatePopularity(title);
+            // Checks if an artifact should appear
+            const random = Math.random();
+            if (random <= baseChance) {
+                const isPositive = Math.random() <= popularity;
 
-        // Checks if an artifact should appear
-        const random = Math.random();
-        if (random <= baseChance) {
-            const isPositive = Math.random() <= popularity;
+                // Select a random artifact
+                const artifactPool = isPositive ? positiveArtifacts : negativeArtifacts;
+                const selectedArtifact = artifactPool[Math.floor(Math.random() * artifactPool.length)];
 
-            // Select a random artifact
-            const artifactPool = isPositive ? positiveArtifacts : negativeArtifacts;
-            const selectedArtifact = artifactPool[Math.floor(Math.random() * artifactPool.length)];
+                // Create artifact
+                const foundArtifact: Artifact = {
+                    id: selectedArtifact.id!,
+                    name: selectedArtifact.name!,
+                    icon: selectedArtifact.icon!,
+                    effect: selectedArtifact.effect!,
+                    count: selectedArtifact.count!
+                };
 
-            // Create artifact
-            const foundArtifact: Artifact = {
-                id: selectedArtifact.id!,
-                name: selectedArtifact.name!,
-                icon: selectedArtifact.icon!,
-                effect: selectedArtifact.effect!,
-                count: selectedArtifact.count!
-            };
-
-            // Checks if artifact is of instant use or not
-            if (foundArtifact.count === -1) {
-                setArtifactFound(foundArtifact);
-                activateInstantArtifact(foundArtifact);
-            } else {
-                setArtifactFound(foundArtifact);
-                setShowArtifactPopup(true);
+                // Checks if artifact is of instant use or not
+                if (foundArtifact.count === -1) {
+                    setArtifactFound(foundArtifact);
+                    activateInstantArtifact(foundArtifact);
+                } else {
+                    setArtifactFound(foundArtifact);
+                    setShowArtifactPopup(true);
+                }
             }
         }
     };
