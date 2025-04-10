@@ -16,7 +16,7 @@ import baseInventory from "../components/game/Inventory.tsx";
 import { useWS } from "../components/WSContext.tsx";
 
 const Game = () => {
-  const { getStart } = useWS();
+  const { getStart, player,setPlayer } = useWS();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
@@ -52,11 +52,30 @@ const Game = () => {
   };
 
   const CheckPage = () => {
-    setArticles(prevArticles =>
-      prevArticles.map(article =>
-        article.title === page ? { ...article, completion: true } : article
-      )
-    );
+    setArticles(prevArticles => {
+      const updatedArticles = prevArticles.map(article => {
+        if (article.title === page) {
+          return { ...article, completion: true };
+        }
+        return article;
+      });
+  
+      if (player) {
+        setPlayer(prev =>
+          prev
+            ? {
+                ...prev,
+                pages: [...prev.pages, page],
+                clicks: (prev.clicks || 0) + 1
+              }
+            : null
+        );
+      }
+  
+      return updatedArticles;
+    });
+  
+    // Vérifie si tous les articles sont complétés
     if (articles.length > 0 && articles.every(article => article.completion)) {
       navigate("/Win");
     }

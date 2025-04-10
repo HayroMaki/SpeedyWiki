@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
+import User from "../interfaces/User";
 
 // Définition du type pour le contexte WebSocket
 interface WSContextType {
@@ -20,6 +21,8 @@ interface WSContextType {
     setPseudo: React.Dispatch<React.SetStateAction<string>>;
     picture: number;
     setPicture: React.Dispatch<React.SetStateAction<number>>;
+    player : User | null;
+    setPlayer: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -30,6 +33,8 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [lobby, setLobby] = useState<string>("");
     const [pseudo, setPseudo] = useState<string>("");
     const [picture,setPicture] = useState<number>(0);
+    const [player, setPlayer] = useState<User | null>(null);
+
 
     useRunOnce({
         fn: () => {
@@ -106,7 +111,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer}}>
             {children}
         </WSContext.Provider>
     );

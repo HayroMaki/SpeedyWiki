@@ -4,7 +4,7 @@ import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {User} from "../interfaces/User.tsx";
+import User from "../interfaces/User.tsx";
 import {PlayerListWindow} from "../components/lobby/PlayerListWindow.tsx";
 import ChatWindow from "../components/lobby/ChatWindow.tsx";
 import {LinkWindow} from "../components/lobby/LinkWindow.tsx";
@@ -29,7 +29,7 @@ export const Lobby = () => {
     const navigate = useNavigate();
     const [isHost, setIsHost] = useState(true); 
     const [players, setPlayers] = useState<User[]>([]);
-    const { sendMessage, setMessages, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart } = useWS();
+    const { sendMessage, setMessages, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart,player,setPlayer } = useWS();
     
     console.log(messages);
     useRunOnce({fn:() => {checkMessages()}});
@@ -56,10 +56,9 @@ export const Lobby = () => {
                 
                 if (playersList) {
                     setPlayers(() => {
-                        // On transforme la liste reçue en format attendu
-                        return playersList.map((player: { pseudo: string; image: number; }) => {
+                        const mappedPlayers = playersList.map((player: { pseudo: string; image: number; }) => {
                             return {
-                                id: player.pseudo,  // Utilise le pseudo comme ID (assurez-vous qu'il soit unique)
+                                id: player.pseudo,  // Utilise le pseudo comme ID 
                                 name: player.pseudo,
                                 picture: player.image,
                                 color: pictureColorMap[player.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
@@ -70,6 +69,24 @@ export const Lobby = () => {
                                 item_used: 0
                             };
                         });
+                
+                        
+                        const matchedPlayer = mappedPlayers.find(p => p.pseudo === pseudo);
+                        if (matchedPlayer) {
+                            setPlayer({
+                                id: matchedPlayer.pseudo,  // Utilise le pseudo comme ID 
+                                name: matchedPlayer.pseudo,
+                                picture: matchedPlayer.image,
+                                color: pictureColorMap[matchedPlayer.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
+                                current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
+                                clicks: 0,
+                                pages: [],
+                                items: [],
+                                item_used: 0
+                            });
+                        }
+                
+                        return mappedPlayers;
                     });
                 }
             }
