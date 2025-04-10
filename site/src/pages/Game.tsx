@@ -85,14 +85,16 @@ const Game = () => {
     fn: () => {
       const m_start = getStart();
       const m_startpage = getStartingPage();
+      console.log(m_startpage);
       if (m_start && m_start.text) {
         const start_art: Article[] = m_start.text;
         console.log(start_art);
         setArticles(start_art);
         if (m_startpage) {
           const startpage: Article[] = m_startpage.text;
-          setWikiContent(startpage[0].url);
-          setPage(startpage[0].title);
+          console.log(startpage);
+          setWikiContent(startpage[1].url);
+          setPage(startpage[1].title);
         }
       }
     }

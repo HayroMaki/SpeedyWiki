@@ -33,7 +33,7 @@ lobbies[111111] = {
 fetchArticles().then((articles) => {
   lobbies[111111].articles = articles;
 });
-const Startarticle = await fetchArticles(10);
+const Startarticle = await fetchArticles(2);
 // Setup websocket :
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
