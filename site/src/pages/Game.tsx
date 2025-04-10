@@ -16,7 +16,7 @@ import baseInventory from "../components/game/Inventory.tsx";
 import { useWS } from "../components/WSContext.tsx";
 
 const Game = () => {
-  const { getStart, player,setPlayer, getStartingPage} = useWS();
+  const { getStart, player,setPlayer, getStartingPage, actualPage, setActualPage} = useWS();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
@@ -85,20 +85,22 @@ const Game = () => {
   useRunOnce({
     fn: () => {
       const m_start = getStart();
-      const m_startpage = getStartingPage();
-      console.log(m_startpage);
       if (m_start && m_start.text) {
         const start_art: Article[] = m_start.text;
         console.log(start_art);
         setArticles(start_art);
       }
-      if (m_startpage) {
-          const startpage: Article[] = m_startpage.text;
-          console.log(startpage);
-          setWikiContent(startpage[1].url);
-          setPage(startpage[1].title);
+      const m_startpage = getStartingPage();
+      if (actualPage) {
+        setWikiContent(actualPage.url);
+        setPage(actualPage.title);
+      } else if (m_startpage) {
+        const startpage: Article[] = m_startpage.text;
+        console.log(startpage);
+        setWikiContent(startpage[1].url);
+        setPage(startpage[1].title);
       }
-      }
+    }
   });
   
   

@@ -3,6 +3,7 @@ import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
 import User from "../interfaces/User";
 import MessageUser from "../interfaces/MessageUser.tsx";
+import {Article} from "../interfaces/Article.tsx";
 
 // Définition du type pour le contexte WebSocket
 interface WSContextType {
@@ -25,6 +26,8 @@ interface WSContextType {
     setPicture: React.Dispatch<React.SetStateAction<number>>;
     player : User | null;
     setPlayer: React.Dispatch<React.SetStateAction<User | null>>;
+    actualPage: Article | null;
+    setActualPage: React.Dispatch<React.SetStateAction<Article | null>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -40,6 +43,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     });
     const [messages, setMessages] = useState<Message[]>(() => {
         const stored = localStorage.getItem("messages");
+        return stored ? JSON.parse(stored) : [];
+    });
+    const [actualPage, setActualPage] = useState<Article | null>(() => {
+        const stored = localStorage.getItem("actualpage");
         return stored ? JSON.parse(stored) : [];
     });
 
@@ -62,6 +69,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     React.useEffect(() => {
         localStorage.setItem("messages", JSON.stringify(messages));
     }, [messages]);
+
+    React.useEffect(() => {
+        localStorage.setItem("actualpage", JSON.stringify(actualPage));
+    }, [actualPage]);
 
     useRunOnce({
         fn: () => {
@@ -200,7 +211,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage, actualPage, setActualPage}}>
             {children}
         </WSContext.Provider>
     );
