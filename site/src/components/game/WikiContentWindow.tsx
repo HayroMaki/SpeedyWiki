@@ -144,10 +144,12 @@ export const WikiContentWindow = (props: {
         const intervalId = setInterval(() => {
             setSnailTimer(prevTime => {
                 const newTime = prevTime - 1;
+                localStorage.setItem("snail",JSON.stringify(prevTime));
                 if (newTime <= 0) {
                     clearInterval(intervalId);
                     setIsSnailActive(false);
                     setShowSnailPopup(false);
+                    localStorage.removeItem("snail");
                     return 0;
                 }
                 return newTime;
@@ -365,6 +367,16 @@ export const WikiContentWindow = (props: {
     }, [snailIntervalId]);
 
     const checkForArtifact = (title: string) => {
+        const snail_timer = localStorage.getItem("snail");
+        if (snail_timer) {
+            const snail_timer_int = parseInt(snail_timer);
+            console.log("you tried to go past the snail ?:",snail_timer_int);
+            setIsSnailActive(true);
+            setSnailTimer(snail_timer_int);
+            setShowSnailPopup(true);
+            startSnailTimer();
+        }
+
         // Prevents artifact farming
         if (visitedPages.has(title)) {
             return;
