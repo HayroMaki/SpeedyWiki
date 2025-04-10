@@ -26,8 +26,8 @@ interface WSContextType {
     setPicture: React.Dispatch<React.SetStateAction<number>>;
     player : User | null;
     setPlayer: React.Dispatch<React.SetStateAction<User | null>>;
-    actualPage: Article | null;
-    setActualPage: React.Dispatch<React.SetStateAction<Article | null>>;
+    actualPage: string;
+    setActualPage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -45,10 +45,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const stored = localStorage.getItem("messages");
         return stored ? JSON.parse(stored) : [];
     });
-    const [actualPage, setActualPage] = useState<Article | null>(() => {
-        const stored = localStorage.getItem("actualpage");
-        return stored ? JSON.parse(stored) : [];
-    });
+    const [actualPage, setActualPage] = useState<string>(() => localStorage.getItem("actualpage") || "");
 
     React.useEffect(() => {
         localStorage.setItem("lobby", lobby);
@@ -71,7 +68,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }, [messages]);
 
     React.useEffect(() => {
-        localStorage.setItem("actualpage", JSON.stringify(actualPage));
+        localStorage.setItem("actualpage", actualPage);
     }, [actualPage]);
 
     useRunOnce({
@@ -88,7 +85,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
                 socket.onopen = () => {
                     if (window.location.hash =="#/Lobby" || window.location.hash == "#/Game") {
-                        console.log("checking for possible reconnexion...")
+                        console.log("checking for possible reconnection...")
                         const storedPseudo = localStorage.getItem("pseudo");
                         const storedLobby = localStorage.getItem("lobby");
                         if (storedLobby && storedLobby.length === 6) {
@@ -184,7 +181,6 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const getStartingPage = () => {
         for (const m of messages) {
             if (m.type == "STARTPAGE" && m.pseudo == "SYSTEM") {
-                console.log(m);
                 return m;
             }
         }

@@ -23,34 +23,6 @@ const Game = () => {
   const [inventory,setInventory] = useState<Artifact[]>(baseInventory);
   const navigate = useNavigate();
 
-  const fetchArticles: () => Promise<Article[]> = async () => {
-    const numberOfArticles = 5;
-    const fetchedArticles: Article[] = [];
-    let id = 0;
-
-    while (fetchedArticles.length < numberOfArticles) {
-      try {
-        const response = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
-        const data = await response.json();
-        const title = data.title;
-
-        if (!fetchedArticles.some(article => article.title === title)) {
-          fetchedArticles.push({
-            id: id,
-            title: title,
-            extract: data.extract,
-            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
-            completion: false
-          });
-          id++;
-        }
-      } catch (error) {
-        console.error("Error during the fetch of the articles : ", error);
-      }
-    }
-    return fetchedArticles;
-  };
-
   const CheckPage = () => {
     setArticles(prevArticles => {
       const updatedArticles = prevArticles.map(article => {
@@ -65,13 +37,19 @@ const Game = () => {
           prev
             ? {
                 ...prev,
-                pages: [...prev.pages, page],
-                clicks: (prev.clicks || 0) + 1
+                pages:
+                  prev.pages[prev.pages.length - 1] !== page
+                    ? [...prev.pages, page]
+                    : prev.pages,
+                clicks:
+                  prev.pages[prev.pages.length - 1] !== page
+                    ? (prev.clicks || 0) + 1
+                    : prev.clicks
               }
             : null
         );
-        console.log(player.clicks)
-        console.log(player.pages)
+        console.log("click:",player.clicks);
+        console.log("history:",player.pages);
       }
       return updatedArticles;
     });
@@ -87,23 +65,27 @@ const Game = () => {
       const m_start = getStart();
       if (m_start && m_start.text) {
         const start_art: Article[] = m_start.text;
-        console.log(start_art);
+        console.log("objectifs:",start_art);
         setArticles(start_art);
       }
       const m_startpage = getStartingPage();
-      if (actualPage) {
-        setWikiContent(actualPage.url);
-        setPage(actualPage.title);
+
+      if (actualPage !== "") {
+        console.log("taking from local :",actualPage);
+        const link = "https://en.wikipedia.org/wiki/"+encodeURIComponent(actualPage.replace(" ","_"));
+        console.log("link :",link);
+        setWikiContent(link);
+        setPage(actualPage);
+
       } else if (m_startpage) {
         const startpage: Article[] = m_startpage.text;
-        console.log(startpage);
+        console.log("starting with:",startpage);
         setWikiContent(startpage[1].url);
         setPage(startpage[1].title);
+        setActualPage(startpage[1].title);
       }
     }
   });
-  
-  
 
   useEffect(() => {
     CheckPage();

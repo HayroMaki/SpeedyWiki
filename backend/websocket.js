@@ -216,7 +216,17 @@ websocket.on("connection", (ws) => {
                             }));
                         }
                     });
-
+                    
+                    lobbies[lobby].players.forEach((client) => {
+                      if (client.ws.readyState === client.ws.OPEN) {
+                          client.ws.send(JSON.stringify({
+                              type: "STARTPAGE",
+                              pseudo: "SYSTEM",
+                              lobby: lobby,
+                              text: lobbies[lobby].Startarticle
+                          }));
+                      }
+                  });
                   var artList = {$set: { articles: lobbies[lobby].articles }};
                   collection.updateOne({id : lobby}, artList).then(r => {
                     console.log("Article list updated in lobby : ", lobby);
@@ -224,18 +234,10 @@ websocket.on("connection", (ws) => {
                       .catch(error => {
                         console.error("Error when updating article list in lobby : ", error);
                       });
+
                 }
 
-                lobbies[lobby].players.forEach((client) => {
-                  if (client.ws.readyState === client.ws.OPEN) {
-                      client.ws.send(JSON.stringify({
-                          type: "STARTPAGE",
-                          pseudo: "SYSTEM",
-                          lobby: lobby,
-                          text: lobbies[lobby].Startarticle
-                      }));
-                  }
-              });
+                
                 break;
           }
           break;

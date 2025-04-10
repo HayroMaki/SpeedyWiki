@@ -19,6 +19,7 @@ import {useEffect, useState, useRef} from "react";
 import InventoryWindow from "./InventoryWindow";
 import { Artifact } from "../../interfaces/Artifact";
 import baseInventory from "./Inventory.tsx";
+import {useWS} from "../WSContext.tsx";
 
 // Different findable artifacts
 const positiveArtifacts: Partial<Artifact>[] = [
@@ -107,6 +108,8 @@ export const WikiContentWindow = (props: {
     setPage: (page: string) => void;
     inventory: Artifact[],
 }) => {
+    const {setActualPage} = useWS();
+
     const [pageTitle, setPageTitle] = useState(props.title);
     const [inventoryOpen, setInventoryOpen] = useState(false);
     const [artifactFound, setArtifactFound] = useState<Artifact | null>(null);
@@ -237,6 +240,7 @@ export const WikiContentWindow = (props: {
     const handlePageChange = (newTitle: string) => {
         setPageTitle(newTitle);
         props.setPage(newTitle);
+        setActualPage(newTitle);
         checkForArtifact(newTitle);
     };
 

@@ -2,6 +2,7 @@ import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
 
+import useRunOnce from "../components/tools/useRunOnce.tsx";
 import FooterWindow from '../components/home/FooterWindow.tsx';
 import CreateLobby from '../components/lobby/CreateLobby.tsx'; // Assurez-vous que le chemin est correct
 
@@ -10,6 +11,11 @@ import '../stylesheets/Home.css'
 import {NavLink} from "react-router-dom";
 
 const Home = () => {
+    useRunOnce({fn:() => {
+        localStorage.removeItem("actualpage");
+        }
+    })
+
     return (
         <>
             <div className="homePage">
