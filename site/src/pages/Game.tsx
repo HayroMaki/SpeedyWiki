@@ -16,7 +16,7 @@ import baseInventory from "../components/game/Inventory.tsx";
 import { useWS } from "../components/WSContext.tsx";
 
 const Game = () => {
-  const { getStart } = useWS();
+  const { getStart, player,setPlayer, getStartingPage} = useWS();
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
@@ -52,26 +52,54 @@ const Game = () => {
   };
 
   const CheckPage = () => {
-    setArticles(prevArticles =>
-      prevArticles.map(article =>
-        article.title === page ? { ...article, completion: true } : article
-      )
-    );
+    setArticles(prevArticles => {
+      const updatedArticles = prevArticles.map(article => {
+        if (article.title === page) {
+          return { ...article, completion: true };
+        }
+        return article;
+      });
+  
+      if (player) {
+        setPlayer(prev =>
+          prev
+            ? {
+                ...prev,
+                pages: [...prev.pages, page],
+                clicks: (prev.clicks || 0) + 1
+              }
+            : null
+        );
+      }
+  
+      return updatedArticles;
+    });
+  
+    // Vérifie si tous les articles sont complétés
     if (articles.length > 0 && articles.every(article => article.completion)) {
       navigate("/Win");
     }
   };
 
-  useRunOnce({fn: () => {
-    const m_start = getStart();
-    if (m_start && m_start.text) {
-      const start_art:Article[] = m_start.text;
-      console.log(start_art);
-      setArticles(start_art);
-      setWikiContent(start_art[0].url);
-      setPage(start_art[0].title);
-    }
-  }});
+  useRunOnce({
+    fn: () => {
+      const m_start = getStart();
+      const m_startpage = getStartingPage();
+      console.log(m_startpage);
+      if (m_start && m_start.text) {
+        const start_art: Article[] = m_start.text;
+        console.log(start_art);
+        setArticles(start_art);
+      }
+      if (m_startpage) {
+          const startpage: Article[] = m_startpage.text;
+          console.log(startpage);
+          setWikiContent(startpage[1].url);
+          setPage(startpage[1].title);
+      }
+      }
+  });
+  
   
 
   useEffect(() => {

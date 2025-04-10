@@ -1,6 +1,7 @@
-import React, {createContext, ReactNode, useContext, useState} from "react";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
+import User from "../interfaces/User";
 
 // Définition du type pour le contexte WebSocket
 interface WSContextType {
@@ -13,6 +14,7 @@ interface WSContextType {
     getResponse: () => Message | null;
     getPlayers: () => Message | null;
     getStart: () => Message | null;
+    getStartingPage:() => Message | null;
     clear: (type:string, pseudo:string) => void;
     lobby: string;
     setLobby: React.Dispatch<React.SetStateAction<string>>;
@@ -20,6 +22,8 @@ interface WSContextType {
     setPseudo: React.Dispatch<React.SetStateAction<string>>;
     picture: number;
     setPicture: React.Dispatch<React.SetStateAction<number>>;
+    player : User | null;
+    setPlayer: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -29,6 +33,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [lobby, setLobby] = useState<string>(() => localStorage.getItem("lobby") || "");
     const [pseudo, setPseudo] = useState<string>(() => localStorage.getItem("pseudo") || "");
     const [picture, setPicture] = useState<number>(() => parseInt(localStorage.getItem("picture") || "0"));
+    const [player, setPlayer] = useState<User | null>(JSON.parse(localStorage.getItem("player") || ""));
     const [messages, setMessages] = useState<Message[]>(() => {
         const stored = localStorage.getItem("messages");
         return stored ? JSON.parse(stored) : [];
@@ -45,6 +50,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     React.useEffect(() => {
         localStorage.setItem("picture", picture.toString());
     }, [picture]);
+
+    React.useEffect(() => {
+        localStorage.setItem("player", JSON.stringify(player));
+    }, [player]);
 
     React.useEffect(() => {
         localStorage.setItem("messages", JSON.stringify(messages));
@@ -156,6 +165,16 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         return null;
     }
 
+    const getStartingPage = () => {
+        for (const m of messages) {
+            if (m.type == "STARTPAGE" && m.pseudo == "SYSTEM") {
+                console.log(m);
+                return m;
+            }
+        }
+        return null;
+    }
+
     const clear = (type:string, pseudo:string = "SYSTEM") => {
         const newMsg:Message[] = [];
         for (const m of messages) {
@@ -176,7 +195,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage}}>
             {children}
         </WSContext.Provider>
     );
