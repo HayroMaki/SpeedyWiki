@@ -54,16 +54,16 @@ export const Lobby = () => {
                 console.log("Message reçu:", m_players);
                 const playersList = m_players.text; 
                 console.log(playersList);
-                
-                if (playersList) {
+
+                if (playersList && Array.isArray(playersList)) {
                     setPlayers(() => {
-                        const mappedPlayers = playersList.map((player: { pseudo: string; image: number; }) => {
+                        const mappedPlayers = playersList.map((player): User => {
                             return {
-                                id: player.pseudo,  // Utilise le pseudo comme ID
+                                id: player.pseudo,
                                 name: player.pseudo,
                                 picture: player.image,
-                                color: pictureColorMap[player.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
-                                current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
+                                color: pictureColorMap[player.image] || "#CCCCCC",
+                                current_page: "...",
                                 clicks: 0,
                                 pages: [],
                                 items: [],
@@ -71,20 +71,9 @@ export const Lobby = () => {
                             };
                         });
 
-
-                        const matchedPlayer = mappedPlayers.find(p => p.pseudo === pseudo);
+                        const matchedPlayer = mappedPlayers.find(p => p.name === pseudo);
                         if (matchedPlayer) {
-                            setPlayer({
-                                id: matchedPlayer.pseudo,  // Utilise le pseudo comme ID
-                                name: matchedPlayer.pseudo,
-                                picture: matchedPlayer.image,
-                                color: pictureColorMap[matchedPlayer.image] || "#CCCCCC",  // On assigne la couleur associée à l'image
-                                current_page: "...",  // Ajouter les autres valeurs par défaut si besoin
-                                clicks: 0,
-                                pages: [],
-                                items: [],
-                                item_used: 0
-                            });
+                            setPlayer(matchedPlayer);
                         }
 
                         return mappedPlayers;

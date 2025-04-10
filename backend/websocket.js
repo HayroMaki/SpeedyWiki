@@ -72,7 +72,8 @@ websocket.on("connection", (ws) => {
             "id": lobbyId,
             "players": new Set(),
             "articles": null,
-            "Startarticle":null,
+            "Startarticle": null,
+            "mined-articles": null
           }
           fetchArticles().then((articles) => {
             lobbies[lobbyId].articles = articles;
