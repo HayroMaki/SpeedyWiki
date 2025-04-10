@@ -70,8 +70,9 @@ const Game = () => {
               }
             : null
         );
+        console.log(player.clicks)
+        console.log(player.pages)
       }
-  
       return updatedArticles;
     });
   
