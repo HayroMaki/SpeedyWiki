@@ -173,7 +173,6 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const getStartingPage = () => {
         for (const m of messages) {
             if (m.type == "STARTPAGE" && m.pseudo == "SYSTEM") {
-                console.log("Start:"+m);
                 return m;
             }
         }

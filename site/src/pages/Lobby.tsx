@@ -27,7 +27,7 @@ const pictureColorMap: { [key: number]: string } = {
 
 export const Lobby = () => {
     const navigate = useNavigate();
-    const [isHost, setIsHost] = useState(true); 
+    const [isHost, setIsHost] = useState(false); 
     const [players, setPlayers] = useState<User[]>([]);
     const { sendMessage, clear, lobby: lobbyId, pseudo, messages, getPlayers, getStart, player, setPlayer} = useWS();
     console.log(messages);
@@ -74,6 +74,9 @@ export const Lobby = () => {
                         const matchedPlayer = mappedPlayers.find(p => p.name === pseudo);
                         if (matchedPlayer) {
                             setPlayer(matchedPlayer);
+                        }
+                        if (mappedPlayers[0]?.name === pseudo) {
+                            setIsHost(true);
                         }
 
                         return mappedPlayers;

@@ -61,7 +61,6 @@ const Game = () => {
       });
   
       if (player) {
-        console.log(player.pages[player.pages.length - 1] !== page);
         setPlayer(prev =>
           prev
             ? {
@@ -104,8 +103,8 @@ const Game = () => {
       if (m_startpage) {
           const startpage: Article[] = m_startpage.text;
           console.log(startpage);
-          setWikiContent(startpage[1].url);
-          setPage(startpage[1].title);
+          setWikiContent(startpage[0].url);
+          setPage(startpage[0].title);
       }
       }
   });
