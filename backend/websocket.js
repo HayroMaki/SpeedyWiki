@@ -33,7 +33,7 @@ lobbies[111111] = {
 fetchArticles().then((articles) => {
   lobbies[111111].articles = articles;
 });
-
+const Startarticle = await fetchArticles(10);
 // Setup websocket :
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
@@ -191,6 +191,17 @@ websocket.on("connection", (ws) => {
                             }));
                         }
                     });
+
+                    lobbies[lobby].players.forEach((client) => {
+                      if (client.ws.readyState === client.ws.OPEN) {
+                          client.ws.send(JSON.stringify({
+                              type: "STARTPAGE",
+                              pseudo: "SYSTEM",
+                              lobby: lobby,
+                              text: Startarticle
+                          }));
+                      }
+                  });
                 }
                 break;
           }

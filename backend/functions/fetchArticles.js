@@ -1,5 +1,5 @@
-export const fetchArticles = async () => {
-    const numberOfArticles = 5;
+export const fetchArticles = async (numberOfArticles = 5) => {
+
     const fetchedArticles = [];
     let id = 0;
 

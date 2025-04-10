@@ -14,6 +14,7 @@ interface WSContextType {
     getResponse: () => Message | null;
     getPlayers: () => Message | null;
     getStart: () => Message | null;
+    getStartingPage:() => Message | null;
     clear: (type:string, pseudo:string) => void;
     lobby: string;
     setLobby: React.Dispatch<React.SetStateAction<string>>;
@@ -91,6 +92,15 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         return null;
     }
 
+    const getStartingPage = () => {
+        for (const m of messages) {
+            if (m.type == "STARTPAGE" && m.pseudo == "SYSTEM") {
+                return m;
+            }
+        }
+        return null;
+    }
+
     const clear = (type:string, pseudo:string = "SYSTEM") => {
         const newMsg:Message[] = [];
         for (const m of messages) {
@@ -111,7 +121,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage}}>
             {children}
         </WSContext.Provider>
     );
