@@ -1,11 +1,12 @@
 import Cross from '../assets/icon/Cross_Icon.png';
 import Full from '../assets/icon/FullScreen_Icon.png';
 import Reduce from '../assets/icon/Reduce_Icon.png';
+import Jules from "../assets/image/about/20230920_201224.webp";
 
 import "../stylesheets/Aboutus.css";
 const teamMembers = [
     {
-        name: "Randy Bou-Jaber",
+        name: "Randy Bou Jaber",
         role: "Project Manager",
         description: "Pretty af",
         image: "https://via.placeholder.com/150",
@@ -21,10 +22,10 @@ const teamMembers = [
         email: "mailto:martialinadisse@gmail.com"
     },
     {
-        name: "Jules Renaud-Granges",
+        name: "Jules Renaud-Grange",
         role: "Developper FullStack",
         description: "Better than Martial",
-        image: "https://via.placeholder.com/150",
+        image: Jules,
         linkedin: "https://www.linkedin.com/in/julesrenaudgrange/",
         email: "mailto:julesgrange@outlook.fr"
     },
