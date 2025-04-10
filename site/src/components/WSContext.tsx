@@ -17,6 +17,7 @@ interface WSContextType {
     getPlayers: () => Message | null;
     getStart: () => Message | null;
     getStartingPage:() => Message | null;
+    getWinner:() => Message | null;
     clear: (type:string, pseudo:string) => void;
     lobby: string;
     setLobby: React.Dispatch<React.SetStateAction<string>>;
@@ -28,6 +29,7 @@ interface WSContextType {
     setPlayer: React.Dispatch<React.SetStateAction<User | null>>;
     actualPage: string;
     setActualPage: React.Dispatch<React.SetStateAction<string>>;
+
 }
 
 const WSContext = createContext<WSContextType | undefined>(undefined);
@@ -187,6 +189,15 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         return null;
     }
 
+    const getWinner = () => {
+        for (const m of messages) {
+            if (m.type == "WIN" && m.pseudo == "SYSTEM") {
+                return m;
+            }
+        }
+        return null;
+    }
+
     const clear = (type:string, pseudo:string = "SYSTEM") => {
         const newMsg:Message[] = [];
         for (const m of messages) {
@@ -198,7 +209,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
 
     // Fonction pour envoyer un message
-    const sendMessage = (message: Message) => {
+    const sendMessage = (message: Message | MessageUser) => {
         if (WS && WS.readyState === WebSocket.OPEN) {
             WS.send(JSON.stringify(message));
         } else {
@@ -207,7 +218,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage, actualPage, setActualPage}}>
+        <WSContext.Provider value={{ WS, sendMessage, setMessages, getResponse, getPlayers, getStart, clear, messages, lobby, setLobby, pseudo, setPseudo, picture, setPicture, player, setPlayer, getStartingPage, actualPage, setActualPage, getWinner}}>
             {children}
         </WSContext.Provider>
     );

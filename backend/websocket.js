@@ -81,7 +81,7 @@ websocket.on("connection", (ws) => {
           fetchArticles(2).then((articles) => {
             lobbies[lobbyId].Startarticle = articles;
           });
-  
+          const winners = [];
           console.log("Lobby created : ID : ",lobbyId);
 
           // Réponse plus claire avec l'ID du lobby
@@ -241,7 +241,29 @@ websocket.on("connection", (ws) => {
                 break;
           }
           break;
+        case "WIN":
+          const winnerSet = new Set(winners.map(winner => winner.pseudo)); 
 
+          if (!winnerSet.has(text.pseudo)) {
+            winners.push({
+                pseudo: pseudo, 
+                image: image,
+                clicks: text 
+            });
+        }
+    
+       
+        winners.sort((a, b) => parseInt(a.clicks) - parseInt(b.clicks));
+            lobbies[lobby].players.forEach((client) => {
+              if (client.ws.readyState === client.ws.OPEN) {
+                  client.ws.send(JSON.stringify({
+                      type: "WIN",
+                      pseudo: "SYSTEM",
+                      lobby: lobby,
+                      text: winners
+                  }));
+              }
+          });
         default:
           console.log("Unknown message type : " + type + " from : " + pseudo + " : " + text );
       }
