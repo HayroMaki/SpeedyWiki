@@ -20,7 +20,7 @@ const Game = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wikiContent, setWikiContent] = useState<string>('');
   const [page, setPage] = useState<string>('');
-  const [inventory,setInventory] = useState<Artifact[]>(baseInventory);
+  const [inventory, setInventory] = useState<Artifact[]>(baseInventory);
   const navigate = useNavigate();
 
   const CheckPage = () => {
@@ -62,12 +62,15 @@ const Game = () => {
 
   useRunOnce({
     fn: () => {
+      // Get the objectives :
       const m_start = getStart();
       if (m_start && m_start.text) {
         const start_art: Article[] = m_start.text;
         console.log("objectifs:",start_art);
         setArticles(start_art);
       }
+
+      // Get the start page or, in case of reloads, the last page visited :
       const m_startpage = getStartingPage();
 
       if (actualPage !== "") {
@@ -83,6 +86,15 @@ const Game = () => {
         setWikiContent(startpage[1].url);
         setPage(startpage[1].title);
         setActualPage(startpage[1].title);
+      }
+
+      // Get the inventory in case of reloads :
+      const stored_inv = localStorage.getItem("inventory");
+      if (stored_inv) {
+        for (const artifact:Artifact of JSON.parse(stored_inv)) {
+          baseInventory.push(artifact);
+        }
+        setInventory(baseInventory);
       }
     }
   });

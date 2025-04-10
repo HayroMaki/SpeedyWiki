@@ -13,6 +13,7 @@ import {NavLink} from "react-router-dom";
 const Home = () => {
     useRunOnce({fn:() => {
         localStorage.removeItem("actualpage");
+        localStorage.removeItem("inventory");
         }
     })
 
