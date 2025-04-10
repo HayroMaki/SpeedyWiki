@@ -61,17 +61,26 @@ const Game = () => {
       });
   
       if (player) {
+        console.log(player.pages[player.pages.length - 1] !== page);
         setPlayer(prev =>
           prev
             ? {
                 ...prev,
-                pages: [...prev.pages, page],
-                clicks: (prev.clicks || 0) + 1
+                pages:
+                  prev.pages[prev.pages.length - 1] !== page
+                    ? [...prev.pages, page]
+                    : prev.pages,
+                clicks:
+                  prev.pages[prev.pages.length - 1] !== page
+                    ? (prev.clicks || 0) + 1
+                    : prev.clicks
               }
             : null
         );
-        console.log(player.clicks)
-        console.log(player.pages)
+      
+        console.log(player.clicks);
+        console.log(player.pages);
+
       }
       return updatedArticles;
     });
@@ -85,13 +94,13 @@ const Game = () => {
   useRunOnce({
     fn: () => {
       const m_start = getStart();
-      const m_startpage = getStartingPage();
-      console.log(m_startpage);
       if (m_start && m_start.text) {
         const start_art: Article[] = m_start.text;
         console.log(start_art);
         setArticles(start_art);
       }
+      const m_startpage = getStartingPage();
+      console.log(m_startpage);
       if (m_startpage) {
           const startpage: Article[] = m_startpage.text;
           console.log(startpage);
