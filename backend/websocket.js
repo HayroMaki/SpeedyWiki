@@ -28,12 +28,15 @@ const lobbies = {};
 lobbies[111111] = {
   "players":new Set(),
   "articles": null,
+  "Startarticle":null,
 };
 
 fetchArticles().then((articles) => {
   lobbies[111111].articles = articles;
 });
-const Startarticle = await fetchArticles(2);
+fetchArticles(2).then((articles) => {
+  lobbies[111111].Startarticle = articles;
+});
 // Setup websocket :
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
@@ -69,10 +72,15 @@ websocket.on("connection", (ws) => {
             "id": lobbyId,
             "players": new Set(),
             "articles": null,
+            "Startarticle":null,
           }
           fetchArticles().then((articles) => {
             lobbies[lobbyId].articles = articles;
           });
+          fetchArticles(2).then((articles) => {
+            lobbies[lobbyId].Startarticle = articles;
+          });
+  
           console.log("Lobby created : ID : ",lobbyId);
 
           // Réponse plus claire avec l'ID du lobby
@@ -223,7 +231,7 @@ websocket.on("connection", (ws) => {
                           type: "STARTPAGE",
                           pseudo: "SYSTEM",
                           lobby: lobby,
-                          text: Startarticle
+                          text: lobbies[lobby].Startarticle
                       }));
                   }
               });
