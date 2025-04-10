@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
 import User from "../interfaces/User";
+import MessageUser from "../interfaces/MessageUser.tsx";
 
 // Définition du type pour le contexte WebSocket
 interface WSContextType {
@@ -98,10 +99,11 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
                                     if (response.text === "OK") {
                                         console.log("Valid Lobby :", storedLobby);
-                                        const joinMessage: Message = {
+                                        const joinMessage: MessageUser = {
                                             type: "lobby",
                                             lobby: storedLobby,
                                             pseudo: storedPseudo || "",
+                                            image: picture,
                                             text: "JOIN"
                                         };
                                         socket.send(JSON.stringify(joinMessage));
