@@ -486,6 +486,7 @@ export const WikiContentWindow = (props: {
             if (!x) {
                 baseInventory.push(artifactFound);
             }
+            localStorage.setItem("inventory", JSON.stringify(baseInventory));
         }
         setShowArtifactPopup(false);
         setArtifactFound(null);
