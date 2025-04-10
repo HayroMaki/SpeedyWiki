@@ -32,10 +32,18 @@ lobbies[111111] = {
 };
 
 fetchArticles().then((articles) => {
-  lobbies[111111].articles = articles;
-});
-fetchArticles(2).then((articles) => {
-  lobbies[111111].Startarticle = articles;
+  // Vérifier qu'il y a au moins un article
+  if (articles.length > 0) {
+    // Startarticle est une liste avec null puis le premier article
+    lobbies[111111].Startarticle = [null, articles[0]];
+
+    // Le reste des articles (sans le premier) va dans articles
+    lobbies[111111].articles = articles.slice(1);
+  } else {
+    // Gérer le cas où il n'y a pas d'articles
+    lobbies[111111].Startarticle = [null, null]; // ou [null] si vous préférez
+    lobbies[111111].articles = [];
+  }
 });
 // Setup websocket :
 websocket.on("connection", (ws) => {
@@ -76,10 +84,18 @@ websocket.on("connection", (ws) => {
             "mined-articles": null
           }
           fetchArticles().then((articles) => {
-            lobbies[lobbyId].articles = articles;
-          });
-          fetchArticles(2).then((articles) => {
-            lobbies[lobbyId].Startarticle = articles;
+            // Vérifier qu'il y a au moins un article
+            if (articles.length > 0) {
+              // Startarticle est une liste avec null puis le premier article
+              lobbies[lobbyId].Startarticle = [null, articles[0]];
+
+              // Le reste des articles (sans le premier) va dans articles
+              lobbies[lobbyId].articles = articles.slice(1);
+            } else {
+              // Gérer le cas où il n'y a pas d'articles
+              lobbies[lobbyId].Startarticle = [null, null]; // ou [null] si vous préférez
+              lobbies[lobbyId].articles = [];
+            }
           });
   
           console.log("Lobby created : ID : ",lobbyId);
