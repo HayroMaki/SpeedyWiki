@@ -33,7 +33,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [lobby, setLobby] = useState<string>(() => localStorage.getItem("lobby") || "");
     const [pseudo, setPseudo] = useState<string>(() => localStorage.getItem("pseudo") || "");
     const [picture, setPicture] = useState<number>(() => parseInt(localStorage.getItem("picture") || "0"));
-    const [player, setPlayer] = useState<User | null>(JSON.parse(localStorage.getItem("player") || ""));
+    const [player, setPlayer] = useState<User | null>(() => {
+        const stored = localStorage.getItem("player");
+        return stored ? JSON.parse(stored) : [];
+    });
     const [messages, setMessages] = useState<Message[]>(() => {
         const stored = localStorage.getItem("messages");
         return stored ? JSON.parse(stored) : [];
