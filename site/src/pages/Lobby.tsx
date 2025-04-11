@@ -139,7 +139,7 @@ export const Lobby = () => {
                     )}
                 </div>
                 <div className="lobby-bottom">
-                    <LinkWindow link={lobbyId}/> {/* Utilisez lobbyId ici */}
+                    <LinkWindow link={lobbyId}/>
                     <ExitWindow/>
                 </div>
             </div>

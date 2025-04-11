@@ -24,7 +24,7 @@ const teamMembers = [
     {
         name: "Jules Renaud-Grange",
         role: "Developper FullStack",
-        description: "Better than Martial",
+        description: "Better than Martial.",
         image: Jules,
         linkedin: "https://www.linkedin.com/in/julesrenaudgrange/",
         email: "mailto:julesgrange@outlook.fr"
@@ -32,7 +32,7 @@ const teamMembers = [
     {
         name: "Guillaume Augeraud",
         role: "Developper Front-end",
-        description: "Im the only serious one here",
+        description: "Im the only serious one here.",
         linkedin: "https://www.linkedin.com/in/guillaume-augeraud/",
         email: "mailto:augeraud.guillaume@gmail.fr"
     }

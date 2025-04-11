@@ -35,7 +35,7 @@ const Game = () => {
       if (articles.length > 0 && articles.every(article => article.completion)) {
         navigate("/Win");
       }
-      
+
       if (player) {
         setPlayer(prev =>
           prev
@@ -68,6 +68,7 @@ const Game = () => {
       return updatedArticles;
     });
   
+    // Check the objectives articles completion :
     if (articles.length > 0 && articles.every(article => article.completion)) {
       navigate("/Win");
     }

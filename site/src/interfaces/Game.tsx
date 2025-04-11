@@ -1,4 +1,4 @@
-import {User} from "./User";
+import User from "./User";
 import {Article} from "./Article";
 import {Chat} from "./Chat";
 
