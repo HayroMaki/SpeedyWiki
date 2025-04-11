@@ -81,7 +81,8 @@ websocket.on("connection", (ws) => {
             "players": new Set(),
             "articles": null,
             "Startarticle": null,
-            "mined-articles": null
+            "mined-articles": null,
+            "winners":null
           }
           fetchArticles().then((articles) => {
             // Vérifier qu'il y a au moins un article
@@ -97,7 +98,7 @@ websocket.on("connection", (ws) => {
               lobbies[lobbyId].articles = [];
             }
           });
-          const winners = [];
+          lobbies[lobbyId].winners = [];
           console.log("Lobby created : ID : ",lobbyId);
 
           // Réponse plus claire avec l'ID du lobby
@@ -257,29 +258,38 @@ websocket.on("connection", (ws) => {
                 break;
           }
           break;
-        case "WIN":
-          const winnerSet = new Set(winners.map(winner => winner.pseudo)); 
-
-          if (!winnerSet.has(text.pseudo)) {
-            winners.push({
-                pseudo: pseudo, 
-                image: image,
-                clicks: text 
+        case "win":
+          console.log("Win websocket");
+          if (lobbies[lobby]) {
+          if (!lobbies[lobby] || !Array.isArray(lobbies[lobby].winners)) {
+            console.error("Lobby or winners list is invalid");
+            return;
+          }
+          
+          
+          const winnerSet = new Set(lobbies[lobby].winners.map(w => w.pseudo));
+          
+          if (!winnerSet.has(pseudo)) {
+            lobbies[lobby].winners.push({
+              pseudo: pseudo,
+              image: userObj?.image ?? 0,
+              clicks: text
             });
-        }
-    
-       
-        winners.sort((a, b) => parseInt(a.clicks) - parseInt(b.clicks));
+          }
+          
+          lobbies[lobby].winners.sort((a, b) => parseInt(a.clicks) - parseInt(b.clicks));
             lobbies[lobby].players.forEach((client) => {
               if (client.ws.readyState === client.ws.OPEN) {
                   client.ws.send(JSON.stringify({
                       type: "WIN",
                       pseudo: "SYSTEM",
                       lobby: lobby,
-                      text: winners
+                      text: lobbies[lobby].winners
                   }));
               }
           });
+        }
+        break;
         default:
           console.log("Unknown message type : " + type + " from : " + pseudo + " : " + text );
       }

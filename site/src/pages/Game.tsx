@@ -32,7 +32,10 @@ const Game = () => {
         return article;
       });
 
-  
+      if (articles.length > 0 && articles.every(article => article.completion)) {
+        navigate("/Win");
+      }
+      
       if (player) {
         setPlayer(prev =>
           prev
@@ -65,7 +68,6 @@ const Game = () => {
       return updatedArticles;
     });
   
-    // Vérifie si tous les articles sont complétés
     if (articles.length > 0 && articles.every(article => article.completion)) {
       navigate("/Win");
     }

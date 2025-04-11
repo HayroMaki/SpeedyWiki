@@ -40,5 +40,14 @@
     display: flex;
     flex-direction: column;
     font-size: 26px;
+    gap: 25px;
+}
+
+.Looser-item{
+    display: flex;
+    padding: 3px;
+    text-align: center;
+    gap: 20px;
+    align-items: center;
 }
 

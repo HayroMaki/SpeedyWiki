@@ -18,7 +18,7 @@ const pictureColorMap: { [key: number]: string } = {
     1: "#1F3A62",   // Bleu foncé
     2: "#BB124C",   // Rouge framboise
     3: "#1149C2",   // Bleu roi
-    4: "#FFFF11",   // Jaune vif
+    4: "#ffd133",   // Jaune vif
     5: "#992817",   // Rouge brique
     6: "#111111",   // Noir
     7: "#AAAABA",   // Gris bleuté
@@ -40,7 +40,7 @@ const Podium = ({ winners }: { winners: { pseudo: string,image:number, clicks: s
                 </div>  
                 <div className="Podium-content">
                     First place:
-                    <h1>{winners[0]?.pseudo}</h1>
+                    <h1 style={{ color: pictureColorMap[winners[0]?.image] }}>{winners[0]?.pseudo}</h1>
                     <img src={PP[winners[0]?.image- 0]} className="First-Place"/>
                     <h1>{winners[0]?.clicks} moves</h1>
                 </div>
@@ -59,7 +59,7 @@ const Podium = ({ winners }: { winners: { pseudo: string,image:number, clicks: s
                 </div>  
                 <div className="Podium-content">
                     Second place:
-                    <h1>{winners[1]?.pseudo}</h1>
+                    <h1 style={{ color: pictureColorMap[winners[1]?.image] }}>{winners[1]?.pseudo}</h1>
                     <img src={PP[winners[1]?.image- 0]} className="Other-podium"/>
                     <h1>{winners[1]?.clicks} moves</h1>
                 </div>
@@ -75,7 +75,7 @@ const Podium = ({ winners }: { winners: { pseudo: string,image:number, clicks: s
                 </div>  
                 <div className="Podium-content">
                     Third place:
-                    <h1>{winners[2]?.pseudo}</h1>
+                    <h1 style={{ color: pictureColorMap[winners[2]?.image] }}>{winners[2]?.pseudo}</h1>
                     <img src={PP[winners[2]?.image- 0]} className="Other-podium"/>
                     <h1>{winners[2]?.clicks} moves</h1>
                 </div>
