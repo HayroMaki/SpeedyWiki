@@ -65,7 +65,7 @@ const Game = () => {
       return updatedArticles;
     });
   
-    // Vérifie si tous les articles sont complétés
+    // Check the objectives articles completion :
     if (articles.length > 0 && articles.every(article => article.completion)) {
       navigate("/Win");
     }
