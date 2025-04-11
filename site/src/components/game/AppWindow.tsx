@@ -6,7 +6,7 @@ import ChatWindow from "../lobby/ChatWindow.tsx";
 const AppWindow = (props: { articles: Article[]}) => {
 const [isContentToggled, setIsContentToggled] = useState(false);
 
-  // Fonction pour basculer entre les deux contenus
+  // Switch from one content to another :
   const toggleContent = () => {
     setIsContentToggled(!isContentToggled);
   };

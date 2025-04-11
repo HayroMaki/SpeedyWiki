@@ -4,7 +4,7 @@ import Reduce from "../../assets/icon/Reduce_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Cross from "../../assets/icon/Cross_Icon.png";
 
-// Artifact icons
+// Artifact icons :
 import GPS from "../../assets/image/artifact/GPS.png";
 import Rollback from "../../assets/image/artifact/Rollback.png";
 import Teleport from "../../assets/image/artifact/Teleport.png";
@@ -22,7 +22,7 @@ import baseInventory from "./Inventory.tsx";
 import {useWS} from "../WSContext.tsx";
 import {Article} from "../../interfaces/Article.tsx";
 
-// Different findable artifacts
+// Different findable artifacts :
 const positiveArtifacts: Partial<Artifact>[] = [
     { id: 1, name: "GPS", icon: GPS, effect: 1, count: -1 },
     { id: 2, name: "Rollback", icon: Rollback, effect: 2, count: 1 },
@@ -58,15 +58,15 @@ const popularityScores: Record<string, number> = {
 };
 
 const estimatePopularity = (title: string): number => {
-    // Check if we already stored the article's popularity.
+    // Check if we already stored the article's popularity :
     if (popularityScores[title]) {
         return popularityScores[title];
     }
 
-    // Current random estimation based on title length (must change)
+    // Current random estimation based on title length (must change) :
     const baseScore = Math.max(0.1, Math.min(0.8, 1 - (title.length / 30)));
 
-    // Keywords for most-likely famous articles (must change too)
+    // Keywords for most-likely famous articles (must change too) :
     const popularKeywords = ['history', 'war', 'country', 'famous', 'science', 'movie', 'music', 'sport'];
     const containsPopularKeyword = popularKeywords.some(keyword =>
         title.toLowerCase().includes(keyword.toLowerCase())
@@ -118,29 +118,29 @@ export const WikiContentWindow = (props: {
     const [showArtifactPopup, setShowArtifactPopup] = useState(false);
     const [visitedPages, setVisitedPages] = useState<Set<string>>(new Set([props.title]));
 
-    // Snail artifact
+    // Snail artifact :
     const [isSnailActive, setIsSnailActive] = useState(false);
     const [snailTimer, setSnailTimer] = useState(0);
     const [showSnailPopup, setShowSnailPopup] = useState(false);
     const [snailIntervalId, setSnailIntervalId] = useState<NodeJS.Timeout | null>(null);
 
-    // Disorientor artifact
+    // Disorientor artifact :
     const [currentWikiUrl, setCurrentWikiUrl] = useState(props.wikiContent);
     const [showDisorientorPopup, setShowDisorientorPopup] = useState(false);
     const [disorientorDestination, setDisorientorDestination] = useState("");
 
-    // Teleporter artifact
+    // Teleporter artifact :
     const [showTeleportPopup, setShowTeleportPopup] = useState(false);
     const [teleportDestination, setTeleportDestination] = useState("");
     // const [teleportNearTarget, setTeleportNearTarget] = useState("");
 
     const startSnailTimer = () => {
-        // Stop every existing timer
+        // Stop every existing timer :
         if (snailIntervalId) {
             clearInterval(snailIntervalId);
         }
 
-        // Start new timer
+        // Start new timer :
         const intervalId = setInterval(() => {
             setSnailTimer(prevTime => {
                 const newTime = prevTime - 1;
@@ -166,17 +166,18 @@ export const WikiContentWindow = (props: {
         return uncompletedArticles[Math.floor(Math.random() * uncompletedArticles.length)];
     };
 
-    // Fonction améliorée pour obtenir une page à deux liens de distance d'un article cible
+    // Find an article 2 links away from an objective :
     const findTeleportDestination = async (targetArticles: Article[]) => {
-        // Trouve un article cible non complété
+        // take a non-completed objective article :
         const targetArticle = findUncompletedTargetArticle(targetArticles);
 
         if (!targetArticle) {
-            // Si tous les articles sont complétés, téléporter vers un article aléatoire
+            // If every article is completed, return a completely random article
+            // (should not happen but just in case) :
             try {
                 const response = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
                 const data = await response.json();
-                return { destination: data.title, nearTarget: "Tous les objectifs sont complétés" };
+                return { destination: data.title, nearTarget: "Every objectives completed... random article." };
             } catch (error) {
                 console.error("Error fetching random article:", error);
                 return null;
@@ -184,21 +185,21 @@ export const WikiContentWindow = (props: {
         }
 
         try {
-            // Utiliser l'API MediaWiki directement pour plus de flexibilité
-            // Cette méthode récupère les liens à partir de l'article cible
+            // Use MediaWiki API :
+            // Fetch URL's from the page :
             const firstLevelUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(targetArticle.title)}&prop=links&pllimit=500&format=json&origin=*`;
             const firstLevelResponse = await fetch(firstLevelUrl);
             const firstLevelData = await firstLevelResponse.json();
 
-            // Extraire la page et ses liens
+            // Extract the links from the page :
             const pages = firstLevelData.query.pages;
             const pageId = Object.keys(pages)[0];
 
             if (!pages[pageId].links || pages[pageId].links.length === 0) {
-                throw new Error("No links found on target page");
+                throw new Error("No links found on target page.");
             }
 
-            // Filtrer pour ne garder que les articles principaux (pas de pages spéciales)
+            // Filter to keep only article pages :
             const validLinks = pages[pageId].links.filter(link =>
                 !link.title.includes("Wikipedia:") &&
                 !link.title.includes("Template:") &&
@@ -212,26 +213,26 @@ export const WikiContentWindow = (props: {
                 throw new Error("No valid links found");
             }
 
-            // Choisir un lien aléatoire du premier niveau
+            // Choose a first level random link :
             const randomFirstLink = validLinks[Math.floor(Math.random() * validLinks.length)].title;
             console.log("First level link:", randomFirstLink);
 
-            // Maintenant, récupérer les liens du premier lien pour atteindre le deuxième niveau
+            // Fetch links from the first level page :
             const secondLevelUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(randomFirstLink)}&prop=links&pllimit=500&format=json&origin=*`;
             const secondLevelResponse = await fetch(secondLevelUrl);
             const secondLevelData = await secondLevelResponse.json();
 
-            // Extraire la page et ses liens
+            // Extract the links from the page :
             const secondPages = secondLevelData.query.pages;
             const secondPageId = Object.keys(secondPages)[0];
 
-            // Si la page existe mais n'a pas de liens ou est une page spéciale
+            // If the page exist but does not have links, we're in an invalid page :
             if (secondPageId === "-1" || !secondPages[secondPageId].links || secondPages[secondPageId].links.length === 0) {
                 // Essayer un autre lien du premier niveau
                 throw new Error("Second level page invalid or has no links");
             }
 
-            // Filtrer pour ne garder que les articles principaux (pas de pages spéciales)
+            // Filter to keep only article pages :
             const validSecondLinks = secondPages[secondPageId].links.filter(link =>
                 !link.title.includes("Wikipedia:") &&
                 !link.title.includes("Template:") &&
@@ -245,7 +246,7 @@ export const WikiContentWindow = (props: {
                 throw new Error("No valid second level links found");
             }
 
-            // Choisir un lien aléatoire du deuxième niveau
+            // Choose a second level random link :
             const randomSecondLink = validSecondLinks[Math.floor(Math.random() * validSecondLinks.length)].title;
             console.log("Second level link:", randomSecondLink);
 
@@ -257,10 +258,10 @@ export const WikiContentWindow = (props: {
         } catch (error) {
             console.error("Error in primary teleport method:", error);
 
-            // Méthode de secours utilisant les catégories
+            // "Just in case" function :
             try {
                 console.log("Trying category-based approach...");
-                // Obtenir les catégories de l'article cible
+                // fetch categories of target article :
                 const categoryUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(targetArticle.title)}&prop=categories&cllimit=50&format=json&origin=*`;
                 const categoryResponse = await fetch(categoryUrl);
                 const categoryData = await categoryResponse.json();
@@ -272,7 +273,7 @@ export const WikiContentWindow = (props: {
                     throw new Error("No categories found for target article");
                 }
 
-                // Filtrer pour obtenir uniquement les catégories valides
+                // Filter to keep only article pages :
                 const validCategories = pages[pageId].categories
                     .filter(cat => !cat.title.includes("stub"))
                     .map(cat => cat.title);
@@ -281,11 +282,11 @@ export const WikiContentWindow = (props: {
                     throw new Error("No valid categories found");
                 }
 
-                // Choisir une catégorie aléatoire
+                // Choose a random category :
                 const randomCategory = validCategories[Math.floor(Math.random() * validCategories.length)];
                 console.log("Random category:", randomCategory);
 
-                // Obtenir des articles de cette catégorie
+                // Fetch articles of this category :
                 const articlesInCategoryUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(randomCategory)}&cmlimit=50&cmtype=page&format=json&origin=*`;
                 const articlesResponse = await fetch(articlesInCategoryUrl);
                 const articlesData = await articlesResponse.json();
@@ -294,7 +295,7 @@ export const WikiContentWindow = (props: {
                     throw new Error("No articles found in selected category");
                 }
 
-                // Filtrer pour éviter de retomber sur l'article cible
+                // Make sure we don't get the target article :
                 const validArticles = articlesData.query.categorymembers
                     .filter(article => article.title !== targetArticle.title);
 
@@ -302,19 +303,19 @@ export const WikiContentWindow = (props: {
                     throw new Error("No valid articles found in category");
                 }
 
-                // Choisir un article aléatoire de la catégorie
+                // Choose a random article of the chosen category :
                 const randomArticle = validArticles[Math.floor(Math.random() * validArticles.length)].title;
                 console.log("Random article from category:", randomArticle);
 
                 return {
                     destination: randomArticle,
-                    nearTarget: `${targetArticle.title} (via catégorie: ${randomCategory.replace("Category:", "")})`
+                    nearTarget: `${targetArticle.title} (use categories : ${randomCategory.replace("Category:", "")})`
                 };
 
             } catch (categoryError) {
                 console.error("Category-based approach failed:", categoryError);
 
-                // Dernier recours : utiliser la recherche
+                // In last resort, use search :
                 try {
                     console.log("Trying search approach...");
                     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(targetArticle.title)}&srlimit=10&format=json&origin=*`;
@@ -325,7 +326,7 @@ export const WikiContentWindow = (props: {
                         throw new Error("Not enough search results");
                     }
 
-                    // Filtrer pour éviter de retomber sur l'article cible
+                    // Make sure we don't get the target article :
                     const validResults = searchData.query.search
                         .filter(result => result.title !== targetArticle.title);
 
@@ -333,6 +334,7 @@ export const WikiContentWindow = (props: {
                         throw new Error("No valid search results");
                     }
 
+                    // Choose a random article from the search :
                     const randomResult = validResults[Math.floor(Math.random() * validResults.length)].title;
                     console.log("Random search result:", randomResult);
 
@@ -344,14 +346,14 @@ export const WikiContentWindow = (props: {
                 } catch (searchError) {
                     console.error("Search approach failed:", searchError);
 
-                    // Vraiment dernier recours : article aléatoire
+                    // If nothing worked, just take a random article :
                     const randomResponse = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
                     const randomData = await randomResponse.json();
                     console.log("Using completely random article as last resort");
 
                     return {
                         destination: randomData.title,
-                        nearTarget: "article aléatoire (dernier recours)"
+                        nearTarget: "Random article (last resort)",
                     };
                 }
             }
