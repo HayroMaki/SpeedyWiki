@@ -173,6 +173,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const getPlayers = () => {
         for (const m of messages) {
             if (m.type == "PLAYERS" && m.pseudo == "SYSTEM") {
+                console.log(m);
                 return m;
             }
         }

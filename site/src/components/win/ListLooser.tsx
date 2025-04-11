@@ -17,7 +17,7 @@ const pictureColorMap: { [key: number]: string } = {
     1: "#1F3A62",   // Bleu foncé
     2: "#BB124C",   // Rouge framboise
     3: "#1149C2",   // Bleu roi
-    4: "#FFFF11",   // Jaune vif
+    4: "#ffd133",   // Jaune vif
     5: "#992817",   // Rouge brique
     6: "#111111",   // Noir
     7: "#AAAABA",   // Gris bleuté
@@ -42,12 +42,14 @@ const ListLooser = ({ loosers }: { loosers: { pseudo: string,image:number, click
                     <div className="Looser-list-container">
                     {loosers.map((looser, index) => (
                             <div key={index} className="Looser-item">
-                                <h2 style={{ color: pictureColorMap[looser.image] }}>{looser.pseudo}</h2>
                                 <img
                                     src={PP[looser.image- 0]}
                                     alt={looser.pseudo}
                                     className="Looser-image"
+                                    style={{width:"80px"}}
                                 />
+                                <h2 style={{ color: pictureColorMap[looser.image] }}>{looser.pseudo}</h2>
+                        
                                 <p>{looser.clicks} moves</p>
                     </div>
                     ))}

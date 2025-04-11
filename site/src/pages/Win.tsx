@@ -9,38 +9,54 @@ import { useEffect, useState } from 'react';
 import { useWS } from '../components/WSContext';
 import MessageUser from '../interfaces/MessageUser';
 
+
 const Win = () => {
-    const { sendMessage, pseudo,picture, player,lobby: lobbyId, setPlayer, getWinner} = useWS();
+    const { sendMessage,messages, pseudo,picture, player,lobby: lobbyId, setPlayer, getWinner, clear} = useWS();
     const [winners, setWinners] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     const [loosers, setLoosers] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     useEffect(() => {
-        if (player) {  
+        if (player) {
             sendMessage({
-                type: 'WIN', 
+                type: 'win',
                 lobby: lobbyId,
                 pseudo: pseudo,
                 image: picture,
                 text: String(player.clicks ?? 0)
             } as MessageUser);
+            
         }
-      });
+    }, [player]); 
+
+      useEffect(() => {
+        checkWinners();
+     },[messages]);
+
+
     const checkWinners = () => {
         try {
-            const winnerplayer = getWinner;
-            if (Array.isArray(winnerplayer)) {
-                // Prendre les 3 premiers gagnants sans trier
-                const winners = winnerplayer.slice(0, 3).map((winner: { pseudo: string,image:number, clicks: string}) => ({
-                    pseudo: winner.pseudo,
-                    image: winner.image,
-                    clicks: winner.clicks
-                }));
-                const loosers = winnerplayer.slice(3).map((winner: { pseudo: string,image:number, clicks: string}) => ({
-                    pseudo: winner.pseudo,
-                    image: winner.image,
-                    clicks: winner.clicks
-                }));
-                setWinners(winners);
-                setLoosers(loosers);
+            console.log("win");
+            const winnerplayer = getWinner();
+            clear("WIN","SYSTEM");
+            console.log("winners:",winnerplayer);
+            if (winnerplayer?.text) {
+                const listWinner = winnerplayer?.text;
+                if (Array.isArray(listWinner)) {
+                    // Prendre les 3 premiers gagnants sans trier
+                    const winners = listWinner.slice(0, 3).map((winner: { pseudo: string,image:number, clicks: string}) => ({
+                        pseudo: winner.pseudo,
+                        image: winner.image,
+                        clicks: winner.clicks
+                    }));
+                    const loosers = listWinner.slice(3).map((winner: { pseudo: string,image:number, clicks: string}) => ({
+                        pseudo: winner.pseudo,
+                        image: winner.image,
+                        clicks: winner.clicks
+                    }));
+                    setWinners(winners);
+                    setLoosers(loosers);
+                    console.log(winners);
+                    console.log(loosers);
+                }
             }
         } catch (error) {
             console.error("Error parsing message:", error);

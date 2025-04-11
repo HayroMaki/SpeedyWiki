@@ -17,7 +17,7 @@ const pictureColorMap: { [key: number]: string } = {
     1: "#1F3A62",   // Bleu foncé
     2: "#BB124C",   // Rouge framboise
     3: "#1149C2",   // Bleu roi
-    4: "#FFFF11",   // Jaune vif
+    4: "#ffd133",   // Jaune vif
     5: "#992817",   // Rouge brique
     6: "#111111",   // Noir
     7: "#AAAABA",   // Gris bleuté
