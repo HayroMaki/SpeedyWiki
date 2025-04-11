@@ -47,7 +47,10 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const stored = localStorage.getItem("messages");
         return stored ? JSON.parse(stored) : [];
     });
-    const [actualPage, setActualPage] = useState<string>(() => localStorage.getItem("actualpage") || "");
+    const [actualPage, setActualPage] = useState<string>(() => {
+        console.log(localStorage.getItem("actualpage"));
+        return localStorage.getItem("actualpage") || ""
+    });
 
     React.useEffect(() => {
         localStorage.setItem("lobby", lobby);
@@ -139,6 +142,13 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                                 window.location.replace("/");
                             }, 5000);
                         }
+                    } else {
+                        localStorage.removeItem("actualpage");
+                        localStorage.removeItem("inventory");
+                        localStorage.removeItem("snail");
+                        localStorage.removeItem("player");
+                        setActualPage("");
+                        setPlayer(null)
                     }
                 };
                 socket.onerror = (error) => console.error("❌ WebSocket Error :", error);
