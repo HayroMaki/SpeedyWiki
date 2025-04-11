@@ -43,7 +43,7 @@ interface ChatWindowProps {
             <div className="chat-content">
                 <div className="chat-content-top">
                     <h1 className="chat-title">Chat :</h1>
-                    <button className="chat-button button" onClick={() => toggleContent && toggleContent()}>Objectif</button>
+                    <button className="chat-button button" onClick={() => toggleContent && toggleContent()}>Objectives</button>
                 </div>
                 <div id="Chat" className="chat-box">
                     {messages.map((msg, index) => {
@@ -60,8 +60,7 @@ interface ChatWindowProps {
                                         {msg.text}
                                     </div>
                                 );
-                            case "":
-                                
+                            case "":break;
                             default:break;
                         }
                     })}

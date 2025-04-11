@@ -7,16 +7,16 @@ import { useWS } from '../WSContext.tsx';
 import MessageUser from "../../interfaces/MessageUser.tsx";
 export const ExitWindow = () => {
     const nav = useNavigate();
-    const {WS: socket, sendMessage, lobby: lobbyId, pseudo, messages, picture } = useWS();
+    const {sendMessage, lobby: lobbyId, pseudo, picture } = useWS();
     const handleClick = () => {
         const message:MessageUser = {
-                        type: "lobby",
-                        lobby: lobbyId,
-                        pseudo: pseudo,
-                        image: picture,
-                        text: "QUIT",
-                    }
-                    sendMessage(message);
+            type: "lobby",
+            lobby: lobbyId,
+            pseudo: pseudo,
+            image: picture,
+            text: "QUIT",
+        }
+        sendMessage(message);
         nav("/");
     }
 
