@@ -10,7 +10,7 @@ import { useWS } from '../components/WSContext';
 import MessageUser from '../interfaces/MessageUser';
 
 const Win = () => {
-    const { sendMessage, pseudo,picture, player,lobby: lobbyId, setPlayer, getWinner} = useWS();
+    const { sendMessage,messages, pseudo,picture, player,lobby: lobbyId, setPlayer, getWinner} = useWS();
     const [winners, setWinners] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     const [loosers, setLoosers] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     useEffect(() => {
@@ -24,6 +24,10 @@ const Win = () => {
             } as MessageUser);
         }
       });
+
+      useEffect(() => {
+        checkWinners();
+     },[messages]);
     const checkWinners = () => {
         try {
             const winnerplayer = getWinner;
@@ -41,6 +45,7 @@ const Win = () => {
                 }));
                 setWinners(winners);
                 setLoosers(loosers);
+                
             }
         } catch (error) {
             console.error("Error parsing message:", error);
