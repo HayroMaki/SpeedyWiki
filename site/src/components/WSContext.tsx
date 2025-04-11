@@ -3,9 +3,7 @@ import useRunOnce from "./tools/useRunOnce";
 import Message from "../interfaces/Message";
 import User from "../interfaces/User";
 import MessageUser from "../interfaces/MessageUser.tsx";
-import {Article} from "../interfaces/Article.tsx";
 
-// Définition du type pour le contexte WebSocket
 interface WSContextType {
     WS: WebSocket | null;
     sendMessage: (message: Message) => void;
@@ -219,12 +217,11 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setMessages(newMsg);
     }
 
-    // Fonction pour envoyer un message
     const sendMessage = (message: Message | MessageUser) => {
         if (WS && WS.readyState === WebSocket.OPEN) {
             WS.send(JSON.stringify(message));
         } else {
-            console.warn("⚠️ WebSocket non connecté");
+            console.warn("⚠️ WebSocket non connected");
         }
     };
 
@@ -238,7 +235,7 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 export const useWS = () => {
     const context = useContext(WSContext);
     if (!context) {
-        throw new Error("useWS doit être utilisé dans un WSProvider");
+        throw new Error("useWS must be used within the WSContext.");
     }
     return context;
 };

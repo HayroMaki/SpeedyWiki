@@ -1,6 +1,6 @@
 import "../../stylesheets/lobby/playerListWindow.css"
 
-import {User} from "../../interfaces/User"
+import User from "../../interfaces/User"
 
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
@@ -38,7 +38,7 @@ export const PlayerListWindow = (props : {players: User[]}) => {
                                 const style = {color:player.color}
                                 return (
                                     <li className="player-list-line" style={style} key={player.id}>
-                                        <img className="player-list-players-image" src={PP[player.picture - 0]} alt=""/>
+                                        <img className="player-list-players-image" src={PP[player.picture]} alt=""/>
                                         <div className="player-list-players-name">{player.name}</div>
                                     </li>
                                 )
