@@ -7,7 +7,10 @@ import Reduce from "../../assets/icon/Reduce_Icon.png";
 import {Artifact} from "../../interfaces/Artifact";
 import InventoryItem from "./InventoryItem.tsx";
 
-export const InventoryWindow = (props: {inventory: Artifact[]}) => {
+export const InventoryWindow = (props: {
+    inventory: Artifact[],
+    onUseArtifact: (artifact: Artifact) => void
+}) => {
     return (
         <>
             <div className="inventory-container">
@@ -22,7 +25,11 @@ export const InventoryWindow = (props: {inventory: Artifact[]}) => {
                     <div className="inventory-spacer"></div>
                     <div className="inventory-box">
                         {props.inventory.map((artifact) => {
-                            return (<InventoryItem artifact={artifact}/>)
+                            return (<InventoryItem
+                                key={artifact.id}
+                                artifact={artifact}
+                                onUse={props.onUseArtifact}
+                            />)
                         })}
                     </div>
                     <div className="inventory-spacer"></div>

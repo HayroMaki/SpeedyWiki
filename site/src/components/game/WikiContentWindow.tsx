@@ -132,7 +132,9 @@ export const WikiContentWindow = (props: {
     // Teleporter artifact :
     const [showTeleportPopup, setShowTeleportPopup] = useState(false);
     const [teleportDestination, setTeleportDestination] = useState("");
-    // const [teleportNearTarget, setTeleportNearTarget] = useState("");
+
+    // Collectibles :
+    const { player } = useWS();
 
     const startSnailTimer = () => {
         // Stop every existing timer :
@@ -383,7 +385,7 @@ export const WikiContentWindow = (props: {
                 return;
             }
             setVisitedPages(prev => new Set(prev).add(title));
-            const baseChance = 0.20;
+            const baseChance = 0.90;
             const popularity = estimatePopularity(title);
 
             // Checks if an artifact should appear
@@ -474,6 +476,47 @@ export const WikiContentWindow = (props: {
         }
 
         setArtifactFound(null);
+    };
+
+    const handleUseArtifact = (artifact: Artifact) => {
+        // Decrements artifact amount in inventory
+        const baseArtifactIndex = baseInventory.findIndex(a => a.id === artifact.id);
+        if (baseArtifactIndex >= 0) {
+            baseInventory[baseArtifactIndex].count--;
+        }
+
+        // Handles different artifact effects
+        switch (artifact.name) {
+            case "Rollback":
+                handleRollbackEffect();
+                break;
+            case "Mine":
+                // Mine effect
+                break;
+            default:
+                console.log(`Effect for ${artifact.name} not implemented yet`);
+        }
+
+        // Close inventory after usage.
+        setInventoryOpen(false);
+    };
+
+    const handleRollbackEffect = () => {
+        if (player && player.pages && player.pages.length > 1) {
+            // Obtain second to last page visited
+            const previousPage = player.pages[player.pages.length - 2];
+
+            // Show rollback in console
+            console.log(`Rolling back to: ${previousPage}`);
+
+            // Update page URL and title.
+            props.setPage(previousPage);
+            setPageTitle(previousPage);
+            const prevUrl = "https://en.wikipedia.org/wiki/" + encodeURIComponent(previousPage);
+            setCurrentWikiUrl(prevUrl);
+        } else {
+            console.log("Not enough page history for rollback");
+        }
     };
 
     const handlePageChange = (newTitle: string) => {
@@ -646,7 +689,9 @@ export const WikiContentWindow = (props: {
                     )}
                     {inventoryOpen && (
                         <div className="Inventory">
-                            <InventoryWindow inventory={props.inventory}/>
+                            <InventoryWindow
+                                inventory={props.inventory}
+                                onUseArtifact={handleUseArtifact}/>
                         </div>
                     )}
                     <section id="wiki-wikipage" className="wiki-wikipage-container">
