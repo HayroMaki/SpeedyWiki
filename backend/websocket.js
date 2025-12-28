@@ -15,7 +15,7 @@ const websocket = new WebSocketServer({
 
 // Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
-const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@randy.x6z56.mongodb.net/';
+const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
@@ -25,26 +25,6 @@ const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies")
 
 const lobbies = {};
 
-lobbies[111111] = {
-  "players":new Set(),
-  "articles": null,
-  "Startarticle":null,
-};
-
-fetchArticles().then((articles) => {
-  // Vérifier qu'il y a au moins un article
-  if (articles.length > 0) {
-    // Startarticle est une liste avec null puis le premier article
-    lobbies[111111].Startarticle = [null, articles[0]];
-
-    // Le reste des articles (sans le premier) va dans articles
-    lobbies[111111].articles = articles.slice(1);
-  } else {
-    // Gérer le cas où il n'y a pas d'articles
-    lobbies[111111].Startarticle = [null, null]; // ou [null] si vous préférez
-    lobbies[111111].articles = [];
-  }
-});
 // Setup websocket :
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
@@ -97,6 +77,8 @@ websocket.on("connection", (ws) => {
               lobbies[lobbyId].Startarticle = [null, null]; // ou [null] si vous préférez
               lobbies[lobbyId].articles = [];
             }
+            
+            console.log("Articles fetched for lobby " + lobbyId + 'Articles :' + lobbies[lobbyId].articles.length);
           });
           lobbies[lobbyId].winners = [];
           console.log("Lobby created : ID : ",lobbyId);

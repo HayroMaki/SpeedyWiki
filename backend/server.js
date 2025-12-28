@@ -4,6 +4,11 @@ import cors from "cors";
 
 const app = express();
 const PORT = 3001;
+const WIKI_REQUEST_HEADERS = {
+    "User-Agent": "SpeedyWikiProxy/1.0 (https://localhost)",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9"
+};
 
 const blockedPrefixes = [
     "Main_Page",
@@ -23,7 +28,17 @@ const blockedPrefixes = [
 app.use(cors());
 
 app.get("/proxy", async (req, res) => {
-    const url = req.query.url;
+    const encodedUrl = req.query.url;
+    if (!encodedUrl) {
+        return res.status(400).send("Missing url query parameter");
+    }
+
+    let url;
+    try {
+        url = decodeURIComponent(encodedUrl);
+    } catch (error) {
+        return res.status(400).send("Invalid url encoding");
+    }
 
     console.log("received : " + url);
 
@@ -34,7 +49,7 @@ app.get("/proxy", async (req, res) => {
 
     try {
         // Get the page's content :
-        const response = await axios.get(url);
+        const response = await axios.get(url, { headers: WIKI_REQUEST_HEADERS });
         let modifiedHtml = response.data;
 
         // Get the page's title :
