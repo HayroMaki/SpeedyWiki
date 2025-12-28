@@ -78,7 +78,9 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         fn: () => {
             if (!WS) {
                 const host = window.location.hostname;
-                const socket = new WebSocket("ws://"+host+":3002");
+                const defaultWsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+                const socketUrl = import.meta.env.VITE_WS_URL || `${defaultWsScheme}://${host}:3002`;
+                const socket = new WebSocket(socketUrl);
 
                 socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
