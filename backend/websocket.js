@@ -62,24 +62,47 @@ websocket.on("connection", (ws) => {
             "articles": null,
             "Startarticle": null,
             "mined-articles": null,
-            "winners":null
+            "winners":null,
+            "isReady": false
           }
-          fetchArticles().then((articles) => {
-            // Vérifier qu'il y a au moins un article
-            if (articles.length > 0) {
-              // Startarticle est une liste avec null puis le premier article
-              lobbies[lobbyId].Startarticle = [null, articles[0]];
+          fetchArticles()
+            .then((articles) => {
+              // Vérifier qu'il y a au moins un article
+              if (articles.length > 0) {
+                // Startarticle est une liste avec null puis le premier article
+                lobbies[lobbyId].Startarticle = [null, articles[0]];
 
-              // Le reste des articles (sans le premier) va dans articles
-              lobbies[lobbyId].articles = articles.slice(1);
-            } else {
-              // Gérer le cas où il n'y a pas d'articles
-              lobbies[lobbyId].Startarticle = [null, null]; // ou [null] si vous préférez
+                // Le reste des articles (sans le premier) va dans articles
+                lobbies[lobbyId].articles = articles.slice(1);
+              } else {
+                // Gérer le cas où il n'y a pas d'articles
+                lobbies[lobbyId].Startarticle = [null, null]; // ou [null] si vous préférez
+                lobbies[lobbyId].articles = [];
+              }
+              
+              console.log("Articles fetched for lobby " + lobbyId + 'Articles :' + lobbies[lobbyId].articles.length);
+              lobbies[lobbyId].isReady = true;
+
+              const readyPayload = JSON.stringify({type:"READY", pseudo:"SYSTEM", lobby: lobbyId, text:"ARTICLES_READY"});
+              lobbies[lobbyId].players.forEach((client) => {
+                if (client.ws.readyState === client.ws.OPEN) {
+                  client.ws.send(readyPayload);
+                }
+              });
+            })
+            .catch((error) => {
+              console.error("Error fetching articles for lobby", lobbyId, error);
+              lobbies[lobbyId].Startarticle = [null, null];
               lobbies[lobbyId].articles = [];
-            }
-            
-            console.log("Articles fetched for lobby " + lobbyId + 'Articles :' + lobbies[lobbyId].articles.length);
-          });
+              lobbies[lobbyId].isReady = false;
+
+              const errorPayload = JSON.stringify({type:"READY", pseudo:"SYSTEM", lobby: lobbyId, text:"ARTICLES_ERROR"});
+              lobbies[lobbyId].players.forEach((client) => {
+                if (client.ws.readyState === client.ws.OPEN) {
+                  client.ws.send(errorPayload);
+                }
+              });
+            });
           lobbies[lobbyId].winners = [];
           console.log("Lobby created : ID : ",lobbyId);
 
@@ -203,6 +226,24 @@ websocket.on("connection", (ws) => {
                 break;
             case "START":
                 if (lobbies[lobby]) {
+                  if (!lobbies[lobby].isReady) {
+                    ws.send(JSON.stringify({
+                      type: "response-sys",
+                      pseudo: "SYSTEM",
+                      text: "Lobby not ready yet. Please wait for articles to load."
+                    }));
+                    const waitMessage = JSON.stringify({
+                      type: "chat-sys",
+                      pseudo: "SYSTEM",
+                      text: "Cannot start the game. Articles are loading, try again in a second."
+                    });
+                    lobbies[lobby].players.forEach((client) => {
+                      if (client.ws.readyState === client.ws.OPEN) {
+                        client.ws.send(waitMessage);
+                      }
+                    });
+                    break;
+                  }
                   
                     // Envoyer un message à tous les joueurs du lobby
                     lobbies[lobby].players.forEach((client) => {
