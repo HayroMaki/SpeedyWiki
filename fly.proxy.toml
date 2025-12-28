@@ -1,0 +1,28 @@
+app = "speedywiki-proxy"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "./backend/Dockerfile"
+
+[env]
+  PORT = "3001"
+
+[deploy]
+  release_command = "node --version"
+
+[[services]]
+  internal_port = 3001
+  processes = ["app"]
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "10s"

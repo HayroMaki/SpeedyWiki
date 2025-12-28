@@ -1,12 +1,15 @@
 import json
 import sys
+import os
 import asyncio
 import aiohttp
 import motor.motor_asyncio
 from collections import deque, defaultdict
 from itertools import permutations
 
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017/")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client["speedywiki"]
 links_collection = db["links"]
 pages_collection = db["pages"]

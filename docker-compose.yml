@@ -1,0 +1,26 @@
+services:
+  proxy:
+    build: ./backend
+    command: ["node", "server.js"]
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3001:3001"
+
+  websocket:
+    build: ./backend
+    command: ["node", "websocket.js"]
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3002:3002"
+    depends_on:
+      - proxy
+
+  frontend:
+    build: ./site
+    ports:
+      - "4173:80"
+    depends_on:
+      - proxy
+      - websocket
