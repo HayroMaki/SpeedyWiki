@@ -1,0 +1,17 @@
+{
+  "ImageRepository": {
+    "ImageIdentifier": "259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest",
+    "ImageConfiguration": {
+      "Port": "3001",
+      "StartCommand": "node server.js",
+      "RuntimeEnvironmentVariables": {
+        "PORT": "3001",
+        "PUBLIC_URL": "https://mnspmi6dtb.eu-west-1.awsapprunner.com"
+      }
+    },
+    "ImageRepositoryType": "ECR"
+  },
+  "AuthenticationConfiguration": {
+    "AccessRoleArn": "arn:aws:iam::259493838682:role/AppRunnerECRAccessRole"
+  }
+}

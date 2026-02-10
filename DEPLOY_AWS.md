@@ -66,78 +66,159 @@ docker push ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/speedywiki-frontend:latest
 
 ---
 
-## Étape 3 : Déployer le Backend API
+## Pré-requis CLI : Rôle IAM
+Pour qu'App Runner puisse télécharger vos images depuis ECR, il a besoin d'un rôle IAM.
 
-1.  Allez dans **AWS App Runner** -> **Create Service**.
-2.  **Source** : Container Registry (ECR). Sélectionnez l'image `speedywiki-backend:latest`.
-3.  **Deployment settings** : Automatic (déploie à chaque push).
-4.  **Service configuration** :
-    *   **Service name** : `speedywiki-api`
-    *   **Port** : `3001`
-    *   **Start command** : `node server.js`
-    *   **Environment variables** :
-        *   `PORT` = `3001`
-        *   `PUBLIC_URL` = Laisser vide pour l'instant (App Runner fournira une URL HTTPS).
-5.  Créez le service.
-6.  Une fois déployé, notez l'**URL par défaut** (ex: `https://api.awsapprunner.com`). Ajoutez la variable d'environnement `PUBLIC_URL` = `https://api.awsapprunner.com` et redéployez si nécessaire.
+1. Créez un fichier `trust-policy.json` :
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "build.apprunner.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 
----
+2. Créez le rôle et attachez la politique :
+```bash
+aws iam create-role --role-name AppRunnerECRAccessRole --assume-role-policy-document file://trust-policy.json
+aws iam attach-role-policy --role-name AppRunnerECRAccessRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess
+```
 
-## Étape 4 : Déployer le Backend WebSocket
+## Étape 3 : Déployer le Backend API (CLI - PowerShell)
 
-1.  **Create Service** sur App Runner.
-2.  **Source** : Même image `speedywiki-backend:latest`.
-3.  **Service configuration** :
-    *   **Service name** : `speedywiki-ws`
-    *   **Port** : `3002`
-    *   **Start command** : `node websocket.js`
-    *   **Environment variables** :
-        *   `WS_PORT` = `3002`
-        *   `MONGO_URI` = `mongodb+srv://...` (Votre chaîne de connexion complète)
-        *   `FRONTEND_URL` = Laisser vide pour l'instant.
+**Note importante :** App Runner n'est pas disponible dans la région Paris (`eu-west-3`). Nous allons déployer le service en Irlande (`eu-west-1`) tout en utilisant votre image stockée à Paris.
+
+```powershell
+aws apprunner create-service `
+    --service-name speedywiki-api `
+    --region eu-west-1 `
+    --source-configuration 'ImageRepository={ImageIdentifier=259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest,ImageConfiguration={Port="3001",StartCommand="node server.js",RuntimeEnvironmentVariables={PORT="3001"}},ImageRepositoryType="ECR"},AuthenticationConfiguration={AccessRoleArn="arn:aws:iam::259493838682:role/AppRunnerECRAccessRole"}'
+```
+
+Une fois le service créé, récupérez son URL (en spécifiant la région) :
+```powershell
+aws apprunner list-services --region eu-west-1
+```
+Notez l'URL (`ServiceUrl`) du service `speedywiki-api`. Vous devrez peut-être mettre à jour la variable `PUBLIC_URL` plus tard :
+```powershell
+# Exemple de mise à jour (si nécessaire)
+aws apprunner update-service --region eu-west-1 --service-arn <SERVICE_ARN> --source-configuration 'ImageRepository={...,ImageConfiguration={...,RuntimeEnvironmentVariables={PORT="3001",PUBLIC_URL="https://..."}}}'
+```
+
+## Étape 4 : Déployer le Backend WebSocket (CLI - PowerShell)
+
+**Important :** Remplacez `VOTRE_MONGO_URI_COMPLET` par votre chaîne de connexion MongoDB réelle (avec utilisateur et mot de passe) avant de lancer cette commande.
+
+```powershell
+aws apprunner create-service `
+    --service-name speedywiki-ws `
+    --region eu-west-1 `
+    --source-configuration 'ImageRepository={ImageIdentifier=259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest,ImageConfiguration={Port="3002",StartCommand="node websocket.js",RuntimeEnvironmentVariables={WS_PORT="3002",MONGO_URI="VOTRE_MONGO_URI_COMPLET"}},ImageRepositoryType="ECR"},AuthenticationConfiguration={AccessRoleArn="arn:aws:iam::259493838682:role/AppRunnerECRAccessRole"}'
+```
+
+## Étape 4.5 : Mise à jour du Backend (Critique)
+
+Nous avons modifié `server.js` pour utiliser `PUBLIC_URL`. Il faut donc :
+1.  Re-builder et Pusher l'image Backend.
+2.  Mettre à jour le service API avec la bonne variable d'environnement `PUBLIC_URL` (l'URL que vous venez d'obtenir).
+
+**1. Build & Push Backend :**
+```powershell
+cd backend
+docker build -t speedywiki-backend .
+docker tag speedywiki-backend:latest 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+docker push 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+cd ..
+```
+
+**2. Update Service API (Trigger Deployment) :**
+Cette commande met à jour la configuration pour ajouter `PUBLIC_URL` et déclenche un nouveau déploiement avec la nouvelle image.
+
+```powershell
+aws apprunner update-service `
+    --service-arn arn:aws:apprunner:eu-west-1:259493838682:service/speedywiki-api/b173d443ebf54d3db2f3c6208fa1d5ea `
+    --region eu-west-1 `
+    --source-configuration 'ImageRepository={ImageIdentifier=259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest,ImageConfiguration={Port="3001",StartCommand="node server.js",RuntimeEnvironmentVariables={PORT="3001",PUBLIC_URL="https://mnspmi6dtb.eu-west-1.awsapprunner.com"}},ImageRepositoryType="ECR"}'
+```
 
 ---
 
 ## Étape 5 : Re-Build et Déployer le Frontend
 
-Maintenant que nous avons les URLs de l'API et du WebSocket, nous devons reconstruire le frontend.
+J'ai déjà créé le fichier `site/.env.production` avec vos URLs :
+*   API : `https://mnspmi6dtb.eu-west-1.awsapprunner.com`
+*   WS : `wss://jmr7p6nqqz.eu-west-1.awsapprunner.com`
 
-1.  Récupérez les URLs des services créés :
-    *   API URL : ex `https://xyz.awsapprunner.com`
-    *   WS URL : ex `wss://abc.awsapprunner.com` (Notez `wss://` au lieu de `https://`)
+Il ne vous reste plus qu'à lancer ces commandes pour mettre à jour l'image et déployer le site :
 
-2.  Re-buildez l'image frontend avec ces arguments (ou modifiez `.env` localement avant build) :
-
-*Méthode recommandée : créer un fichier `.env.production` localement dans `site/`*
-```env
-VITE_API_URL=https://votre-url-api.awsapprunner.com
-VITE_WS_URL=wss://votre-url-ws.awsapprunner.com
-```
-
-3.  Build et Push :
-```bash
+### 1. Build et Push
+```powershell
 cd site
 docker build -t speedywiki-frontend .
-docker tag speedywiki-frontend:latest ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/speedywiki-frontend:latest
-docker push ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/speedywiki-frontend:latest
+docker tag speedywiki-frontend:latest 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-frontend:latest
+docker push 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-frontend:latest
+cd ..
 ```
 
-4.  **Create Service** sur App Runner pour le Frontend :
-    *   **Source** : Image `speedywiki-frontend:latest`.
-    *   **Port** : `80`
-    *   **Service name** : `speedywiki-site`
+### 2. Déployer le Frontend sur App Runner
+```powershell
+aws apprunner create-service `
+    --service-name speedywiki-site `
+    --region eu-west-1 `
+    --source-configuration 'ImageRepository={ImageIdentifier=259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-frontend:latest,ImageConfiguration={Port="80"},ImageRepositoryType="ECR"},AuthenticationConfiguration={AccessRoleArn="arn:aws:iam::259493838682:role/AppRunnerECRAccessRole"}'
+```
 
 ---
 
 ## Étape 6 : Finalisation
 
-1.  Récupérez l'URL finale du Frontend App Runner.
-2.  Mettez à jour les variables d'environnement des services Backends :
-    *   Sur `speedywiki-api` : `FRONTEND_URL` = `https://votre-url-frontend.awsapprunner.com`
-    *   Sur `speedywiki-ws` : `FRONTEND_URL` = `https://votre-url-frontend.awsapprunner.com` (si utilisé).
+Une fois le service `speedywiki-site` déployé (vérifiez avec `aws apprunner list-services --region eu-west-1`), vous pourrez accéder à votre jeu via l'URL fournie !
 
-Votre application est maintenant en ligne ! 🚀
+Optionnel : Si vous avez besoin de mettre à jour l'URL du frontend dans vos backends (pour les CORS ou redirections), utilisez :
+```powershell
+# Remplacez SERVICE_ARN_API et SERVICE_ARN_WS par les vrais ARNs
+# Et FRONTEND_URL par la nouvelle URL (https://...)
+aws apprunner update-service --region eu-west-1 --service-arn SERVICE_ARN_API --source-configuration 'ImageRepository={...,ImageConfiguration={...,RuntimeEnvironmentVariables={PORT="3001",PUBLIC_URL="FRONTEND_URL"}}}'
+```
 
 ## Note sur Redis (Scalabilité)
 Pour l'instant, le WebSocket stocke l'état en mémoire. Si le service `speedywiki-ws` redémarre ou scale horizontalement (plus d'une instance), les joueurs seront déconnectés ou séparés.
 Pour corriger cela, provisionnez un cluster **Amazon ElastiCache for Redis** et configurez le code pour l'utiliser (comme décrit dans le document de stratégie).
+
+## Dépannage des Erreurs Courantes
+
+### 1. API "Cannot GET /" (404) et WS "426 Upgrade Required"
+C'est normal si vous visitez les liens directement. Nous avons mis à jour le code pour afficher un message "OK" à la place.
+**Action :** Re-deployez le backend (voir commande ci-dessous).
+
+### 2. Site "DNS address could not be found"
+Cela signifie généralement que le service **App Runner n'a pas fini de démarrer** ou a échoué.
+**Action :** Vérifiez le statut du service :
+```powershell
+aws apprunner list-services --region eu-west-1
+```
+Si le statut est `CREATE_FAILED`, regardez les logs :
+1. Allez sur la console AWS -> App Runner.
+2. Cliquez sur `speedywiki-site`.
+3. Onglet **Logs**.
+
+## Mise à jour Corrective (Backend)
+Lancez ceci pour appliquer les correctifs de "Health Check" :
+
+```powershell
+cd backend
+docker build -t speedywiki-backend .
+docker tag speedywiki-backend:latest 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+docker push 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+cd ..
+# Redéployer API et WS
+aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:259493838682:service/speedywiki-api/b173d443ebf54d3db2f3c6208fa1d5ea --region eu-west-1
+aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:259493838682:service/speedywiki-ws/eecb74b5d22746dc8928395721079508 --region eu-west-1
+```
