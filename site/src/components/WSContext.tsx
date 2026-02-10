@@ -7,9 +7,7 @@ import MessageUser from "../interfaces/MessageUser.tsx";
 interface WSContextType {
     WS: WebSocket | null;
     sendMessage: (message: Message) => void;
-    messages: {
-        type: any; pseudo: string; text: string 
-    }[];
+    messages: Message[];
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     getResponse: () => Message | null;
     getPlayers: () => Message | null;
@@ -77,9 +75,14 @@ export const WSProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     useRunOnce({
         fn: () => {
             if (!WS) {
-                const host = window.location.hostname;
-                const defaultWsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-                const socketUrl = import.meta.env.VITE_WS_URL || `${defaultWsScheme}://${host}:3002`;
+                let socketUrl = import.meta.env.VITE_WS_URL;
+                
+                if (!socketUrl) {
+                    const host = window.location.hostname;
+                    const defaultWsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+                    socketUrl = `${defaultWsScheme}://${host}:3002`;
+                }
+                
                 const socket = new WebSocket(socketUrl);
 
                 socket.onmessage = (event) => {

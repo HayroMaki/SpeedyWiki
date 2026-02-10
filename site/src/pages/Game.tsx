@@ -78,10 +78,10 @@ const Game = () => {
     fn: () => {
       // Get the objectives :
       const m_start = getStart();
-      if (m_start && m_start.text) {
-        const start_art: Article[] = m_start.text;
-        console.log("objectifs:",start_art);
-        setArticles(start_art);
+      if (m_start && Array.isArray(m_start.text)) {
+        const startArticles = m_start.text as Article[];
+        console.log("objectifs:",startArticles);
+        setArticles(startArticles);
       }
 
       // Get the start page or, in case of reloads, the last page visited :
@@ -94,8 +94,8 @@ const Game = () => {
         setWikiContent(link);
         setPage(actualPage);
 
-      } else if (m_startpage) {
-        const startpage: Article[] = m_startpage.text;
+      } else if (m_startpage && Array.isArray(m_startpage.text) && m_startpage.text.length > 1) {
+        const startpage = m_startpage.text as Article[];
         console.log("starting with:",startpage);
         setWikiContent(startpage[1].url);
         setPage(startpage[1].title);
@@ -105,9 +105,10 @@ const Game = () => {
       // Get the inventory in case of reloads :
       const stored_inv = localStorage.getItem("inventory");
       if (stored_inv) {
-        for (const artifact:Artifact of JSON.parse(stored_inv)) {
+        const storedInventory = JSON.parse(stored_inv) as Artifact[];
+        storedInventory.forEach((artifact) => {
           baseInventory.push(artifact);
-        }
+        });
         setInventory(baseInventory);
       }
     }

@@ -1,21 +1,41 @@
 import {WebSocketServer} from "ws";
 import mongoose from "mongoose";
-import fs from 'fs';
-import path from 'path';
+import { createServer } from 'http';
 
 import {generateUniqueId} from './functions/generateUniqueId.js';
 import {fetchArticles} from './functions/fetchArticles.js';
 import {readEnvFile} from './functions/readEnvFile.js';
 
-// Create websocket on 3002 :
-const websocket = new WebSocketServer({
-  port: 3002,
-  host: '0.0.0.0'
+// Create HTTP server for Health Checks & WebSocket upgrade
+const PORT = process.env.WS_PORT || 3002;
+const server = createServer((req, res) => {
+  console.log(`[HTTP] Request: ${req.method} ${req.url}`);
+  console.log('[HTTP] Headers:', JSON.stringify(req.headers));
+
+  if (req.method === 'GET' && req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('SpeedyWiki WebSocket is running');
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+// Create websocket attached to the HTTP server
+const websocket = new WebSocketServer({ noServer: true });
+
+server.on('upgrade', (request, socket, head) => {
+  console.log(`[UPGRADE] Request: ${request.method} ${request.url}`);
+  console.log('[UPGRADE] Headers:', JSON.stringify(request.headers));
+
+  websocket.handleUpgrade(request, socket, head, (ws) => {
+    websocket.emit('connection', ws, request);
+  });
 });
 
 // Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
-const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
@@ -346,5 +366,6 @@ websocket.on("connection", (ws) => {
   });
 });
 
-console.log("✅ WebSocket server running on ws://localhost:3002");
-
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ WebSocket Server running on port ${PORT}`);
+});

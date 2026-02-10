@@ -22,6 +22,11 @@ import baseInventory from "./Inventory.tsx";
 import {useWS} from "../WSContext.tsx";
 import {Article} from "../../interfaces/Article.tsx";
 
+type MediaWikiLink = { title: string };
+type MediaWikiCategory = { title: string };
+type MediaWikiCategoryMember = { title: string };
+type MediaWikiSearchResult = { title: string };
+
 // Different findable artifacts :
 const positiveArtifacts: Partial<Artifact>[] = [
     { id: 1, name: "GPS", icon: GPS, effect: 1, count: -1 },
@@ -77,13 +82,13 @@ const estimatePopularity = (title: string): number => {
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const defaultOrigin = `${window.location.protocol}//${window.location.hostname}:3001`;
-    const proxyOrigin = import.meta.env.VITE_PROXY_ORIGIN || defaultOrigin;
+    const proxyOrigin = import.meta.env.VITE_API_URL || "http://localhost:3001";
     const proxyUrl = `${proxyOrigin}/proxy?url=${encodeURIComponent(props.src)}`;
 
     useEffect(() => {
         const handlePageTitleChange = (event: MessageEvent) => {
-            if (event.origin === proxyOrigin) { // Verify origin for security (WILL BE MODIFIED LATER)
+            // Check if origin matches (allowing for flexible check if needed)
+            if (event.origin === new URL(proxyOrigin).origin) { 
                 props.onPageChange(event.data);
             }
         };
@@ -203,7 +208,7 @@ export const WikiContentWindow = (props: {
             }
 
             // Filter to keep only article pages :
-            const validLinks = pages[pageId].links.filter(link =>
+            const validLinks = pages[pageId].links.filter((link: MediaWikiLink) =>
                 !link.title.includes("Wikipedia:") &&
                 !link.title.includes("Template:") &&
                 !link.title.includes("Help:") &&
@@ -236,7 +241,7 @@ export const WikiContentWindow = (props: {
             }
 
             // Filter to keep only article pages :
-            const validSecondLinks = secondPages[secondPageId].links.filter(link =>
+            const validSecondLinks = secondPages[secondPageId].links.filter((link: MediaWikiLink) =>
                 !link.title.includes("Wikipedia:") &&
                 !link.title.includes("Template:") &&
                 !link.title.includes("Help:") &&
@@ -278,8 +283,8 @@ export const WikiContentWindow = (props: {
 
                 // Filter to keep only article pages :
                 const validCategories = pages[pageId].categories
-                    .filter(cat => !cat.title.includes("stub"))
-                    .map(cat => cat.title);
+                    .filter((cat: MediaWikiCategory) => !cat.title.includes("stub") && !cat.title.includes("Wikipedia:") && !cat.title.includes("Template:") && !cat.title.includes("Help:") && !cat.title.includes("Category:") && !cat.title.includes("Talk:") && !cat.title.includes("File:"))
+                    .map((cat: MediaWikiCategory) => cat.title);
 
                 if (validCategories.length === 0) {
                     throw new Error("No valid categories found");
@@ -300,7 +305,7 @@ export const WikiContentWindow = (props: {
 
                 // Make sure we don't get the target article :
                 const validArticles = articlesData.query.categorymembers
-                    .filter(article => article.title !== targetArticle.title);
+                    .filter((article: MediaWikiCategoryMember) => article.title !== targetArticle.title);
 
                 if (validArticles.length === 0) {
                     throw new Error("No valid articles found in category");
@@ -331,7 +336,7 @@ export const WikiContentWindow = (props: {
 
                     // Make sure we don't get the target article :
                     const validResults = searchData.query.search
-                        .filter(result => result.title !== targetArticle.title);
+                        .filter((result: MediaWikiSearchResult) => result.title !== targetArticle.title);
 
                     if (validResults.length === 0) {
                         throw new Error("No valid search results");

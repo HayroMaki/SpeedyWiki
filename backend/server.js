@@ -4,6 +4,7 @@ import cors from "cors";
 
 const app = express();
 const PORT = 3001;
+const SELF_URL = process.env.PUBLIC_URL;
 const WIKI_REQUEST_HEADERS = {
     "User-Agent": "SpeedyWikiProxy/1.0 (https://localhost)",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -25,7 +26,14 @@ const blockedPrefixes = [
 ];
 
 // Allow Front-End to make requests :
-app.use(cors());
+const corsOptions = {
+    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : "*"
+};
+app.use(cors(corsOptions));
+
+app.get("/", (req, res) => {
+    res.send("SpeedyWiki API is running");
+});
 
 app.get("/proxy", async (req, res) => {
     const encodedUrl = req.query.url;
@@ -86,7 +94,7 @@ app.get("/proxy", async (req, res) => {
 
                     // Convert the link for our proxy :
                     const updatedHref = href.startsWith("/wiki/")
-                        ? `http://localhost:${PORT}/proxy?url=https://en.wikipedia.org${href}`
+                        ? `${SELF_URL}/proxy?url=https://en.wikipedia.org${href}`
                         : href;
                     return match.replace(href, updatedHref);
                 }
@@ -165,6 +173,6 @@ app.get("/proxy", async (req, res) => {
 });
 
 // Launch the server :
-app.listen(PORT, () => {
-    console.log(`Serveur proxy démarré sur http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Serveur proxy démarré sur port ${PORT}`);
 });
