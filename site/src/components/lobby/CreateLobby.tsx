@@ -13,7 +13,7 @@ const CreateLobby: React.FC = () => {
 
         const m = getResponse();
         console.log(m);
-        if (m && m.text.includes("Lobby") && m.text.includes("created")) {
+        if (m && typeof m.text === 'string' && m.text.includes("Lobby") && m.text.includes("created")) {
             setIsCreating(false);
             // Extract the created lobby's id :
             const lobbyId = m.text.split("Lobby ")[1].split(" created")[0];

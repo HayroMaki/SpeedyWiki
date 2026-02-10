@@ -51,13 +51,13 @@ interface ChatWindowProps {
                             case "chat":
                                 return (
                                     <div key={index}>
-                                        <strong>{msg.pseudo} :</strong> {msg.text}
+                                        <strong>{msg.pseudo} :</strong> {String(msg.text)}
                                     </div>
                                 );
                             case "chat-sys":
                                 return (
                                     <div key={index} style={{color:"#FFAA00"}}>
-                                        {msg.text}
+                                        {String(msg.text)}
                                     </div>
                                 );
                             case "":break;

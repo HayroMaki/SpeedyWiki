@@ -11,7 +11,7 @@ import MessageUser from '../interfaces/MessageUser';
 
 
 const Win = () => {
-    const { sendMessage,messages, pseudo,picture, player,lobby: lobbyId, setPlayer, getWinner, clear} = useWS();
+    const { sendMessage,messages, pseudo,picture, player,lobby: lobbyId, getWinner, clear} = useWS();
     const [winners, setWinners] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     const [loosers, setLoosers] = useState<{ pseudo: string,image:number, clicks: string  }[]>([]);
     useEffect(() => {
