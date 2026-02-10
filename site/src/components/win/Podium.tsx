@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import Cross from "../../assets/icon/Cross_Icon.png";
 import Full from "../../assets/icon/FullScreen_Icon.png";
 import Reduce from "../../assets/icon/Reduce_Icon.png";
