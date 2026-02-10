@@ -25,7 +25,10 @@ const blockedPrefixes = [
 ];
 
 // Allow Front-End to make requests :
-app.use(cors());
+const corsOptions = {
+    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : "*"
+};
+app.use(cors(corsOptions));
 
 app.get("/proxy", async (req, res) => {
     const encodedUrl = req.query.url;

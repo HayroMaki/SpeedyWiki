@@ -82,13 +82,13 @@ const estimatePopularity = (title: string): number => {
 
 const WikipediaFrame = (props: { src: string; className: string; onPageChange: (title: string) => void }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const defaultOrigin = `${window.location.protocol}//${window.location.hostname}:3001`;
-    const proxyOrigin = import.meta.env.VITE_PROXY_ORIGIN || defaultOrigin;
+    const proxyOrigin = import.meta.env.VITE_API_URL || "http://localhost:3001";
     const proxyUrl = `${proxyOrigin}/proxy?url=${encodeURIComponent(props.src)}`;
 
     useEffect(() => {
         const handlePageTitleChange = (event: MessageEvent) => {
-            if (event.origin === proxyOrigin) { // Verify origin for security (WILL BE MODIFIED LATER)
+            // Check if origin matches (allowing for flexible check if needed)
+            if (event.origin === new URL(proxyOrigin).origin) { 
                 props.onPageChange(event.data);
             }
         };

@@ -6,7 +6,8 @@ const execPromise = promisify(exec);
 export const fetchArticles = async (numberOfArticles = 6) => {
     try {
         // Exécuter le solveur Python et récupérer la sortie JSON
-        const { stdout } = await execPromise('python solveur_global.py --json');
+        // Utilisation explicite de python3 pour compatibilité Docker
+        const { stdout } = await execPromise('python3 solveur_global.py --json');
 
         // Parser la sortie JSON
         const data = JSON.parse(stdout);

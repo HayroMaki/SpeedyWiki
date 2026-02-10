@@ -8,14 +8,15 @@ import {fetchArticles} from './functions/fetchArticles.js';
 import {readEnvFile} from './functions/readEnvFile.js';
 
 // Create websocket on 3002 :
+const PORT = process.env.WS_PORT || 3002;
 const websocket = new WebSocketServer({
-  port: 3002,
+  port: PORT,
   host: '0.0.0.0'
 });
 
 // Connect to mongoDB Atlas cluster :
 const env = readEnvFile();
-const MONGO_URI = 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
@@ -346,5 +347,5 @@ websocket.on("connection", (ws) => {
   });
 });
 
-console.log("✅ WebSocket server running on ws://localhost:3002");
+console.log(`✅ WebSocket server running on ws://localhost:${PORT}`);
 
