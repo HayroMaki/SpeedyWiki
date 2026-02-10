@@ -8,7 +8,6 @@ $ECR_REPO_FRONTEND = "$ACCOUNT_ID.dkr.ecr.$REGION_ECR.amazonaws.com/speedywiki-f
 
 # NOTE: App Runner services (names must match what you created)
 $SERVICE_API = "speedywiki-api"
-$SERVICE_WS = "speedywiki-ws"
 $SERVICE_SITE = "speedywiki-site"
 
 Write-Host "Starting SpeedyWiki deployment..." -ForegroundColor Green
@@ -17,8 +16,8 @@ Write-Host "Starting SpeedyWiki deployment..." -ForegroundColor Green
 Write-Host "Authentification ECR ($REGION_ECR)..."
 aws ecr get-login-password --region $REGION_ECR | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION_ECR.amazonaws.com"
 
-# --- BACKEND ---
-Write-Host "Build & Push Backend..." -ForegroundColor Cyan
+# --- BACKEND (API) ---
+Write-Host "Build & Push Backend (for API)..." -ForegroundColor Cyan
 Set-Location backend
 docker build -t speedywiki-backend .
 docker tag speedywiki-backend:latest $ECR_REPO_BACKEND
@@ -33,7 +32,7 @@ docker tag speedywiki-frontend:latest $ECR_REPO_FRONTEND
 docker push $ECR_REPO_FRONTEND
 Set-Location ..
 
-# --- DEPLOYMENTS ---
+# --- DEPLOYMENTS (APP RUNNER) ---
 Write-Host "Triggering App Runner deployments ($REGION_APP_RUNNER)..." -ForegroundColor Yellow
 
 function Start-Deploy {
@@ -61,7 +60,11 @@ function Start-Deploy {
 }
 
 Start-Deploy $SERVICE_API
-Start-Deploy $SERVICE_WS
 Start-Deploy $SERVICE_SITE
 
-Write-Host "Deployment commands sent! Check AWS Console." -ForegroundColor Green
+# --- DEPLOYMENT (LIGHTSAIL WS) ---
+Write-Host "Triggering Lightsail deployment (WebSocket)..." -ForegroundColor Yellow
+# We call the specific script for Lightsail which handles its own build/push to Lightsail registry
+powershell -ExecutionPolicy Bypass -File ./deploy-ws.ps1
+
+Write-Host "Global Deployment commands sent! Check AWS Console." -ForegroundColor Green

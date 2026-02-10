@@ -1,44 +1,78 @@
 # Configuration
-$env:AWS_PAGER="" # Disable pager
-$REGION_APP_RUNNER = "eu-west-1"
-$REGION_ECR = "eu-west-3"
-$ACCOUNT_ID = "259493838682"
-$ECR_REPO_BACKEND = "$ACCOUNT_ID.dkr.ecr.$REGION_ECR.amazonaws.com/speedywiki-backend:latest"
-$SERVICE_WS = "speedywiki-ws"
+$env:AWS_PAGER=""
+$REGION = "eu-west-1"
+$SERVICE_NAME = "speedywiki-ws-service"
+$IMAGE_LABEL = "speedywiki-ws"
+$LOCAL_IMAGE = "speedywiki-backend:latest"
 
-Write-Host "Starting SpeedyWiki WebSocket Deployment..." -ForegroundColor Green
+# Ensure lightsailctl is in path (assuming it's in the current directory)
+$currentDir = Get-Location
+$env:Path += ";$currentDir"
 
-# 1. Login ECR
-Write-Host "Authentification ECR ($REGION_ECR)..."
-aws ecr get-login-password --region $REGION_ECR | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION_ECR.amazonaws.com"
+Write-Host "Starting SpeedyWiki WebSocket Deployment to Lightsail..." -ForegroundColor Green
 
-# 2. Build & Push Backend
-Write-Host "Build & Push Backend Image..." -ForegroundColor Cyan
+# 1. Build Backend
+Write-Host "Building Backend Image..." -ForegroundColor Cyan
 Set-Location backend
-docker build -t speedywiki-backend .
-docker tag speedywiki-backend:latest $ECR_REPO_BACKEND
-docker push $ECR_REPO_BACKEND
+docker build -t $LOCAL_IMAGE .
 Set-Location ..
 
-# 3. Trigger App Runner Deployment
-Write-Host "Triggering App Runner deployment for $SERVICE_WS..." -ForegroundColor Yellow
+# 2. Push to Lightsail
+Write-Host "Pushing image to Lightsail (this may take a while)..." -ForegroundColor Cyan
+# The output is text, not JSON, because of the lightsailctl plugin.
+# We capture both stdout and stderr.
+$pushOutput = aws lightsail push-container-image --region $REGION --service-name $SERVICE_NAME --label $IMAGE_LABEL --image $LOCAL_IMAGE 2>&1 | Out-String
 
-try {
-    $json = aws apprunner list-services --region $REGION_APP_RUNNER --output json
-    if ($json) {
-        $data = $json | ConvertFrom-Json
-        $ServiceArn = $data.ServiceSummaryList | Where-Object { $_.ServiceName -eq $SERVICE_WS } | Select-Object -ExpandProperty ServiceArn
+Write-Host "Raw Push Output: $pushOutput"
 
-        if ($ServiceArn) {
-            Write-Host "   -> Found: $ServiceArn"
-            Write-Host "   -> Starting deployment..."
-            aws apprunner start-deployment --service-arn $ServiceArn --region $REGION_APP_RUNNER
-        } else {
-            Write-Host "   Warning: Service $SERVICE_WS not found!" -ForegroundColor Red
-        }
-    }
-} catch {
-    Write-Host "   Error: $_" -ForegroundColor Red
+# Extract the image identifier using regex
+# Pattern: Refer to this image as ":speedywiki-ws-service.speedywiki-ws.1"
+if ($pushOutput -match 'Refer to this image as "([^"]+)"') {
+    $imageIdentifier = $matches[1]
+    Write-Host "Image pushed successfully: $imageIdentifier" -ForegroundColor Green
+} else {
+    Write-Host "Error: Could not find image identifier in push output." -ForegroundColor Red
+    exit 1
 }
 
-Write-Host "Deployment command sent! Check AWS Console." -ForegroundColor Green
+# 3. Create Deployment
+Write-Host "Creating Deployment..." -ForegroundColor Yellow
+
+$containerConfig = @{
+    containers = @{
+        ($SERVICE_NAME) = @{
+            image = $imageIdentifier
+            command = @("node", "websocket.js")
+            environment = @{
+                "WS_PORT" = "3002"
+                "MONGO_URI" = "mongodb+srv://jules:UsNHdFnXGR8It1i4@cluster.mongodb.net/"
+            }
+            ports = @{
+                "3002" = "HTTP"
+            }
+        }
+    }
+    publicEndpoint = @{
+        containerName = $SERVICE_NAME
+        containerPort = 3002
+        healthCheck = @{
+            path = "/"
+            intervalSeconds = 10
+        }
+    }
+}
+
+# Save config to temp json file because passing complex json via CLI args in PS is a nightmare
+$configJson = $containerConfig | ConvertTo-Json -Depth 4
+$configJson | Out-File -FilePath "lightsail-deploy-config.json" -Encoding ASCII
+
+try {
+    aws lightsail create-container-service-deployment --region $REGION --service-name $SERVICE_NAME --cli-input-json file://lightsail-deploy-config.json
+    Write-Host "Deployment triggered successfully!" -ForegroundColor Green
+} catch {
+    Write-Host "Error triggering deployment: $_" -ForegroundColor Red
+} finally {
+    Remove-Item "lightsail-deploy-config.json" -ErrorAction SilentlyContinue
+}
+
+Write-Host "Monitor deployment status with: aws lightsail get-container-services --service-name $SERVICE_NAME --region $REGION" -ForegroundColor Gray

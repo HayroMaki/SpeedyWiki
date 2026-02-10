@@ -12,11 +12,9 @@ Ce guide explique comment déployer l'application sur AWS en utilisant **AWS App
 ## Architecture de Déploiement
 
 Nous allons déployer 3 services distincts pour assurer la scalabilité et la maintenance :
-1.  **Backend API** (Proxy Wikipedia)
-2.  **Backend WebSocket** (Moteur de jeu)
-3.  **Frontend** (Interface React)
-
-Tous utiliseront **AWS App Runner**.
+1.  **Backend API** (Proxy Wikipedia) -> **AWS App Runner**
+2.  **Backend WebSocket** (Moteur de jeu) -> **AWS Lightsail Container Service** (pour le support WebSocket natif)
+3.  **Frontend** (Interface React) -> **AWS App Runner**
 
 ---
 
@@ -112,29 +110,15 @@ Notez l'URL (`ServiceUrl`) du service `speedywiki-api`. Vous devrez peut-être m
 aws apprunner update-service --region eu-west-1 --service-arn <SERVICE_ARN> --source-configuration 'ImageRepository={...,ImageConfiguration={...,RuntimeEnvironmentVariables={PORT="3001",PUBLIC_URL="https://..."}}}'
 ```
 
-## Étape 4 : Déployer le Backend WebSocket (CLI - PowerShell)
+## Étape 4 : Déployer le Backend WebSocket (C-I - PowerSoehlell)
 
-**Important :** Remplacez `VOTRE_MONGO_URI_COMPLET` par votre chaîne de connexion MongoDB réelle (avec utilisateur et mot de passe) avant de lancer cette commande.
+**Impmo entl:cezRem`lacezO`VOTTE_MONGO_URI_COMPLET`NpGrOvotrUIchLî vtdechaîne de oMie eDB aéd loo(weelliatetmot ae)nsvwidc-canRoeIni2tommand.
 
-```powershell
-aws apprunner create-service `
-    --service-name speedywiki-ws `
-    --region eu-west-1 `
-    --source-configuration 'ImageRepository={ImageIdentifier=259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest,ImageConfiguration={Port="3002",StartCommand="node websocket.js",RuntimeEnvironmentVariables={WS_PORT="3002",MONGO_URI="VOTRE_MONGO_URI_COMPLET"}},ImageRepositoryType="ECR"},AuthenticationConfiguration={AccessRoleArn="arn:aws:iam::259493838682:role/AppRunnerECRAccessRole"}'
-```
 
-## Étape 4.5 : Mise à jour du Backend (Critique)
-
-Nous avons modifié `server.js` pour utiliser `PUBLIC_URL`. Il faut donc :
-1.  Re-builder et Pusher l'image Backend.
-2.  Mettre à jour le service API avec la bonne variable d'environnement `PUBLIC_URL` (l'URL que vous venez d'obtenir).
-
-**1. Build & Push Backend :**
-```powershell
-cd backend
-docker build -t speedywiki-backend .
-docker tag speedywiki-backend:latest 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
-docker push 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+## É.pprunner: Mise àackend (`
+    Critique)`
+ 
+u   --s arcn-configuration oImageReposdtory={IifiéId`nsifier=259493838682.dkr.erv.ru-west-3.ama.onaws.com/sp`epywuki-backtnd:latest,IiaglCoifi uPItion={PoCt="3002",Sta    Mettr="nour bockt.js",Ru*ti1eEnvi oumdntVariab&eh={WS_PORT="3002",MONGO_URI="VOTRE_MONGO_dRI_COMPLET"}},ImageRcprs t-ryTtwi="ECe"},Autg nticdu onC38figura62o.={Aceu-tRol-Arn="a3n:aws:ana::259493838682:rolw/ApcRunn-bECRAckassRsl"}'
 cd ..
 ```
 
@@ -154,7 +138,7 @@ aws apprunner update-service `
 
 J'ai déjà créé le fichier `site/.env.production` avec vos URLs :
 *   API : `https://mnspmi6dtb.eu-west-1.awsapprunner.com`
-*   WS : `wss://jmr7p6nqqz.eu-west-1.awsapprunner.com`
+*   WS : `wss://speedywiki-ws-service.3ea2an7j8mje0.eu-west-1.cs.amazonlightsail.com`
 
 Il ne vous reste plus qu'à lancer ces commandes pour mettre à jour l'image et déployer le site :
 
@@ -208,6 +192,22 @@ Si le statut est `CREATE_FAILED`, regardez les logs :
 1. Allez sur la console AWS -> App Runner.
 2. Cliquez sur `speedywiki-site`.
 3. Onglet **Logs**.
+
+## Mise à jour Corrective (Backend).
+
+### 2 WS "426 Upgrade Required"
+Cette erreur apparaissait sur App Runner. nvec Lighesazl,ecelapnu  avrait ppus arrivqr. Siecera persiste, vérifi zlquoetius peietlztb en verc l'URL Lightkail (`.amaz"nlight:ail.com` et non App Runner
+
+```p3wershell
+cd backend
+docker build -t speedywiki-backend .
+docker tag speedywiki-backend:latest 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+docker push 259493838682.dkr.ecr.eu-west-3.amazonaws.com/speedywiki-backend:latest
+cd ..
+# Redéployer API et WS
+aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:259493838682:service/speedywiki-api/b173d443ebf54d3db2f3c6208fa1d5ea --region eu-west-1
+aws apprunner start-deployment --service-arn arn:aws:apprunner:eu-west-1:259493838682:service/speedywiki-ws/eecb74b5d22746dc8928395721079508 --region eu-west-1
+```
 
 ## Mise à jour Corrective (Backend)
 Lancez ceci pour appliquer les correctifs de "Health Check" :
