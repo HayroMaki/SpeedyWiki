@@ -1,17 +1,103 @@
 import {WebSocketServer} from "ws";
 import mongoose from "mongoose";
 import { createServer } from 'http';
+import { createClient } from 'redis';
 
 import {generateUniqueId} from './functions/generateUniqueId.js';
 import {fetchArticles} from './functions/fetchArticles.js';
 import {readEnvFile} from './functions/readEnvFile.js';
 
+const env = readEnvFile();
+
+// --- Redis Setup ---
+const redisConfig = {
+  username: env.REDIS_USERNAME || 'speedywiki',
+  password: env.REDIS_PASSWORD,
+  socket: {
+      host: env.REDIS_HOST,
+      port: env.REDIS_PORT || 18676
+  }
+};
+
+// Client for data operations
+const redisClient = createClient(redisConfig);
+// Client for publishing messages
+const pubClient = createClient(redisConfig);
+// Client for subscribing to messages
+const subClient = createClient(redisConfig);
+
+redisClient.on('error', (err) => console.error('Redis Client Error', err));
+pubClient.on('error', (err) => console.error('Redis Pub Client Error', err));
+subClient.on('error', (err) => console.error('Redis Sub Client Error', err));
+
+Promise.all([redisClient.connect(), pubClient.connect(), subClient.connect()])
+  .then(() => {
+    console.log('✅ Connected to Redis (Data, Pub, Sub)');
+    
+    // Subscribe to global channel
+    subClient.subscribe('speedywiki:events', (message) => {
+      try {
+        const { lobbyId, payload } = JSON.parse(message);
+        broadcastToLocalLobby(lobbyId, payload);
+      } catch (e) {
+        console.error("Error handling redis message:", e);
+      }
+    });
+  })
+  .catch(err => {
+    console.error('❌ Failed to connect to Redis:', err);
+    process.exit(1);
+  });
+
+// --- Local Connections Management ---
+// We only store the *active connections* for this specific instance here.
+// Shared state is in Redis.
+const localConnections = new Map(); // lobbyId -> Set<UserObj>
+
+function addLocalConnection(lobbyId, userObj) {
+  if (!localConnections.has(lobbyId)) {
+    localConnections.set(lobbyId, new Set());
+  }
+  localConnections.get(lobbyId).add(userObj);
+}
+
+function removeLocalConnection(lobbyId, userObj) {
+  if (localConnections.has(lobbyId)) {
+    const set = localConnections.get(lobbyId);
+    set.delete(userObj);
+    if (set.size === 0) {
+      localConnections.delete(lobbyId);
+    }
+  }
+}
+
+function broadcastToLocalLobby(lobbyId, messageString) {
+  const clients = localConnections.get(lobbyId);
+  if (clients) {
+    clients.forEach(client => {
+      if (client.ws.readyState === client.ws.OPEN) {
+        client.ws.send(messageString);
+      }
+    });
+  }
+}
+
+// Publish a message to be received by ALL instances (including self) and sent to clients
+async function publishToLobby(lobbyId, messageObj) {
+  const payload = JSON.stringify(messageObj);
+  // We wrap it to target the lobby
+  await pubClient.publish('speedywiki:events', JSON.stringify({
+    lobbyId,
+    payload
+  }));
+}
+
+
 // Create HTTP server for Health Checks & WebSocket upgrade
 const PORT = process.env.WS_PORT || 3002;
 const server = createServer((req, res) => {
-  console.log(`[HTTP] Request: ${req.method} ${req.url}`);
-  console.log('[HTTP] Headers:', JSON.stringify(req.headers));
-
+  // console.log(`[HTTP] Request: ${req.method} ${req.url}`);
+  
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('SpeedyWiki WebSocket is running');
@@ -25,17 +111,14 @@ const server = createServer((req, res) => {
 const websocket = new WebSocketServer({ noServer: true });
 
 server.on('upgrade', (request, socket, head) => {
-  console.log(`[UPGRADE] Request: ${request.method} ${request.url}`);
-  console.log('[UPGRADE] Headers:', JSON.stringify(request.headers));
-
+  // console.log(`[UPGRADE] Request: ${request.method} ${request.url}`);
   websocket.handleUpgrade(request, socket, head, (ws) => {
     websocket.emit('connection', ws, request);
   });
 });
 
 // Connect to mongoDB Atlas cluster :
-const env = readEnvFile();
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://'+env["USER"]+':'+env["PASS"]+'@jules-renaud-grange.uuold.mongodb.net/';
+const MONGO_URI = env.MONGO_URI || process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI, {})
     .then(() => console.log('✅ Connecté à MongoDB Atlas'))
@@ -43,7 +126,9 @@ mongoose.connect(MONGO_URI, {})
 
 const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies");
 
-const lobbies = {};
+// Helper to construct Redis keys
+const kLobby = (id) => `lobby:${id}`;
+const kPlayers = (id) => `lobby:${id}:players`;
 
 // Setup websocket :
 websocket.on("connection", (ws) => {
@@ -52,7 +137,7 @@ websocket.on("connection", (ws) => {
   let userPseudo = null;
   let userObj = null;
   
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     try {
       const {type, lobby, pseudo, text} = JSON.parse(message);
       
@@ -62,305 +147,287 @@ websocket.on("connection", (ws) => {
       switch(type) {
 
         case "chat":
-          if (userLobby && lobbies[userLobby].players) {
-
-            // Send the message to every user in the same lobby :
-            lobbies[userLobby].players.forEach((client) => {
-              if (client.ws.readyState === ws.OPEN) {
-                client.ws.send(JSON.stringify({type:"chat", pseudo, text }));
-              }
-            });
+          if (userLobby) {
+             await publishToLobby(userLobby, {type: "chat", pseudo, text});
           }
           break;
 
         case "create":
           // Create a lobby and send the lobbyId back.
-          const lobbyId = generateUniqueId(6,new Set(Object.keys(lobbies)));
-          lobbies[lobbyId] = {
-            "id": lobbyId,
-            "players": new Set(),
-            "articles": null,
-            "Startarticle": null,
-            "mined-articles": null,
-            "winners":null,
-            "isReady": false
+          // We need to generate a unique ID. We can't check `lobbies` object anymore.
+          // We'll trust generateUniqueId for now or check redis.
+          // Ideally we should check existence in Redis.
+          let lobbyId = generateUniqueId(6, new Set()); // Passing empty set, collisions unlikely but possible.
+          let attempts = 0;
+          while (await redisClient.exists(kLobby(lobbyId)) && attempts < 5) {
+             lobbyId = generateUniqueId(6, new Set());
+             attempts++;
           }
+
+          // Initial State
+          const initialState = {
+            id: lobbyId,
+            isReady: "false",
+            articles: "[]",
+            Startarticle: "[]",
+            winners: "[]"
+          };
+          
+          await redisClient.hSet(kLobby(lobbyId), initialState);
+          // Set expiry (e.g. 24 hours) to prevent garbage accumulation
+          await redisClient.expire(kLobby(lobbyId), 86400);
+
           fetchArticles()
-            .then((articles) => {
-              // Vérifier qu'il y a au moins un article
-              if (articles.length > 0) {
-                // Startarticle est une liste avec null puis le premier article
-                lobbies[lobbyId].Startarticle = [null, articles[0]];
+            .then(async (articles) => {
+                let startArticle = [null, null];
+                let gameArticles = [];
 
-                // Le reste des articles (sans le premier) va dans articles
-                lobbies[lobbyId].articles = articles.slice(1);
-              } else {
-                // Gérer le cas où il n'y a pas d'articles
-                lobbies[lobbyId].Startarticle = [null, null]; // ou [null] si vous préférez
-                lobbies[lobbyId].articles = [];
-              }
-              
-              console.log("Articles fetched for lobby " + lobbyId + 'Articles :' + lobbies[lobbyId].articles.length);
-              lobbies[lobbyId].isReady = true;
-
-              const readyPayload = JSON.stringify({type:"READY", pseudo:"SYSTEM", lobby: lobbyId, text:"ARTICLES_READY"});
-              lobbies[lobbyId].players.forEach((client) => {
-                if (client.ws.readyState === client.ws.OPEN) {
-                  client.ws.send(readyPayload);
+                if (articles.length > 0) {
+                    startArticle = [null, articles[0]];
+                    gameArticles = articles.slice(1);
                 }
-              });
+
+                console.log("Articles fetched for lobby " + lobbyId + ' Articles :' + gameArticles.length);
+                
+                // Update Redis
+                await redisClient.hSet(kLobby(lobbyId), {
+                    isReady: "true",
+                    articles: JSON.stringify(gameArticles),
+                    Startarticle: JSON.stringify(startArticle)
+                });
+
+                // Notify Players
+                await publishToLobby(lobbyId, {
+                    type: "READY", 
+                    pseudo: "SYSTEM", 
+                    lobby: lobbyId, 
+                    text: "ARTICLES_READY"
+                });
             })
-            .catch((error) => {
+            .catch(async (error) => {
               console.error("Error fetching articles for lobby", lobbyId, error);
-              lobbies[lobbyId].Startarticle = [null, null];
-              lobbies[lobbyId].articles = [];
-              lobbies[lobbyId].isReady = false;
-
-              const errorPayload = JSON.stringify({type:"READY", pseudo:"SYSTEM", lobby: lobbyId, text:"ARTICLES_ERROR"});
-              lobbies[lobbyId].players.forEach((client) => {
-                if (client.ws.readyState === client.ws.OPEN) {
-                  client.ws.send(errorPayload);
-                }
+              
+              await publishToLobby(lobbyId, {
+                  type: "READY", 
+                  pseudo: "SYSTEM", 
+                  lobby: lobbyId, 
+                  text: "ARTICLES_ERROR"
               });
             });
-          lobbies[lobbyId].winners = [];
-          console.log("Lobby created : ID : ",lobbyId);
 
-          // Réponse plus claire avec l'ID du lobby
+          console.log("Lobby created : ID : ", lobbyId);
+
+          // Reply specifically to the creator (ws)
           ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"Lobby " + lobbyId + " created."}));
 
-          collection.insertOne(lobbies[lobbyId]).then(r => {
-            console.log("Lobby created in DB : DB_ID : ", r.insertedId);
-          })
-              .catch(error => {
-                console.error("Error while inserting lobby : ", error);
-              });
+          // DB logging (optional/async)
+          collection.insertOne({id: lobbyId, createdAt: new Date()}).catch(e => console.error("DB Insert Error", e));
           break;
 
         case "lobby":
           switch (text) {
             case "JOIN":
-              // Check that the lobby exists :
-              if (lobbies[lobby]) {
+              // Check if lobby exists in Redis
+              const exists = await redisClient.exists(kLobby(lobby));
+              if (exists) {
                 const { type, lobby, pseudo, text, image } = JSON.parse(message);
                 userLobby = lobby;
                 userPseudo = pseudo;
                 userObj = {
-                  "ws":ws,
-                  "pseudo":pseudo,
-                  "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
+                  "ws": ws,
+                  "pseudo": pseudo,
+                  "image": typeof image !== "undefined" ? image : 2
                 };
 
+                // Add to local connections
+                addLocalConnection(userLobby, userObj);
 
-                // Add the player to the lobby and notify him that he can join (OK) :
-                lobbies[userLobby].players.add(userObj);
+                // Add to Redis Player Set (Stored as JSON string to keep metadata)
+                const playerJson = JSON.stringify({ pseudo: pseudo, image: userObj.image });
+                await redisClient.sAdd(kPlayers(userLobby), playerJson);
+                await redisClient.expire(kPlayers(userLobby), 86400);
 
+                // Send OK to user
                 ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
 
-                const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
-                  pseudo: player.pseudo,
-                  image: player.image
-                }));
+                // Get all players from Redis to broadcast list
+                const members = await redisClient.sMembers(kPlayers(userLobby));
+                const playersArray = members.map(m => JSON.parse(m));
 
-                lobbies[lobby].players.forEach((client) => {
-                  if (client.ws.readyState === client.ws.OPEN) {
-                    client.ws.send(JSON.stringify({
-                      type: "PLAYERS",
-                      pseudo: "SYSTEM",
-                      text: playersArray 
-                    }));
-                  }
-                });
-                
-                // Send the connexion message to every user in the same lobby :
-                lobbies[userLobby].players.forEach((client) => {
-                  if (client.ws.readyState === ws.OPEN) {
-                    const sys_text = pseudo + " joined the game.";
-                    client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
-                  }
-                });
-                var plrList = {$set: { players: playersArray }};
-                collection.updateOne({id : lobby}, plrList).then(r => {
-                  console.log("Player list updated in lobby : ", lobby);
-                })
-                    .catch(error => {
-                      console.error("Error when updating player list in lobby : ", error);
-                    });
-              } else {
-                // If lobby does not exist, notify him that he cannot join (KO) :
-                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
-              }
-
-              break;
-            case "CHECK":
-              // Return whether the lobby exists or not :
-              if (lobbies[lobby]) {
-                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
-              } else {
-                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
-              }
-              break;
-            case "QUIT":
-              if (lobbies[lobby]) {
-                const { type, lobby, pseudo, text, image } = JSON.parse(message);
-                userLobby = lobby;
-                userPseudo = pseudo;
-                userObj = {
-                  "ws":ws,
-                  "pseudo":pseudo,
-                  "image": typeof image !== "undefined" ? image : 2 // ← fallback à 0 si image non fournie
-                };
-                for (const player of lobbies[userLobby].players) {
-                  if (player.pseudo === pseudo) {
-                    lobbies[userLobby].players.delete(player);
-                    break;
-                  }
-                }
-                const playersArray = Array.from(lobbies[userLobby].players).map(player => ({
-                  pseudo: player.pseudo,
-                  image: player.image
-              }));
-              lobbies[lobby].players.forEach((client) => {
-                if (client.ws.readyState === client.ws.OPEN) {
-                  client.ws.send(JSON.stringify({
+                await publishToLobby(userLobby, {
                     type: "PLAYERS",
                     pseudo: "SYSTEM",
-                    text: playersArray 
-                  }));
-                }
-              });
-                lobbies[userLobby].players.forEach((client) => {
-                  if (client.ws.readyState === ws.OPEN) {
-                    const sys_text = pseudo + " quit the game.";
-                    client.ws.send(JSON.stringify({type:"chat-sys", pseudo:"SYSTEM", text:sys_text}));
-                  }
+                    text: playersArray
                 });
-                var plrLeave = {$set: { players: playersArray }};
-                collection.updateOne({id : lobby}, plrLeave).then(r => {
-                  console.log("Player list updated in lobby : ", lobby);
-                })
-                    .catch(error => {
-                      console.error("Error when updating player list in lobby : ", error);
-                    });
+                
+                // Chat notification
+                const sys_text = pseudo + " joined the game.";
+                await publishToLobby(userLobby, {type:"chat-sys", pseudo:"SYSTEM", text:sys_text});
+
+                // Update DB
+                collection.updateOne({id : lobby}, {$set: { players: playersArray }}).catch(e => {});
+
+              } else {
+                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
               }
-                break;
+              break;
+
+            case "CHECK":
+              if (await redisClient.exists(kLobby(lobby))) {
+                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"OK"}));
+              } else {
+                ws.send(JSON.stringify({type:"response-sys", pseudo:"SYSTEM", text:"KO"}));
+              }
+              break;
+
+            case "QUIT":
+              if (await redisClient.exists(kLobby(lobby))) {
+                const { type, lobby, pseudo, text, image } = JSON.parse(message);
+                userLobby = lobby;
+                userPseudo = pseudo;
+                userObj = {
+                  "ws": ws,
+                  "pseudo": pseudo,
+                  "image": typeof image !== "undefined" ? image : 2
+                };
+
+                // Remove from Redis
+                const playerJson = JSON.stringify({ pseudo: pseudo, image: userObj.image });
+                await redisClient.sRem(kPlayers(userLobby), playerJson);
+                
+                // Remove from local (will be handled by close, but good to be explicit if action is sent)
+                removeLocalConnection(userLobby, userObj);
+
+                // Broadcast new list
+                const members = await redisClient.sMembers(kPlayers(userLobby));
+                const playersArray = members.map(m => JSON.parse(m));
+
+                await publishToLobby(userLobby, {
+                    type: "PLAYERS",
+                    pseudo: "SYSTEM",
+                    text: playersArray
+                });
+
+                const sys_text = pseudo + " quit the game.";
+                await publishToLobby(userLobby, {type:"chat-sys", pseudo:"SYSTEM", text:sys_text});
+                
+                collection.updateOne({id : lobby}, {$set: { players: playersArray }}).catch(e => {});
+              }
+              break;
+
             case "START":
-                if (lobbies[lobby]) {
-                  if (!lobbies[lobby].isReady) {
+                if (await redisClient.exists(kLobby(lobby))) {
+                  const isReady = await redisClient.hGet(kLobby(lobby), 'isReady');
+                  
+                  if (isReady !== "true") {
                     ws.send(JSON.stringify({
                       type: "response-sys",
                       pseudo: "SYSTEM",
                       text: "Lobby not ready yet. Please wait for articles to load."
                     }));
-                    const waitMessage = JSON.stringify({
+                    await publishToLobby(lobby, {
                       type: "chat-sys",
                       pseudo: "SYSTEM",
                       text: "Cannot start the game. Articles are loading, try again in a second."
                     });
-                    lobbies[lobby].players.forEach((client) => {
-                      if (client.ws.readyState === client.ws.OPEN) {
-                        client.ws.send(waitMessage);
-                      }
-                    });
                     break;
                   }
                   
-                    // Envoyer un message à tous les joueurs du lobby
-                    lobbies[lobby].players.forEach((client) => {
-                        if (client.ws.readyState === client.ws.OPEN) {
-                            client.ws.send(JSON.stringify({
-                                type: "START",
-                                pseudo: "SYSTEM",
-                                lobby: lobby,
-                                text: lobbies[lobby].articles
-                            }));
-                        }
-                    });
-                    
-                    lobbies[lobby].players.forEach((client) => {
-                      if (client.ws.readyState === client.ws.OPEN) {
-                          client.ws.send(JSON.stringify({
-                              type: "STARTPAGE",
-                              pseudo: "SYSTEM",
-                              lobby: lobby,
-                              text: lobbies[lobby].Startarticle
-                          }));
-                      }
+                  const articlesStr = await redisClient.hGet(kLobby(lobby), 'articles');
+                  const startArticleStr = await redisClient.hGet(kLobby(lobby), 'Startarticle');
+                  
+                  const articles = JSON.parse(articlesStr || "[]");
+                  const startArticle = JSON.parse(startArticleStr || "[]");
+
+                  // START Message
+                  await publishToLobby(lobby, {
+                      type: "START",
+                      pseudo: "SYSTEM",
+                      lobby: lobby,
+                      text: articles
                   });
-                  var artList = {$set: { articles: lobbies[lobby].articles }};
-                  collection.updateOne({id : lobby}, artList).then(r => {
-                    console.log("Article list updated in lobby : ", lobby);
-                  })
-                      .catch(error => {
-                        console.error("Error when updating article list in lobby : ", error);
-                      });
+                    
+                  // STARTPAGE Message
+                  await publishToLobby(lobby, {
+                      type: "STARTPAGE",
+                      pseudo: "SYSTEM",
+                      lobby: lobby,
+                      text: startArticle
+                  });
 
+                  collection.updateOne({id : lobby}, {$set: { articles: articles }}).catch(e => {});
                 }
-
-                
                 break;
           }
           break;
+
         case "win":
           console.log("Win websocket");
-          if (lobbies[lobby]) {
-          if (!lobbies[lobby] || !Array.isArray(lobbies[lobby].winners)) {
-            console.error("Lobby or winners list is invalid");
-            return;
+          if (await redisClient.exists(kLobby(lobby))) {
+            const winnersStr = await redisClient.hGet(kLobby(lobby), 'winners');
+            let winners = JSON.parse(winnersStr || "[]");
+            
+            // Check if already won
+            const winnerSet = new Set(winners.map(w => w.pseudo));
+            
+            if (!winnerSet.has(pseudo)) {
+                const newWinner = {
+                    pseudo: pseudo,
+                    image: userObj?.image ?? 0,
+                    clicks: text
+                };
+                winners.push(newWinner);
+                
+                // Sort
+                winners.sort((a, b) => parseInt(a.clicks) - parseInt(b.clicks));
+                
+                // Save back to Redis
+                await redisClient.hSet(kLobby(lobby), 'winners', JSON.stringify(winners));
+
+                // Broadcast
+                await publishToLobby(lobby, {
+                    type: "WIN",
+                    pseudo: "SYSTEM",
+                    lobby: lobby,
+                    text: winners
+                });
+            }
           }
-          
-          
-          const winnerSet = new Set(lobbies[lobby].winners.map(w => w.pseudo));
-          
-          if (!winnerSet.has(pseudo)) {
-            lobbies[lobby].winners.push({
-              pseudo: pseudo,
-              image: userObj?.image ?? 0,
-              clicks: text
-            });
-          }
-          
-          lobbies[lobby].winners.sort((a, b) => parseInt(a.clicks) - parseInt(b.clicks));
-            lobbies[lobby].players.forEach((client) => {
-              if (client.ws.readyState === client.ws.OPEN) {
-                  client.ws.send(JSON.stringify({
-                      type: "WIN",
-                      pseudo: "SYSTEM",
-                      lobby: lobby,
-                      text: lobbies[lobby].winners
-                  }));
-              }
-          });
-        }
         break;
+
         default:
           console.log("Unknown message type : " + type + " from : " + pseudo + " : " + text );
       }
     } catch (error) {
-      console.error("Erreur de parsing JSON :", error);
+      console.error("Erreur de parsing JSON/Processing :", error);
     }
   });
 
-  ws.on("close", () => {
+  ws.on("close", async () => {
     console.log("❌ Client disconnected");
-    if (userLobby && lobbies[userLobby]) {
+    if (userLobby && userObj) {
+        
+      // Remove from Local
+      removeLocalConnection(userLobby, userObj);
+      
+      // Remove from Redis
+      // Note: We need the exact string to remove from Set. 
+      // This assumes pseudo/image didn't change.
+      const playerJson = JSON.stringify({ pseudo: userPseudo, image: userObj.image });
+      await redisClient.sRem(kPlayers(userLobby), playerJson);
+      
+      console.log("Removed player %s from lobby %d.", userPseudo, userLobby);
 
-      // Remove the deconnected user :
-      lobbies[userLobby].players.delete(userObj);
-      console.log("Removed player %s from lobby %d.",userObj.pseudo, userLobby);
-
-      // Send the deconnexion message to every user in the same lobby :
-      lobbies[userLobby].players.forEach((client) => {
-        if (client.ws.readyState === ws.OPEN) {
-          const sys_text = userPseudo + " left the game.";
-          client.ws.send(JSON.stringify({type: "chat-sys", pseudo:"SYSTEM", text:sys_text }));
-        }
-      });
-
-      // Delete empty lobbies :
-      if (lobbies[userLobby].players.size === 0) {
-        console.log("No more players in lobby %d -> deleting.",userLobby);
-        delete lobbies[userLobby];
+      // Notification
+      const sys_text = userPseudo + " left the game.";
+      await publishToLobby(userLobby, {type: "chat-sys", pseudo:"SYSTEM", text:sys_text });
+      
+      // Check if lobby is empty (global check)
+      const count = await redisClient.sCard(kPlayers(userLobby));
+      if (count === 0) {
+        console.log("No more players in lobby %s -> deleting data.", userLobby);
+        await redisClient.del(kLobby(userLobby));
+        await redisClient.del(kPlayers(userLobby));
       }
     }
   });

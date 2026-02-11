@@ -35,6 +35,21 @@ if ($pushOutput -match 'Refer to this image as "([^"]+)"') {
     exit 1
 }
 
+# Load .env variables
+$envParams = @{}
+if (Test-Path ".env") {
+    Get-Content ".env" | ForEach-Object {
+        if ($_ -match "^\s*([^#=]+)\s*=\s*(.*)") {
+            $name = $matches[1].Trim()
+            $value = $matches[2].Trim()
+            $envParams[$name] = $value
+        }
+    }
+} else {
+    Write-Host "Error: .env file not found in root directory!" -ForegroundColor Red
+    exit 1
+}
+
 # 3. Create Deployment
 Write-Host "Creating Deployment..." -ForegroundColor Yellow
 
@@ -45,7 +60,11 @@ $containerConfig = @{
             command = @("node", "websocket.js")
             environment = @{
                 "WS_PORT" = "3002"
-                "MONGO_URI" = "mongodb+srv://jules:UsNHdFnXGR8It1i4@cluster.mongodb.net/"
+                "MONGO_URI" = $envParams["MONGO_URI"]
+                "REDIS_USERNAME" = $envParams["REDIS_USERNAME"]
+                "REDIS_PASSWORD" = $envParams["REDIS_PASSWORD"]
+                "REDIS_HOST" = $envParams["REDIS_HOST"]
+                "REDIS_PORT" = $envParams["REDIS_PORT"]
             }
             ports = @{
                 "3002" = "HTTP"

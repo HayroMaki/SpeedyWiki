@@ -6,6 +6,22 @@ Ce guide explique comment déployer l'application sur AWS en utilisant **AWS App
 1.  Un compte AWS actif.
 2.  [AWS CLI](https://aws.amazon.com/cli/) installé et configuré (`aws configure`).
 3.  [Docker](https://www.docker.com/) installé.
+4.  Un fichier `.env` à la racine du projet contenant vos secrets (voir section Configuration).
+
+---
+
+## Configuration (.env)
+
+Créez un fichier `.env` à la racine du projet avec les valeurs suivantes :
+```env
+MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/
+REDIS_USERNAME=speedywiki
+REDIS_PASSWORD=votre_mot_de_passe_redis
+REDIS_HOST=votre_host_redis
+REDIS_PORT=18676
+WS_PORT=3002
+```
+*Note : Ce fichier est ignoré par git pour la sécurité.*
 
 ---
 

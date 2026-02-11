@@ -1,2 +1,4 @@
 package.json
 trust-policy.json
+.env
+lightsail-deploy-config.json
