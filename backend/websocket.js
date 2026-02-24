@@ -130,9 +130,16 @@ const collection = mongoose.connection.useDb("speedywiki").collection("Lobbies")
 const kLobby = (id) => `lobby:${id}`;
 const kPlayers = (id) => `lobby:${id}:players`;
 
+function heartbeat() {
+  this.isAlive = true;
+}
+
 // Setup websocket :
 websocket.on("connection", (ws) => {
   console.log("✅ Client connected");
+  ws.isAlive = true;
+  ws.on('pong', heartbeat);
+
   let userLobby = null;
   let userPseudo = null;
   let userObj = null;
@@ -426,6 +433,19 @@ websocket.on("connection", (ws) => {
       const count = await redisClient.sCard(kPlayers(userLobby));
       if (count === 0) {
         console.log("No more players in lobby %s -> deleting data.", userLobby);
+const interval = setInterval(function ping() {
+  websocket.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 25000);
+
+websocket.on('close', function close() {
+  clearInterval(interval);
+});
+
         await redisClient.del(kLobby(userLobby));
         await redisClient.del(kPlayers(userLobby));
       }
