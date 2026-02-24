@@ -1,0 +1,34 @@
+services:
+  proxy:
+    build: ./backend
+    command: ["node", "server.js"]
+    environment:
+      - PORT=${PORT}
+      - PUBLIC_URL=${PUBLIC_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - WS_PORT=${WS_PORT}
+    ports:
+      - "3001:3001"
+
+  websocket:
+    build: ./backend
+    command: ["node", "websocket.js"]
+    environment:
+      - WS_PORT=${WS_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    ports:
+      - "3002:3002"
+    depends_on:
+      - proxy
+
+  frontend:
+    build: ./site
+    ports:
+      - "4173:80"
+    depends_on:
+      - proxy
+      - websocket
