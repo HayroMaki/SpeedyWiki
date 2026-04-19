@@ -42,8 +42,6 @@ Ce document retrace la migration complète de SpeedyWiki vers AWS, incluant les 
 │ │  eu-west-1                               │ │
 │ └──────────────────────────────────────────┘ │
 └──────────────────────────────────────────────┘
-     │               │                │
-     ├───────────────┴────────────────┤
      │                                │
 ┌────▼─────┐                  ┌───────▼────────┐
 │ MongoDB  │                  │ Redis Cloud    │
